@@ -1,0 +1,128 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/products.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/contact.css">
+<link rel="stylesheet" href="/static/css/countries/demo.css">
+<link rel="stylesheet" href="/static/css/countries/intlTelInput.css">
+<link rel="stylesheet" href="/static/css/countries/intlTelInput.min.css">
+<title class="text">Noble paints | Contact</title>
+<style>
+    header{
+        background: url("/static/images/header08.jpg");
+    }
+</style>
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav>
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
+                            <span class="text">Home</span>
+                        </a>
+                        <span class="text">Contact</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1><span class="text-bg-red text">Contact</span></h1>
+    </div>
+</header>
+<section class="contact-us-section">
+    <div class="container2">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="contact-us-wrap">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane show active" id="Asia" role="tabpanel" aria-labelledby="Asia-tab">
+                                
+                                <div class="countryrow">
+                                    <div class="countryname"><img src="/static/images/icons/0ea21280-9eb1-4974-9914-0d508b0b6838.png" alt=""><span class="text">Saudi Arabia</span></div>
+                                    <div class="stores" style="display: none;">
+                                        <ul>
+                                            <li>
+                                                <div class="tag text">Main</div>
+                                                <h4 class="text">Noble Paint</h4>
+                                                    <span class="contact"><span class="text">Tel</span>: <span style="direction: ltr;display: inline-block;"><a href="tel:+966114477704">+966114477704</a></span></span>
+                                                    <p class=""><a href="mailto:info@noblepaints.com.sa"><i class="fa fa-envelope" style="margin:5px;font-size:16px"></i>info@noblepaints.com.sa</a></p>
+
+                                                    <a href="https://www.google.com/maps/dir/30.113792,31.3688064/Noble+Paints/@27.0914568,30.0525038,5z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3e2f094c27f7d81d:0xe844d4bf911568a8!2m2!1d46.7737938!2d24.6218263?hl=en" class="maplink text" target="_blank">Map it </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <form class="tab-content">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                          <input type="text" class="form-control text10" id="inputname" placeholder="YourName">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-sm-12">
+                          <input type="text" class="form-control text10" id="inputcomp" placeholder="Company Name">
+                        </div>
+                      </div>
+                    <div class="form-group row">
+                      <div class="col-sm-12">
+                        <input type="email" class="form-control text10" id="inputemail" placeholder="Email Address">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <div class="col-sm-12">
+                        <input type="number" class="form-control text10" id="inputphone" placeholder="Mobile Number">
+                      </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                          <select name="" id="inputtype" class="form-control" style="height: fit-content;">
+                            <option value=""></option>
+                            <option value="employment" class="text10" selected="">Employment</option>
+                            <option value="Marketing" class="text10">Marketing</option>
+                            <option value="Local sales" class="text10">Local sales</option>
+                            <option value="Export sales" class="text10">Export sales</option>
+                            <option value="Technical Support" class="text10">Technical Support</option>
+                          </select>
+                        </div>
+                      </div>
+                    
+                      <div class="form-group row">
+                        <div class="col-sm-12">
+                            <textarea class="form-control" id="inputmessage" cols="30" rows="10"></textarea>
+                        </div>
+                      </div>
+
+                    <div class="form-group row">
+                      <div class="col-sm-12">
+                        <button type="submit" id="submit" class="btn btn-primary text10" style="width:100%">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script src="/static/js/countries/intlTelInput.js"></script>
+<script src="/static/js/languages/contact.js"></script>
+<script src="/static/js/contact.js"></script>
+{%endblock%}

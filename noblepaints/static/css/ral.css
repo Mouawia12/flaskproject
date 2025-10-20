@@ -1,0 +1,64 @@
+.colors li {
+    width: 25%;
+    float: left;
+    padding: 5px 0 10px 15px;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+
+@media screen and (max-width: 1000px){
+    .colors li {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 500px){
+    .colors li {
+        width: 100%;
+    }
+}
+
+ul {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color .2s ease,color .2s ease;
+}
+
+h3{
+    position: relative;
+    font-size: 22px;
+    line-height: 26px;
+    margin: 30px 0 20px 0;
+}
+
+.colors a.reverse {
+    color: rgba(0,0,0,1.0);
+}
+.colors a {
+    width: 100%;
+    height: 60px;
+    display: block;
+    font-weight: normal;
+    line-height: 60px;
+    text-align: center;
+    white-space: nowrap;
+    color: rgba(255,255,255,1.0);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+}
+
+.colors a > span{
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    top: calc(100% + 5px);
+    line-height: 21px;
+    width: 100%;
+    color: black;
+}

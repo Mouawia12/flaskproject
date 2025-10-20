@@ -1,0 +1,26 @@
+# ===== Flask & Python =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+instance/
+*.sqlite3
+
+# ===== Virtual Environment =====
+venv/
+env/
+ENV/
+
+# ===== OS & Editor Files =====
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# ===== Build or Cache =====
+*.egg-info/
+*.egg/
+dist/
+build/
+.cache/

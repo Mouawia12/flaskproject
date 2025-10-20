@@ -1,0 +1,377 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/products.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/about.css">
+<title class="text">Noble paints | About Us</title>
+<style>
+    header{
+        background: url("/static/images/header11.jpg");
+    }
+</style>
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav>
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
+                            <span class="text"></span>
+                        </a>
+                        <span class="text">About Us</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1 class="text"><span class="text-bg-red text">About Us</span></h1>
+    </div>
+</header>
+<section id="moreInfo" class="container2">
+    <div>
+        <div id="titles" class="swiper mySwiper2" style = "height: fit-content;">
+            <div class="swiper-wrapper ">
+                <div class="swiper-slide" id="swipsl1">
+                    <span class="text">About Us</span><img src="/static/images/about-on.png">
+                </div>
+                <div class="swiper-slide" id="swipsl2">
+                    <span class="text">Our Goals</span><img src="/static/images/target.png">
+                </div>
+                <div class="swiper-slide" id="swipsl3">
+                    <span class="text">Our Vision</span><img src="/static/images/view.png">
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+        <div id="nab">
+        <div class="list" id="list1" style="z-index:5;opacity:1">
+            <h3 class="text">
+                Noble Paints was established in 1991 AD, and in a short period of time, and as a result of the vision and dedication of the founders, the efforts have succeeded in laying strong grounds for a leading company in the paint industry in GCC countries and the Middle East in general. Hence, the company became a leading company in manufacturing and developing innovative high quality and eco-friendly paints designed to meet the requirements and needs of a wide range of clients including industrial, commercial, and individuals
+            </h3>
+        </div>
+        <div class="list" id="list2" style="z-index:-5;opacity:0">
+            <h3 class="text">Over the next five years, we aim to become a leading force in paints & coatings industry on the premise of adopting a specific sector (Segment by sector) marketing strategy to develop Saudi and regional markets. The brand equity & the reputation we have built over the last four decades drives us further to the future in ensuring our defined goals & objectives.The company's success stems from a deeper understanding of local market trends, varied customers' needs fueled with exceptional customer service that enables us to meet each paints & coatings requirement. 
+                <br>
+                We respect the environment and in order to make the workplace & our planet a healthier and safer place we go beyond our ways to complying with global legislation on health and safety issues.
+             </h3>
+        </div>
+        <div class="list" id="list3" style="z-index:-5;opacity:0">
+            <h3 class="text">The Vision of Noble paints is to become a global leader in innovative painting, coating, and construction solution, and the most reliable partner to customers in the market.</h3>
+        </div>
+        </div>
+        
+    </div>
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script>
+
+function setAboutCont(){
+    document.querySelector('#titles').querySelectorAll('.swiper-slide')[0].classList.add('colored')
+            let n = [...document.querySelectorAll('.list')][0].clientHeight
+            document.querySelector('#moreInfo').querySelector('#nab').style.height = `${n+8}px`
+            translate(document.querySelectorAll('.list'))
+}
+
+(function() {
+    var state = document.readyState;
+    if(state === 'interactive' || state === 'complete') {
+        setAboutCont()
+        setSwiper()
+    }
+    else setTimeout(arguments.callee, 100);
+})();
+
+
+window.addEventListener('resize',()=>{
+    setSwiper()
+    setAboutCont()
+})
+    
+localStorage.setItem('slideInd',0)
+/******************************************/
+
+    document.querySelector('#titles').querySelectorAll('.swiper-slide').forEach((e,i)=>{
+        e.addEventListener('click',(evt)=>{
+            localStorage.setItem('slideInd',i)
+            document.querySelector('#titles').querySelectorAll('.swiper-slide').forEach((e,i)=>{
+                e.style.color=''
+                e.querySelector('img').src = e.querySelector('img').src.replace('-on','')
+            })
+            e.style.color='var(--sec)'
+            e.querySelector('img').src = e.querySelector('img').src.replace('.png','-on.png')
+            document.querySelector(`#list${i+1}`).style.opacity = '0'
+            document.querySelectorAll('.list').forEach(elm=>{
+                if(elm!=document.querySelector(`#list${i+1}`)){
+                    elm.style.opacity='0'
+                    elm.style.transform='translateY(100%)'
+                    elm.style.zIndex='-5'
+                }
+            })
+            document.querySelector('#titles').querySelectorAll('.swiper-slide').forEach(e=>{
+                e.classList.remove('colored')
+            })
+            document.querySelector('#titles').querySelectorAll('.swiper-slide')[i].classList.add('colored')
+            document.querySelector(`#list${i+1}`).style.opacity='1'
+            //document.querySelector(`#list${i+1}`).style.transform=''
+            document.querySelector(`#list${i+1}`).style.zIndex='5'
+            translate(document.querySelectorAll('.list'));
+            let n = [...document.querySelectorAll('.list')].filter((e,i)=>i==localStorage.getItem('slideInd'))[0].clientHeight
+            
+            document.querySelector('#moreInfo').querySelector('#nab').style.height = `${n+8}px`
+        })
+    })
+
+    /********/
+    function chechHidden2(x){
+        return x.style.opacity == '0'
+    }
+    function translate(j){
+  if(chechHidden2(j[0])==false&&localStorage.getItem('slideInd') == 0){
+      j[0].style.transform = ``
+  }
+  if(chechHidden2(j[1])==false &&localStorage.getItem('slideInd') == 1){
+    j[1].style.transform = `translateY(-${j[0].clientHeight}px)`
+  }
+  if(chechHidden2(j[2])==false &&localStorage.getItem('slideInd') == 2){
+    j[2].style.transform = `translateY(-${(j[0].clientHeight+j[1].clientHeight)}px)`
+  }
+}
+
+/**********************************/
+
+var swiper1 = new Swiper("#swiper1", {
+    effect: "fade",
+    slidesPerView:1,
+    autoplay: {
+        delay: 6000,
+        disableOnInteraction: false,
+        observer: true,
+        observeParents: true
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+});
+
+var swiper2 = new Swiper("#swiper2", {
+    effect: "fade",
+    slidesPerView:1,
+    autoplay: {
+        delay: 6000,
+        disableOnInteraction: false,
+        observer: true,
+        observeParents: true
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+});
+
+var swiper3 = new Swiper("#swiper3", {
+    effect: "fade",
+    slidesPerView:1,
+    autoplay: {
+        delay: 6000,
+        disableOnInteraction: false,
+        observer: true,
+        observeParents: true
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+});
+
+function setSwiper(){
+    if(window.innerWidth>=1215){
+            var swiper = new Swiper(".mySwiper1", {
+                slidesPerView: 3,
+                spaceBetween: 30,
+                freeMode: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+            });
+        }
+        else if(window.innerWidth<1215&&window.innerWidth>=750){
+            var swiper = new Swiper(".mySwiper1", {
+                slidesPerView: 3,
+                spaceBetween: 30,
+                freeMode: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+            });
+        }
+        else if(window.innerWidth<750&&window.innerWidth>=500){
+            var swiper = new Swiper(".mySwiper1", {
+                slidesPerView: 2,
+                spaceBetween: 30,
+                freeMode: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+            });
+        }
+        else{
+            var swiper = new Swiper(".mySwiper1", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                freeMode: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+            });
+        }
+        /*********************************/
+        if(window.innerWidth>1420){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 3,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop:false,
+                loopFillGroupWithBlank: true,
+                pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+        else if(window.innerWidth>=1215&&window.innerWidth<1420){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 3,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop:false,
+                loopFillGroupWithBlank: true,
+                pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+        else if(window.innerWidth<1215&&window.innerWidth>=750){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 3,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop:false,
+                loopFillGroupWithBlank: true,
+                pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+        else if(window.innerWidth<750&&window.innerWidth>=650){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 2,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop:false,
+                loopFillGroupWithBlank: true,
+                pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+        else if(window.innerWidth<650&&window.innerWidth>=436){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 1,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop:false,
+                loopFillGroupWithBlank: true,
+                pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+        else if(window.innerWidth<436){
+            var swiper = new Swiper(".mySwiper2", {
+                updateOnWindowResize:false,
+                slidesPerView: 1,
+                spaceBetween: 10,
+                slidesPerGroup: 1,
+                loop: false,
+               pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                },
+                navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+                },
+            });
+        }
+}
+
+window.addEventListener('resize',()=>{
+    let n = [...document.querySelectorAll('.list')].filter((e,i)=>i==localStorage.getItem('slideInd'))[0].clientHeight
+    
+    document.querySelector('#moreInfo').querySelector('#nab').style.height = `${n+8}px`
+    //location.reload()
+})
+
+window.addEventListener('DOMContentLoaded', function() { 
+    setTimeout(()=>{
+        let n = [...document.querySelectorAll('.list')].filter((e,i)=>i==localStorage.getItem('slideInd'))[0].scrollHeight
+        document.querySelector('#moreInfo').querySelector('#nab').style.height = `${n+8}px`
+    },1000)
+});
+
+    if(localStorage.getItem('langPref')=='ar')
+        document.querySelector('header').querySelector('h1').innerHTML = 'من نحن'
+    else
+        document.querySelector('header').querySelector('h1').innerHTML = 'About Us'
+</script>
+<script src="/static/js/languages/about.js"></script>
+<script src="/static/js/about.js"></script>
+{%endblock%}

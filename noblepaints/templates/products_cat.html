@@ -1,0 +1,175 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/products.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/product_cat.css">
+<title>Noble paints | products</title>
+<style>
+    header{
+        background: url("{{header}}");
+    }
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage">
+    <div class="container2">
+        <h1 class="text"><span class="text-bg-red">{{title}}</span></h1>
+    </div>
+</header>
+<section class="paintspart" id="productsCategories" style="display: flex;">
+    <div class="lists">
+        <div class="swiper mySwiper" id="swiper1">
+            <div class="swiper-wrapper" id="">
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories01.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/palitr-icon.png" alt=""></div>
+                        <h4>Decorative<br>Interior Paints</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories02.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/calculator-icon.png" alt=""></div>
+                        <h4>Decorative Interior<br>Trust Hygienic</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories03.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Decorative<br>Exterior</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories04.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Automotive<br>Paint</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories05.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Industrial<br>Coatings</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories06.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Protective<br>Paints</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories07.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Wood<br>Stain</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories08.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Fire Intumescent<br>Paints</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories09.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Floor Coating <br>&Road Marking</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories10.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Powder<br>Coatings</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories11.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Adhesives</h4>
+                    </div>
+                </div>
+                <div class="swiper-slide paintbox">
+                    <div class="imgbox">
+                        <img src="/static/images/products_categories12.png" alt="">
+                    </div>
+                    <div class="details">
+                        <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
+                        <h4>Thinners</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+<div class="gray-bg-cus" id="prodsShowContainer">
+    <div class="container2 productsShow2">
+        <div class="swiper mySwiper" id="swiper2">
+            <div class="swiper-wrapper" id="gamesList_content2">
+                {% for x in items %}
+                <div class='gamesList_content_div2 adventure popular all swiper-slide swiper-slide5'>
+                    <img src="/static/images/prod01.png">
+                    <div>
+                        <h2 style="color:#2c2c2c;height: 59px;">{{x.name}}</h2>
+                        <span>{{x.desc}}</span>
+                    </div>
+                    <div>
+                        <a href="/product/{{x.id}}" style="color:inherit;width:100%"><span style="width:100%" class="btn btn-success btn-block btn2 btn2radius-big btn2-width text">Learn More</span></a>
+                    </div>
+                    <span style="background-image:url('static/images/prod01.png')"></span>
+                </div>  
+                {% endfor %}  
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+            <a class="btn" id="Go_Product" style="width: 230px;" href="/products/">Go to products page</a>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/languages/products_cat.js"></script>
+<script src="/static/js/products_cat.js"></script>
+{%endblock%}

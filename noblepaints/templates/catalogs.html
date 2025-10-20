@@ -1,0 +1,562 @@
+{% extends 'sec.html' %}
+{%block head%}
+<!-- Preload critical CSS -->
+<link rel="preload" href="/static/css/products.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/static/css/products.css"></noscript>
+<link rel="preload" href="/static/css/props.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+<link rel="stylesheet" href="../static/css2/nicepage.css" media="screen">
+<link rel="stylesheet" href="../static/css2/CATALOGS.css" media="screen">
+<script class="u-script" type="text/javascript" src="../static/js/jquery.js"
+    defer></script>
+<script class="u-script" type="text/javascript"
+    src="../static/js/nicepage.js"
+    defer></script>
+<noscript><link rel="stylesheet" href="/static/css/props.css"></noscript>
+<link rel="stylesheet" href="/static/css/catalogs.css">
+
+<!-- Load external resources efficiently -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://netdna.bootstrapcdn.com">
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"></noscript>
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css"
+    rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link
+        href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css"
+        rel="stylesheet"></noscript>
+
+<title class="text">Noble paints | Catalogs</title>
+<style>
+    header{
+        background: url("/static/images/header12.jpg");
+        background-size: cover;
+        background-position: center;
+    }
+    /* Fix lazy loading transitions */
+    .catalog-item img {
+        transition: opacity 0.3s ease;
+        opacity: 1;
+    }
+    .catalog-item img[loading="lazy"]:not(.loaded) {
+        opacity: 0.3;
+    }
+    .catalog-item img.loaded {
+        opacity: 1;
+    }
+    /* Loading states */
+    .catalog-wrap {
+        min-height: 400px;
+        position: relative;
+    }
+    .loading-spinner {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    /* Optimize country dropdown */
+    .select-wrap select {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage medium">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav>
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false"
+                                data-prefix="fal" data-icon="home-alt"
+                                role="img" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 576 512"
+                                class="svg-inline--fa fa-home-alt fa-w-18"><path
+                                    fill="currentColor"
+                                    d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z"
+                                    class></path></svg>
+                            <span class="text">Catalogs</span>
+                        </a>
+                        <span class="text">Catalogs</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1 class="text"><span class="text-bg-red text">Catalogs</span></h1>
+    </div>
+</header>
+<section class="u-clearfix u-section-2" id="block-2">
+    <div
+        class="u-clearfix u-sheet u-valign-bottom-xl u-valign-middle-lg u-valign-middle-md u-valign-middle-sm u-valign-middle-xs u-sheet-1">
+        <div class="u-expanded-width u-layout-horizontal u-list u-list-1">
+            <div class="u-repeater u-repeater-1">
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-1">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-1">
+                            <div
+                                class="u-container-layout u-container-layout-2">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-1"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.59_9da5bf29.jpg"
+                                    alt data-image-width="451"
+                                    data-image-height="643">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-color-var u-text-default u-text-1">
+                                    Automotive Paint<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleAutomativePaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-1">
+                                    View </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-3">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-2">
+                            <div
+                                class="u-container-layout u-container-layout-4">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-2"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.58_626afbf3.jpg"
+                                    alt data-image-width="456"
+                                    data-image-height="643">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-2">
+                                    Emulsions<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleEmulsionsDecorativePaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-2">
+                                    View </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-5">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-3">
+                            <div
+                                class="u-container-layout u-container-layout-6">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-3"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.59_2c7bba5a.jpg"
+                                    alt data-image-width="453"
+                                    data-image-height="640">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-3">
+                                    Flurescent Paint<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleFlurescentPaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-3">
+                                    View </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-7">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-4">
+                            <div
+                                class="u-container-layout u-container-layout-8">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-4"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.59_23a40785.jpg"
+                                    alt data-image-width="453"
+                                    data-image-height="642">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-4">
+                                    Hammer Finish<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleHammerFinishPaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-4">View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-9">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-5">
+                            <div
+                                class="u-container-layout u-container-layout-10">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-5"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.57_2b1d51a9.jpg"
+                                    alt data-image-width="453"
+                                    data-image-height="641">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-5">
+                                    Wood Stain<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleMarineCoatings_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-5">View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-11">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-6">
+                            <div
+                                class="u-container-layout u-container-layout-12">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-6"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.52_3bc8be75.jpg"
+                                    alt data-image-width="450"
+                                    data-image-height="640">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-6">
+                                    Floor Coating<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleFloorPaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-6">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-13">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-7">
+                            <div
+                                class="u-container-layout u-container-layout-14">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-7"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.54_660afd04.jpg"
+                                    alt data-image-width="454"
+                                    data-image-height="643">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-7">
+                                    MMA Cold Plastic<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleMarineCoatings_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-7">View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-15">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-8">
+                            <div
+                                class="u-container-layout u-container-layout-16">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-8"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.55_814d0d99.jpg"
+                                    alt data-image-width="454"
+                                    data-image-height="643">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-8">
+                                    Powder Coating<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NoblePowderCoating_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-8">View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-17">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-9">
+                            <div
+                                class="u-container-layout u-container-layout-18">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-9"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.55_d62140f1.jpg"
+                                    alt data-image-width="452"
+                                    data-image-height="637">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-9">
+                                    Noble NextGen FBF Rebar Coating<br>
+                                </h6>
+                                <a
+                                    href="../static/files/NobleRabberCoatings_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-9">View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-19">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-10">
+                            <div
+                                class="u-container-layout u-container-layout-20">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-10"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.57_45a29c4e.jpg"
+                                    alt data-image-width="451"
+                                    data-image-height="644">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-10">
+                                    Ral Colors</h6>
+                                <a
+                                    href="../static/files/NobleRALColor_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-10">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-21">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-11">
+                            <div
+                                class="u-container-layout u-container-layout-22">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-11"
+                                    src="../static/images/download7.png" alt
+                                    data-image-width="451"
+                                    data-image-height="642">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-11">
+                                    Colors Card Wood &amp; Metal</h6>
+                                <a
+                                    href="../static/files/Noble-Synthatic-Enamel-N.C-Paints2025_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-11">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-23">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-12">
+                            <div
+                                class="u-container-layout u-container-layout-24">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-12"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.55_9beaa55c.jpg"
+                                    alt data-image-width="453"
+                                    data-image-height="644">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-12">
+                                    Intumescent Paint &amp; Fire Retardant
+                                    Paint</h6>
+                                <a
+                                    href="../static/files/NobleFireRetardantandIntumescentPaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-12">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-25">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-13">
+                            <div
+                                class="u-container-layout u-container-layout-26">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-13"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.56_8e99217d.jpg"
+                                    alt data-image-width="453"
+                                    data-image-height="640">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-13">
+                                    Noble Trust Hygienic</h6>
+                                <a
+                                    href="../static/files/NobleTrustHyginicPaints_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-13">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-27">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-14">
+                            <div
+                                class="u-container-layout u-container-layout-28">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-14"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.53_349cfce1.jpg"
+                                    alt data-image-width="454"
+                                    data-image-height="642">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-14">
+                                    Graffio Decor (Textured Coating)</h6>
+                                <a
+                                    href="../static/files/NobleProfileGraffioDecorTexturedCoatings_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-14">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="u-container-style u-list-item u-repeater-item">
+                    <div
+                        class="u-container-layout u-similar-container u-valign-top-lg u-valign-top-md u-valign-top-sm u-valign-top-xs u-container-layout-29">
+                        <div
+                            class="u-border-1 u-border-grey-75 u-container-style u-group u-radius u-shape-round u-white u-group-15">
+                            <div
+                                class="u-container-layout u-container-layout-30">
+                                <img
+                                    class="u-expanded-width u-image u-image-contain u-image-round u-radius u-image-15"
+                                    src="../static/images/WhatsAppImage2025-10-07at21.48.58_8058aff9.jpg"
+                                    alt data-image-width="451"
+                                    data-image-height="643">
+                                <h6
+                                    class="u-align-center u-custom-font u-text u-text-default u-text-15">
+                                    Noble Water Proofing</h6>
+                                <a
+                                    href="../static/files/NobleWaterProofing_compressed.pdf"
+                                    class="u-btn u-btn-round u-button-style u-custom-color-3 u-file-link u-hover-custom-color-12 u-hover-feature u-radius u-btn-15">
+                                    View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a
+                class="u-absolute-vcenter u-gallery-nav u-gallery-nav-prev u-grey-70 u-icon-circle u-opacity u-opacity-70 u-spacing-10 u-text-white u-gallery-nav-1"
+                href="#" role="button"><span aria-hidden="true">
+                    <svg viewBox="0 0 451.847 451.847"><path
+                            d="M97.141,225.92c0-8.095,3.091-16.192,9.259-22.366L300.689,9.27c12.359-12.359,32.397-12.359,44.751,0
+c12.354,12.354,12.354,32.388,0,44.748L173.525,225.92l171.903,171.909c12.354,12.354,12.354,32.391,0,44.744
+c-12.354,12.365-32.386,12.365-44.745,0l-194.29-194.281C100.226,242.115,97.141,234.018,97.141,225.92z"></path></svg></span><span
+                    class="sr-only">
+                    <svg viewBox="0 0 451.847 451.847"><path
+                            d="M97.141,225.92c0-8.095,3.091-16.192,9.259-22.366L300.689,9.27c12.359-12.359,32.397-12.359,44.751,0
+c12.354,12.354,12.354,32.388,0,44.748L173.525,225.92l171.903,171.909c12.354,12.354,12.354,32.391,0,44.744
+c-12.354,12.365-32.386,12.365-44.745,0l-194.29-194.281C100.226,242.115,97.141,234.018,97.141,225.92z"></path></svg></span>
+            </a>
+            <a
+                class="u-absolute-vcenter u-gallery-nav u-gallery-nav-next u-grey-70 u-icon-circle u-opacity u-opacity-70 u-spacing-10 u-text-white u-gallery-nav-2"
+                href="#" role="button"><span aria-hidden="true">
+                    <svg viewBox="0 0 451.846 451.847"><path
+                            d="M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744
+L278.318,225.92L106.409,54.017c-12.354-12.359-12.354-32.394,0-44.748c12.354-12.359,32.391-12.359,44.75,0l194.287,194.284
+c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,248.292z"></path></svg></span><span
+                    class="sr-only">
+                    <svg viewBox="0 0 451.846 451.847"><path
+                            d="M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744
+L278.318,225.92L106.409,54.017c-12.354-12.359-12.354-32.394,0-44.748c12.354-12.359,32.391-12.359,44.75,0l194.287,194.284
+c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,248.292z"></path></svg></span>
+            </a>
+        </div>
+    </div>
+
+</section>
+
+<!-- Add loading spinner -->
+<div class="loading-spinner" id="loadingSpinner"></div>
+
+<!-- Defer non-critical JavaScript for better performance -->
+<script src="/static/js/languages/catalogs.js" defer></script>
+<script src="/static/js/catalogs.js" defer></script>
+
+<!-- Enhanced image loading optimization and loading states -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Optimize image loading with better transitions
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+        if (img.complete) {
+            img.classList.add('loaded');
+        } else {
+            img.addEventListener('load', function() {
+                this.classList.add('loaded');
+            });
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                console.warn('Failed to load image:', this.src);
+            });
+        }
+    });
+    
+    // Add loading states for navigation
+    const pagination = document.querySelectorAll('.page-link');
+    const spinner = document.getElementById('loadingSpinner');
+    
+    pagination.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!this.parentElement.classList.contains('disabled') && !this.parentElement.classList.contains('active')) {
+                spinner.style.display = 'block';
+            }
+        });
+    });
+    
+    // Form submission loading states
+    const searchBtn = document.getElementById('Searchbtn');
+    const selectCountries = document.getElementById('selectCountries');
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function() {
+            spinner.style.display = 'block';
+        });
+    }
+    
+    if (selectCountries) {
+        selectCountries.addEventListener('change', function() {
+            spinner.style.display = 'block';
+        });
+    }
+    
+    // Hide spinner when page fully loaded
+    window.addEventListener('load', function() {
+        spinner.style.display = 'none';
+    });
+});
+</script>
+{%endblock%}

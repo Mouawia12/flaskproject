@@ -1,0 +1,15 @@
+flask
+flask-sqlalchemy
+flask-marshmallow
+marshmallow-sqlalchemy
+itsdangerous
+Flask-HTTPAuth
+email_validator
+flask_bcrypt
+flask_login
+flask-mail
+flask-wtf
+itsdangerous==2.0.1
+Authlib==0.14.3
+requests
+urllib3

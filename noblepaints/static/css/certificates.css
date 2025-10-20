@@ -1,0 +1,139 @@
+#topics-toggle{
+    display: flex;
+    padding: 30px 0;
+    justify-content: center;
+    gap:30px;
+    white-space: nowrap;
+    overflow: scroll;
+    overflow: hidden;
+}
+
+#topics-toggle > div{
+    padding:12px 20px;
+}
+
+
+#topics-toggle > div.activeTopic{
+    border-radius: 500px;
+    color:white;
+    background-color: var(--red);
+}
+
+/**********************************************************/
+
+#certificates{
+    display: flex;
+    gap:30px;
+    flex-wrap: wrap;
+    padding: 1.1em 0 3.3rem 0;
+}
+
+#certificates > div{
+    border: 1px solid #e7e8e9;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: calc(33% - 20px);
+    transition: 0.6s;
+    cursor: pointer;
+}
+
+#certificates > div:hover{
+    box-shadow: 0 8px 16px 0 rgb(16 25 40 / 10%);
+}
+
+#certificates > div > div:first-child{
+    max-height: 220px;
+    overflow: hidden;
+}
+
+#certificates > div > div >div.post-info-small.gray{
+    color:var(--gray2)
+}
+
+#certificates > div > div > div > span{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+#certificates > div > div > img{
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 16/9;
+}
+
+#certificates > div > div:not(#certificates > div > div:first-child){
+    padding: 20px;
+    flex-direction: column;
+    gap:5px;
+}
+
+#certificates > div > div > div > h2{
+    padding-bottom: 20px;
+}
+
+/*************************************************************/
+
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 3.3rem;
+    direction: ltr;
+}
+
+.pagination__link {
+    display: inline-flex;
+    padding: 0.25rem 0.4rem;
+    margin: 0 0.1rem;
+    color: #101928;
+    text-decoration: none;
+    border: 2px solid rgba(0,0,0,0);
+    line-height: 1;
+    border-radius: 7px;
+}
+
+.pagination__button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    position: static;
+    width: 40px;
+    height: 40px;
+    left: 0px;
+    top: 0px;
+    background: #fff;
+    border: 1px solid #d5d7da;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 6px rgb(16 25 40 / 6%);
+    border-radius: 4px;
+    margin: 0px 8px;
+}
+
+#logo > img{
+    height: 60px;
+}
+
+@media(max-width:1000px){
+    #certificates > div{
+        flex-basis: calc(50% - 20px);
+    }  
+}
+
+@media(max-width:767px){
+    #certificates > div{
+        flex-basis: calc(100% - 0px);
+    }  
+    #topics-toggle{
+        justify-content: flex-start;
+    }
+}
+
+

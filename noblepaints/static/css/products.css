@@ -1,0 +1,19 @@
+#productsCategories{
+    margin-top: -20px;
+}
+
+.paintspart .paintbox{
+    border-color: transparent!important;
+}
+
+header{
+    background: url("/static/images/header01.png");
+}
+
+#productsCategories .paintbox .imgbox{
+    aspect-ratio: 2/1.2;
+}
+
+#productsCategories .paintbox .details h4{
+    font-size: 20px;
+}

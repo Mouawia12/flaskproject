@@ -1,0 +1,540 @@
+{% extends 'sec.html' %}
+{%block head%}
+<!-- Preload critical CSS -->
+<link rel="preload" href="/static/css/products.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/static/css/products.css"></noscript>
+<link rel="preload" href="/static/css/props.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/static/css/props.css"></noscript>
+<link rel="stylesheet" href="/static/css/TechnicalDatasheets.css">
+
+<!-- Load external resources efficiently -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://netdna.bootstrapcdn.com">
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    media="print" onload="this.media='all'"
+/>
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"></noscript>
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet"></noscript>
+
+<title class="text">Noble paints | Technical Datasheets</title>
+<style>
+    header{
+        background: url("/static/images/header04.webp");
+        background-size: cover;
+        background-position: center;
+    }
+    /* Loading states */
+    .catalog-wrap {
+        min-height: 400px;
+        position: relative;
+    }
+    .loading-spinner {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage medium">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav>
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
+                            <span class="text">Technical Datasheets</span>
+                        </a>
+                        <span class="text">Technical Datasheets</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1 class="text"><span class="text-bg-red text">Technical Datasheets</span></h1>
+    </div>
+</header>
+<main style="padding-top: 35px;">
+    <div class="container2">
+        <div class="row">
+            <aside class="filters">
+                <h3 class="title text">Filter Products</h3>
+                <div class="filter-professionals">
+                    <form>
+                        <div class="filed-wrap search-wrap">
+                                <input type="text" id="SearchKeywords" value="{{ search if search else '' }}" placeholder="Search technical datasheets...">
+                                <button id="Searchbtn" type="button">
+                                    <img src="/static/images/icons/search-icon-2.png" alt="search icon">
+                                </button>
+                        </div>
+                        <div class="filed-wrap">
+
+                                    <label for="country" class="field-title text">Select a country </label>
+                                    <div class="select-wrap">
+                                        <select name="country" id="selectCountries" value="{{country}}">
+                                                <option></option>
+                                                {%if country == 'All'%}
+                                                <option selected>All</option>
+                                                {%else%}
+                                                <option>All</option>
+                                                {%endif%}
+                                                {%if country == 'Algeria'%}
+                                                <option selected>Algeria</option>
+                                                {%else%}
+                                                <option>Algeria</option>
+                                                {%endif%}
+                                                {%if country == 'Bahrain'%}
+                                                <option selected>Bahrain</option>
+                                                {%else%}
+                                                <option>Bahrain</option>
+                                                {%endif%}
+                                                {%if country == 'Canada'%}
+                                                <option selected>Canada</option>
+                                                {%else%}
+                                                <option>Canada</option>
+                                                {%endif%}
+                                                {%if country == 'Denmark'%}
+                                                <option selected>Denmark</option>
+                                                {%else%}
+                                                <option>Denmark</option>
+                                                {%endif%}
+                                                {%if country == 'Egypt'%}
+                                                <option selected>Egypt</option>
+                                                {%else%}
+                                                <option>Egypt</option>
+                                                {%endif%}
+                                                {%if country == 'France'%}
+                                                <option selected>France</option>
+                                                {%else%}
+                                                <option>France</option>
+                                                {%endif%}
+                                                {%if country == 'Germany'%}
+                                                <option selected>Germany</option>
+                                                {%else%}
+                                                <option>Germany</option>
+                                                {%endif%}
+                                                {%if country == 'India'%}
+                                                <option selected>India</option>
+                                                {%else%}
+                                                <option>India</option>
+                                                {%endif%}
+                                                {%if country == 'Iraq'%}
+                                                <option selected>Iraq</option>
+                                                {%else%}
+                                                <option>Iraq</option>
+                                                {%endif%}
+                                                {%if country == 'Italy'%}
+                                                <option selected>Italy</option>
+                                                {%else%}
+                                                <option>Italy</option>
+                                                {%endif%}
+                                                {%if country == 'Kuwait'%}
+                                                <option selected>Kuwait</option>
+                                                {%else%}
+                                                <option>Kuwait</option>
+                                                {%endif%}
+                                                {%if country == 'Kyrgyzstan'%}
+                                                <option selected>Kyrgyzstan</option>
+                                                {%else%}
+                                                <option>Kyrgyzstan</option>
+                                                {%endif%}
+                                                {%if country == 'Libya'%}
+                                                <option selected>Libya</option>
+                                                {%else%}
+                                                <option>Libya</option>
+                                                {%endif%}
+                                                {%if country == 'Morocco'%}
+                                                <option selected>Morocco</option>
+                                                {%else%}
+                                                <option>Morocco</option>
+                                                {%endif%}
+                                                {%if country == 'Oman'%}
+                                                <option selected>Oman</option>
+                                                {%else%}
+                                                <option>Oman</option>
+                                                {%endif%}
+                                                {%if country == 'Qatar'%}
+                                                <option selected>Qatar</option>
+                                                {%else%}
+                                                <option>Qatar</option>
+                                                {%endif%}
+                                                {%if country == 'Saudi Arabia'%}
+                                                <option selected>Saudi Arabia</option>
+                                                {%else%}
+                                                <option>Saudi Arabia</option>
+                                                {%endif%}
+                                                {%if country == 'Sudan'%}
+                                                <option selected>Sudan</option>
+                                                {%else%}
+                                                <option>Sudan</option>
+                                                {%endif%}
+                                                {%if country == 'Tanzania'%}
+                                                <option selected>Tanzania</option>
+                                                {%else%}
+                                                <option>Tanzania</option>
+                                                {%endif%}
+                                                {%if country == 'South Africa'%}
+                                                <option selected>South Africa</option>
+                                                {%else%}
+                                                <option>South Africa</option>
+                                                {%endif%}
+                                                {%if country == 'UAE'%}
+                                                <option selected>UAE</option>
+                                                {%else%}
+                                                <option>UAE</option>
+                                                {%endif%}
+                                                {%if country == 'United States'%}
+                                                <option selected>United States</option>
+                                                {%else%}
+                                                <option>United States</option>
+                                                {%endif%}
+                                                {%if country == 'Yemen'%}
+                                                <option selected>Yemen</option>
+                                                {%else%}
+                                                <option>Yemen</option>
+                                                {%endif%}
+                                        </select>
+                                    </div>
+
+
+                        </div>
+                        <div class="filed-wrap radio-fields">
+                            <label class="field-title text">Category</label>
+                            <div class="radio-wrap checked">
+                                <div class="check-wrap checked">
+                                    <input type="radio" class="radioSegments" value="All" id="seg0">
+                                </div>
+                                <label for="seg0" name="All">All</label>
+                            </div>
+                            <div class="">
+                                <div class="radio-wrap hidden" lang="en">
+                                            <div class="check-wrap  23">
+                                                <input type="radio" name="radioSegments" class="radioSegments" value="29" id="seg23" data-name="General Technical Information">
+                                            </div>
+                                            <label name="29" for="seg23">General Technical Information</label>
+                                        </div>
+                                        <div class="radio-wrap hidden" lang="ar">
+                                            <div class="check-wrap  23">
+                                                <input type="radio" name="radioSegments" class="radioSegments" value="29" id="seg23" data-name="General Technical Information">
+                                            </div>
+                                            <label name="29" for="seg23">معلومات عامة للتطبيق</label>
+                                        </div>
+                                {% for x in categories %}
+                                        
+                                        {% if x.id != 29 %}
+                                        <div class="radio-wrap hidden" lang="en">
+                                            <div class="check-wrap  23">
+                                                <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
+                                            </div>
+                                            <label name="{{x.id}}" for="seg23">{{x.name}}</label>
+                                        </div>
+                                        <div class="radio-wrap hidden" lang="ar">
+                                            <div class="check-wrap  23">
+                                                <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
+                                            </div>
+                                            <label name="{{x.id}}" for="seg23">{{x.nameArabic}}</label>
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                            </div>
+                            <div class="show-on-mobile hidden">
+                                {% for x in categories %}
+                                {% if loop.index < 5 %}
+                                <div class="radio-wrap hidden" lang="en">
+                                    <div class="check-wrap  23">
+                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
+                                    </div>
+                                    <label name="{{x.name}}" for="seg23">{{x.name}}</label>
+                                </div>
+                                <div class="radio-wrap hidden" lang="ar">
+                                    <div class="check-wrap  23">
+                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
+                                    </div>
+                                    <label name="{{x.name}}" for="seg23">{{x.nameArabic}}</label>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                {% if categories|length >= 5 %}
+                                <!--button onclick="myFunction()" id="myBtn" type="button">See All</button-->
+                                <div class="more">
+                                {% for x in categories %}
+                                {% if loop.index >= 5 %}
+                                    <div class="radio-wrap hidden" lang="en">
+                                        <div class="check-wrap  22">
+                                            <input type="radio" name="radioSegments" class="radioSegments" value="22" id="seg22" data-name="{{x.name}}">
+                                        </div>
+                                        <label name="{{x.name}}" for="seg22">{{x.name}}</label>
+                                    </div>
+                                    <div class="radio-wrap hidden" lang="ar">
+                                        <div class="check-wrap  22">
+                                            <input type="radio" name="radioSegments" class="radioSegments" value="22" id="seg22" data-name="{{x.name}}">
+                                        </div>
+                                        <label name="{{x.name}}" for="seg22">{{x.nameArabic}}</label>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                </div>
+                    </form>
+                </div>
+            </aside>
+            <section class="products">
+                <div class="top-info">
+                    <!--<span class="results">Results: <b>24</b> products</span>-->
+                    <div class="category">
+
+                        
+                        
+                    </div>
+                </div>
+                <div class="catalog-wrap">
+                    {% for x in items %}
+                    <div class="catalog-item full" lang="{{x.lang}}">
+                        <div class="title">
+                            <img src="/static/images/icons/reader-icon.png" alt="icon" loading="lazy">{{x.name}}
+                        </div>
+                        <div class="action">
+                            {% if x.lang == 'ar' %}
+                            <a class="view" href="/show/{{x.datasheet}}" target="_blank">
+                                <img src="/static/images/icons/view-icon.png" alt="view" loading="lazy">عرض
+                            </a>
+                            <a class="download" href="/download/{{x.datasheet}}" download="">
+                                <img src="/static/images/icons/download-icon.png" alt="download" loading="lazy">تحميل
+                            </a>
+                            {% else %}
+                            <a class="view" href="/show/{{x.datasheet}}" target="_blank">
+                                <img src="/static/images/icons/view-icon.png" alt="view" loading="lazy">View
+                            </a>
+                            <a class="download" href="/download/{{x.datasheet}}" download="">
+                                <img src="/static/images/icons/download-icon.png" alt="download" loading="lazy">Download
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if items|length == 0 %}
+                    <div class="no-results" style="text-align: center; padding: 2rem; color: #666;">
+                        <p>No technical datasheets found matching your criteria.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-12">
+                    <div class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between" style="background: transparent;">
+                        {% if total_items is defined and items_per_page is defined %}
+                        {% set total_pages = ((total_items / items_per_page) | round(0, 'ceil')) | int %}
+                        {% if total_pages > 1 %}
+                        <div class="results-info" style="margin-bottom: 1rem;">
+                            <span class="text">Showing {{ ((page|int - 1) * items_per_page + 1) }} to {{ [page|int * items_per_page, total_items] | min }} of {{ total_items }} results</span>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination mb-0">
+                                <li class="page-item {% if page|int < 2 %}disabled{% endif %}">
+                                    <a class="page-link text" href="/TechnicalDatasheets/?page={{page|int - 1}}&category={{ category if category else 'All' }}&search={{ search if search else '' }}&country={{ country if country else 'All' }}&lang=en">Previous</a>
+                                </li>
+                                
+                                {% for i in range(1, total_pages + 1) %}
+                                    {% if i <= 3 or i > total_pages - 3 or (i >= page|int - 1 and i <= page|int + 1) %}
+                                        <li class="page-item {% if i == page|int %}active{% endif %}">
+                                            <a class="page-link" href="/TechnicalDatasheets/?page={{i}}&category={{ category if category else 'All' }}&search={{ search if search else '' }}&country={{ country if country else 'All' }}&lang=en">{{i}}</a>
+                                        </li>
+                                    {% elif i == 4 or i == total_pages - 3 %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                <li class="page-item {% if page|int >= total_pages %}disabled{% endif %}">
+                                    <a class="page-link text" href="/TechnicalDatasheets/?page={{page|int + 1}}&category={{ category if category else 'All' }}&search={{ search if search else '' }}&country={{ country if country else 'All' }}&lang=en">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+</main>
+
+<!-- Add loading spinner -->
+<div class="loading-spinner" id="loadingSpinner"></div>
+
+<!-- Load languages first, then main JavaScript -->
+<script src="/static/js/languages/TechnicalDatasheets.js"></script>
+<script src="/static/js/TechnicalDatasheets.js" defer></script>
+
+<!-- Enhanced loading states and image optimization -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure langs is available as a fallback for compatibility
+    if (typeof langs === 'undefined') {
+        console.warn('langs object not loaded, creating fallback');
+        window.langs = {
+            'en': [
+                'Noble paints | Technical Datasheets',
+                'Home',
+                'Technical Datasheets',
+                'Technical Datasheets', 
+                'Technical Datasheets',
+                'Filter Technical Datasheets',
+                'Select a country',
+                'Category',
+                'Previous',
+                'Next'
+            ],
+            'ar': [
+                'نوبل بينتس | المواصفات الفنية',
+                'الرئيسية',
+                'المواصفات الفنية',
+                'المواصفات الفنية',
+                'المواصفات الفنية',
+                'فلترة المواصفات',
+                'الدولة',
+                'الفئة',
+                'السابق',
+                'التالي'
+            ]
+        };
+    }
+    
+    // Optimize image loading
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+        if (img.complete) {
+            img.style.opacity = '1';
+        } else {
+            img.addEventListener('load', function() {
+                this.style.opacity = '1';
+            });
+            img.addEventListener('error', function() {
+                console.warn('Failed to load image:', this.src);
+            });
+        }
+    });
+    
+    // Add loading states for navigation - use regular links instead of onclick
+    const pagination = document.querySelectorAll('.page-link[href]:not([href="#"])');
+    const spinner = document.getElementById('loadingSpinner');
+    
+    if (pagination && spinner) {
+        pagination.forEach(link => {
+            if (link && typeof link.addEventListener === 'function') {
+                link.addEventListener('click', function(e) {
+                    if (!this.parentElement.classList.contains('disabled') && !this.parentElement.classList.contains('active')) {
+                        spinner.style.display = 'block';
+                        // Let the browser handle the navigation naturally
+                    }
+                });
+            }
+        });
+    }
+    
+    // Form submission loading states
+    const searchBtn = document.getElementById('Searchbtn');
+    const selectCountries = document.getElementById('selectCountries');
+    
+    if (searchBtn && spinner) {
+        searchBtn.addEventListener('click', function() {
+            const searchInput = document.getElementById('SearchKeywords');
+            const searchValue = searchInput ? searchInput.value || '' : '';
+            const currentCategory = '{{ category if category else "All" }}';
+            const currentCountry = '{{ country if country else "All" }}';
+            
+            if (searchValue.trim() !== '') {
+                spinner.style.display = 'block';
+                window.location.href = `/TechnicalDatasheets/?page=1&category=${encodeURIComponent(currentCategory)}&search=${encodeURIComponent(searchValue)}&country=${encodeURIComponent(currentCountry)}&lang=en`;
+            }
+        });
+    }
+    
+    if (selectCountries && spinner) {
+        selectCountries.addEventListener('change', function() {
+            const selectedCountry = this.value || 'All';
+            const currentCategory = '{{ category if category else "All" }}';
+            const currentSearch = '{{ search if search else "" }}';
+            
+            spinner.style.display = 'block';
+            window.location.href = `/TechnicalDatasheets/?page=1&category=${encodeURIComponent(currentCategory)}&search=${encodeURIComponent(currentSearch)}&country=${encodeURIComponent(selectedCountry)}&lang=en`;
+        });
+    }
+    
+    // Handle category radio button changes
+    const radioButtons = document.querySelectorAll('.radioSegments');
+    radioButtons.forEach(radio => {
+        if (radio && typeof radio.addEventListener === 'function') {
+            radio.addEventListener('change', function() {
+                if (this.checked && spinner) {
+                    const selectedCategory = this.value || 'All';
+                    const currentCountry = '{{ country if country else "All" }}';
+                    const currentSearch = '{{ search if search else "" }}';
+                    
+                    spinner.style.display = 'block';
+                    window.location.href = `/TechnicalDatasheets/?page=1&category=${encodeURIComponent(selectedCategory)}&search=${encodeURIComponent(currentSearch)}&country=${encodeURIComponent(currentCountry)}&lang=en`;
+                }
+            });
+        }
+    });
+    
+    // Handle search on Enter key
+    const searchInput = document.getElementById('SearchKeywords');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (searchBtn) {
+                    searchBtn.click();
+                }
+            }
+        });
+    }
+    
+    // Hide spinner when page fully loaded
+    window.addEventListener('load', function() {
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+    });
+    
+    // Hide spinner if it's been showing for too long (fallback)
+    setTimeout(function() {
+        if (spinner) {
+            spinner.style.display = 'none';
+        }
+    }, 5000);
+    
+    // Error handling for any remaining undefined functions
+    window.addEventListener('error', function(e) {
+        if (e.message && e.message.includes('is not defined')) {
+            console.warn('Caught undefined function error:', e.message);
+            // Prevent the error from breaking the page
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{%endblock%}

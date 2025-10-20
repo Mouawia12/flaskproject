@@ -1,0 +1,181 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/index.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<title>Noble paints</title>
+<meta name="keywords" content="نوبل للدهانات, noble paints, مصنع دهانات, دهانات صناعية, دهان ضد الحريق, دهانات نوبل, مصنع الدهانات, شركة دهانات نهوبل, شركة دهانات بالسعودية">
+{%endblock%}
+{%block content%}
+<div class="steam-train">
+    <div class="train">
+      <div class="window"></div>
+    </div>
+  </div>
+<header>
+    <img src="/static/images/video.PNG" style="position:absolute">
+    <video width="100%" height="100%" loop autoplay muted playsinline preload="metadata" poster="/static/images/video.PNG" loading="lazy">
+        <source src="/static/videos/5.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+      </video>
+      <div class="text-wrapper aos-init aos-animate container" data-aos="fade-in" data-aos-delay="500">
+        <div class="text-box">
+          <h2 class="text">Hello, we’re noble</h2>
+          <p class="text">We help you protect your most valuable assets with our<br>high-quality coatings</p>
+        </div>
+      </div>
+      <!--iframe width="100%" height="100%" src="https://drive.google.com/file/d/1kidFA64-WEetlpe0ROg9RZppb7lZnKeU/preview?autoplay=1&loop=1" width="640" height="480"></iframe-->
+    <!--div class="swiper mySwiper" id="swiper1" style="direction: ltr;">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="swiper-text-box swiper-text-box1 containerAbs">
+                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
+                    <span class="text">Innovative Painting<span class="after-swiper-text-box"></span></span>
+                </div>
+                <div class="swiper-img-box">
+                    <img src="/static/images/prod01.png">
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="swiper-text-box swiper-text-box2 containerAbs">
+                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
+                    <span class="text">Coating<span class="after-swiper-text-box"></span></span>
+                </div>
+                <div class="swiper-img-box">
+                    <img src="/static/images/prod02.png">
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="swiper-text-box swiper-text-box3 containerAbs">
+                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
+                    <span class="text">Construction<span class="after-swiper-text-box"></span></span>
+                </div>
+                <div class="swiper-img-box">
+                    <img src="/static/images/prod03.png">
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="swiper-text-box swiper-text-box4 containerAbs">
+                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
+                    <span class="text">Solutions<span class="after-swiper-text-box"></span></span>
+                </div>
+                <div class="swiper-img-box">
+                    <img src="/static/images/prod01.png">
+                </div>
+            </div>
+        </div>
+                <div class="swiper-pagination"></div>
+    </div-->
+</header>
+<section class="paintspart custom" id="productsCategories" style="display:flex;">
+    <div class="lists" style="margin-top: 0;">
+        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/TechnicalDatasheets/?lang=${localStorage.getItem('nobleLang')}`">
+            <div class="imgbox">
+                <img src="/static/images/tech.png" alt="">
+            </div>
+            <div class="details">
+                <div class="icon"><img src="/static/images/icons/palitr-icon.png" alt=""></div>
+                <h3 class="text">Technical<br>Data Sheets</h3>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/productsSearch/?lang=en`">
+            <div class="imgbox">
+                <img src="/static/images/boxes02.png" alt="">
+            </div>
+            <div class="details">
+                <div class="icon"><img src="/static/images/icons/icon6.png" alt=""></div>
+                <h3 class="text">Browse<br>Our Products</h3>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12 col-xs-12 paintbox" onclick="location.href=`/catalogs/`">
+            <div class="imgbox">
+                <img src="/static/images/boxes04.jpg" alt="">
+            </div>
+            <div class="details">
+                <div class="icon"><img src="/static/images/icons/icon3.png" alt=""></div>
+                <h3 class="text">Browse<br>Our Catalogs</h3>
+            </div>
+        </div>
+    </div>
+</section>
+<div style="position: relative;">
+    <div class="specesContainer">
+        <div>
+            <div class="container2">
+                <div class="descr">
+                    <h3 class="subTitle"><span class="text">Research &</span><br><span class="text">Development</span></h3>
+                    <p class="text">Besides conducting on- going research, with our international specialists, our original paints innovations have continually redefined the paint industry, at the same time adding value to life and the environment through our complete paint and coating solutions. <br>At any given time Noble evaluates between 10 and 20 products for areas of possible product improvement. A typical year sees the development of at least five new products and the upgrading about 5 to 15 products. This constant innovation and improvement has played a key role in the success of brand Noble. Our research & technical team along with experienced and qualified chemists constantly analyze the application, finish, aesthetics, and longevity and service requirement of our clients</p>
+                    <a href="#" class="btn text hidden">Learn More</a>
+                </div>
+                <img src="/static/images/speces03.png" alt="speces02">
+            </div>
+        </div>
+        <div>
+            <div class="container2 inverse">
+                <img src="/static/images/speces02.png" alt="speces02">
+                <div class="descr">
+                    <h3 class="subTitle">
+                        <span class="text">Quality</span>
+                        <span class="text">Control</span>
+                    </h3>
+                    <p class="text">Noble Quality Standards are at the core.The quality assurance comes from various key aspects of the framework. Stakeholders are encouraged to work towards continuous improvement through engagement in the processes of planning and evaluation,<br>All Quality Control (QC) activities are carried out in accordance with ISO standards and rules of the authorities and International standards such as ASTM (American Standard) BS (British Standard) & SASO (Saudi Standard), safety regulations and company policies. The laboratory ensures consistent quality, relevant tests are conducted periodically ensuring results are well within the set standards. QC also monitors raw materials, shelf life, stability and packaging in order to make sure it is within specifications and under control led conditions.<br>The Research & Development and Quality Control labs are equipped with the most modern equipment to maintain the quality bench marks that have become the hallmark of Noble products.</p>
+                    <a href="#" class="btn text hidden">Learn More</a>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="container2">
+                <div class="descr">
+                    <h3 class="subTitle">
+                        <span class="text">Quality</span>
+                    </h3>
+                    <p class="text">Noble Quality Standards are at the core.The quality assurance comes from various key aspects of the framework. Stakeholders are encouraged to work towards continuous improvement through engagement in the processes of planning and evaluation,<br>All Quality Control (QC) activities are carried out in accordance with ISO standards and rules of the authorities and International standards such as ASTM (American Standard) BS (British Standard) & SASO (Saudi Standard), safety regulations and company policies. The laboratory ensures consistent quality, relevant tests are conducted periodically ensuring results are well within the set standards. QC also monitors raw materials, shelf life, stability and packaging in order to make sure it is within specifications and under control led conditions.<br>The Research & Development and Quality Control labs are equipped with the most modern equipment to maintain the quality bench marks that have become the hallmark of Noble products.</p>
+                    <a href="#" class="btn text hidden">Learn More</a>
+                </div>
+                <img src="/static/images/speces011.png" alt="speces02">
+            </div>
+        </div>
+        <div>
+            <div class="container2">
+                <div class="descr">
+                    <h3 class="subTitle">
+                        <span class="text">Technical Support &</span>
+                        <span class="text">After Sales Services</span>
+                    </h3>
+                    <p class="text">At Noble we believe that our customers deserve the best quality of service . We work hard to meet all of your needs and requirements efficiently and effectively with our technical support team and after sales services . An expression of Noble’s commitment is the construction of its Technical Services Centre within the factory premises in Riyadh . The centre is equipped with the most modern and advanced training equipment . The facility is supported with professional technical staff and applicators providing the following :</p>
+                    <ul>
+                        <li><img src="/static/images/icons01.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons02.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons03.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons04.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons05.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons06.PNG"><span class="text"></span></li>
+                        <li><img src="/static/images/icons07.PNG"><span class="text"></span></li>
+                    </ul>
+                    <a href="#" class="btn text hidden">Learn More</a>
+                </div>
+                <!--img src="/static/images/speces04.jpg" alt="speces02"-->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="gray-bg-cus" id="prodsShowContainer">
+    <div class="col-xs-12 ctitle" style="z-index: 999;">
+        <h1 class="text-center py-5"><span class="text-bg-blue text">ESSENTIAL</span><span class="text-bg-red text">TOOLS</span> </h1>
+    </div>
+    <div class="container2 productsShow2">
+        <div class="swiper mySwiper" id="swiper2">
+            <div class="swiper-wrapper" id="gamesList_content2">
+            </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+    </div>
+</div>
+<script src="/static/js/languages/index.js"></script>
+<script src="/static/js/index.js"></script>
+{%endblock%}

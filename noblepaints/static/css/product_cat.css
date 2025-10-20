@@ -1,0 +1,142 @@
+
+.productsShow2 .swiper-slide:hover {
+    box-shadow: 0 8px 16px 0 rgb(16 25 40 / 10%);
+}
+
+
+.productsShow2 .swiper-slide{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #002c6b;
+    border-radius: 20px;
+    padding: 0px;
+    height: calc(100% - 12px);
+    padding: 0;
+    border: 1px solid #ffffff42;
+    transition: 0.6s;
+    height: fit-content;
+    padding-bottom: 12px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px!important;
+    transition: 0.6s;
+    border: 1px solid #ffffff1e;
+    color: black;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    margin-bottom: 2px;
+}
+.productsShow2 .swiper-slide img{
+    background-color: #004a83;
+    background-attachment: fixed;
+    background-size: cover;
+    border-radius: 25px;
+    aspect-ratio: 1/1;
+    margin: 0;
+    width: calc(100% - 100px);
+    padding: 10px;
+    
+}
+
+.productsShow2 .swiper-slide article{
+    width: calc(100% - 40px);
+    border-radius: 2000px;
+    background: #00800033;
+    color: black;
+    padding: 10px;
+}
+
+.productsShow2 .swiper-slide > div:nth-child(2){
+    padding: 0px 5px 5px 5px;
+}
+
+.productsShow2 .swiper-slide p {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    line-break: anywhere;
+    font-size: 16px;
+}
+
+
+.productsShow2 .swiper-slide:hover{
+    box-shadow: 0 8px 16px 0 rgb(16 25 40 / 10%);
+}
+.productsShow2{
+    background-color: unset;
+    position: relative;
+    box-shadow: unset;
+    border:0;
+    padding: 0!important;
+}
+
+.productsShow2 > div:nth-child(2){
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.productsShow2 > div:nth-child(2) i{
+    font-size: 35px;
+}
+
+.productsShow2 > span{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('/static/images/prod-01.jpg');
+    background-size: cover;
+    opacity: 0.1;
+    right: 0;
+    top:0;
+    border-radius: inherit;
+    display: none;
+}
+
+.productsShow2 > span:after{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top:0;
+    content: '';
+    background: linear-gradient(to top,white,white,transparent);
+    border-radius: inherit;
+}
+
+#gamesList_content > div > img, #gamesList_content2 > div > img:nth-child(1) {
+    object-fit: cover;
+    border-radius: 0;
+    width: 100%;
+    aspect-ratio: 1/1;
+    transition: 0.6s;
+    border: 6px solid #ffffff09;
+    border-radius: 5px;
+}
+
+#prodsShowContainer{
+    margin-top: 130px;
+    margin-bottom: 0;
+}
+
+#prodsShowContainer::after{
+    content: '';
+    position: absolute;
+    top:0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0064a2d4;
+}
+
+.gray-bg-cus{
+    /*background-color: #0064a2!important;*/
+    padding: 100px 0;
+    background: url(/static/images/prods.png);
+    background-size: cover;
+    position: relative;
+}

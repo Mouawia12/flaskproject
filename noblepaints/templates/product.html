@@ -1,0 +1,308 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<script type="text/javascript" src="html2canvas.js"></script>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/products.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/product.css">
+<title>Noble paints | {{product.name}}</title>
+<meta name="description" content="{{product.desc}}">
+<meta property="og:description" content="{{product.desc}}">
+{% if product.img != None %}
+<meta property="og:image" content="{{product.img}}" />
+{% endif %}
+<style>
+    header{
+        background: url("/static/images/header07.jpg");
+    }
+</style>
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav style="overflow:hidden">
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
+                            <span class="text">الرئيسية</span>
+                        </a>
+                        <a href="#" class="home" onclick="location.href=`/productsSearch/?lang=${localStorage.getItem('nobleLang')}`">
+                            <span class="text">المنتجات</span>
+                        </a>
+                        <span style="white-space: nowrap;">{{product.name}}</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="tabmenu tabmenuproduct">
+    <div class="container">
+        <!-- Nav tabs -->
+        <ul class="nav mainnav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#building" aria-controls="building" role="tab" data-toggle="tab" class="text">Overview</a></li>
+            <li role="presentation"><a href="#Info" aria-controls="building" role="tab" data-toggle="tab" class="text">Product Information</a></li>
+            <li role="presentation"><a href="#calculate" aria-controls="building" role="tab" data-toggle="tab" class="text">Calculate</a></li>
+            <li role="presentation"><a href="#prodsShowContainer" aria-controls="building" role="tab" data-toggle="tab" class="text">Similar Products</a></li>
+
+        </ul>
+    </div>
+</div>
+
+<section id="overview" dir="rtl">
+    <div class="container2">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-2">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-5 details">
+                <div class=" ctitle">
+                    <span class="text">About the product</span>
+                    <h3>{{product.name}}</h3>
+                    <p>{{product.desc|safe}}</p>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-5 imgbox">
+                {% if product.img != None %}
+                <img src="{{product.img}}" alt="product">
+                {% else %}
+                <img src="/static/images/prod01.png" alt="product">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="Info">
+    <div class="container2">
+        <!--div class="row inforow hide">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs ">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Key Benefits
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                
+            </div>
+        </div-->
+
+        <div class="row inforow ">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitles title text">
+                    Datasheet (English)
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                <a href="/show/{{product.datasheet}}" target="_blank">
+                    <div class="datasheet">
+                        {{product.name}}
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!--div class="row inforow hide">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Datasheet (Arabic)
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                <a href="{{product.datasheet}}" target="_blank">
+                    <div class="datasheet">
+                        {{product.name}}
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="row inforow hide">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Colors
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                <div class="datasheet">
+                    justo nec molestie fringilla.pdf
+                </div>
+            </div>
+        </div-->
+        <!--div class="row inforow ">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Application Information
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                <div class="subinfo  ">
+                    <span class="stringtext">Coverage</span>
+                    13
+                </div>
+
+                <div class="subinfo hide">
+                    <span class="stringtext">Touch dry</span>
+                    
+                </div>
+
+                <div class="subinfo hide">
+                    <span class="stringtext">Recoatable</span>
+                    
+                </div>
+
+                <div class="subinfo hide">
+                    <span class="stringtext">Thinning</span>
+                    
+                </div>
+
+            </div>
+        </div>
+        <div class="row inforow hide">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Pack sizes
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                
+            </div>
+        </div>
+        <div class="row inforow">
+            <div class="col-xs-12 col-sm-12 col-md-2 hidden-sm hidden-xs">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 productinfodetails">
+                <div class="infotitle">
+                    Additional info
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 infodetails">
+                        <span class="infospan">Low VOC</span>
+                        <span class="infospan">Odorless</span>
+                        <span class="infospan">EcoFriendly</span>
+                        <span class="infospan">Water Resistant</span>
+                        <span class="infospan">Easy to Apply</span>
+
+            </div>
+        </div-->
+    </div>
+</section>
+
+<section class="paint-calculator " id="calculate">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="subtitle">{{product.name}}</div>
+                <h2 style="color:white" class="text">Paint Calculator</h2>
+                <form action="#">
+                    <div class="field-wrap">
+                        <label for="field" class="text">Length (m)</label>
+                        <input type="number" placeholder="0" id="length">
+                    </div>
+                    <div class="field-wrap">
+                        <label for="field" class="text">width (m)</label>
+                        <input type="number" placeholder="0" id="width">
+                    </div>
+                    <div class="field-wrap">
+                        <label for="field" class="text">height (m)</label>
+                        <input type="number" placeholder="0" id="height">
+                    </div>
+                    <div class="field-wrap">
+                        <label for="field" class="text">Doors</label>
+                        <input type="number" placeholder="0" id="doors">
+                    </div>
+                    <div class="field-wrap">
+                        <label for="field" class="text">Windows</label>
+                        <input type="number" placeholder="0" id="windows">
+                    </div>
+                    <div class="field-wrap">
+                        <button class="btn" onclick="CalculatePaint(); return false;">
+                            <img src="/static/images/icons/calculate-icon.png" alt="icon">
+                            <span class="text"></span>
+                        </button>
+                    </div>
+                </form>
+                <div class="descr">
+                    <span class="label text">Paint Name and Code</span>
+                    <span id="name" class="value">{{product.name}}</span>
+                    <span class="label text">Approximate surface area of this room:</span>
+                    
+                    <span id="surface" class="value"></span>
+                    <span class="label text">Recommended amount of paint for this room:</span>
+                    
+                    <span id="amount" class="value"></span>
+                </div>
+                <div class="btns-wrap">
+                    <button class="btn" onclick="myFunction()">
+                        <img src="/static/images/icons/print-icon-2.png" alt="icon">
+                        <span class="text"></span>
+                    </button>
+                    <button class="btn" onclick="CreatePDFfromHTML()">
+                        <img src="/static/images/icons/pdf-icon.png" alt="icon">
+                        <span class="text"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="gray-bg-cus" id="prodsShowContainer">
+    <div class="container2 productsShow2">
+        <div class="swiper mySwiper" id="swiper2">
+            <div class="swiper-wrapper" id="gamesList_content2">
+                {% for x in similar %}
+                {% if x.id !=product.id %}
+                <div class='gamesList_content_div2 adventure popular all swiper-slide swiper-slide5' idNum="{{x.id}}">
+                    {% if x.img != None %}
+                            <img src="{{x.img}}" alt="product">
+                            {% else %}
+                            <img src="/static/images/prod01.png" alt="product">
+                            {% endif %}
+                    <div>
+                        <h2 style="color:#2c2c2c;height: fit-content;">{{x.name}}</h2>
+                        <span>{{x.desc|safe}}</span>
+                    </div>
+                    <div>
+                        <a href="/product/?id={{x.id}}" style="color:inherit;width:100%"><span style="width:100%" class="btn btn-success btn-block btn2 btn2radius-big btn2-width LearnMore">Learn More</span></a>
+                    </div>
+                    <span style="background-image:url('static/images/prod01.png')"></span>
+                </div>  
+                {% endif %}
+                {% endfor %}  
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+            <a class="btn text toRep3" id="Go_Product" style="width: 230px;background:var(--red)" href="/productsSearch/?page=1">Go to products page</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+<script src="/static/js/languages/product.js"></script>
+<script src="/static/js/product.js"></script>
+{%endblock%}

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <meta name="description" content="At Noble Paints (دهانات نوبل), We always manufacture renewable ideas that suit our customers' desires and reach them to the point of satisfaction and represent you">
+  <meta property="og:description" content="At Noble Paints, We always manufacture renewable ideas that suit our customers' desires and reach them to the point of satisfaction and represent you.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--script src="http://maps.googleapis.com/maps/api/js?sensor=false&key=YOUR_API_KEY"></script--> 
+    <!--script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script-->
+    <!--script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script-->
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/images/logo-footer.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/logo-footer.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/logo-footer.png">
+    <link rel="manifest" href="/static/cpanel2/assets/img/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/static/images/logo-footer.png" color="#ffffff">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <script src="/static/js/normalize.js"></script>
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    />
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="/static/fonts/stylesheet.css" rel="stylesheet">
+    <link href="/static/css/normalize.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100;200;300;400;500;600;700;800;900&family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="overlay {% if template=='catalogs' or template == 'products' or template == 'cats'%}hidden{% endif %}">
+        <div class="overlayDoor"></div>
+        <div class="overlayContent">
+            <div class="loader">
+                <img src="/static/images/logo-footer.png">
+            </div>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            {% if category == 'info' %}
+                <script>
+                    Swal.fire({
+                    title: 'Done',
+                    text: '{{message}}',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                    })
+                </script>
+            {% else %}
+            <script>
+                Swal.fire({
+                title: 'Error',
+                text: '{{message}}',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+                })
+            </script>
+            {%endif%}
+            {% if category == 'hello' %}
+            <script>
+                Swal.fire('{{message}}')
+            </script>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <a href="https://wa.me/966114477704" class="float" target="_blank">
+      <i class="fa fa-whatsapp my-float"></i>
+      </a>
+      <a href="/contact" class="support-btn opened float" title="support" style="display: flex;
+      align-items: center;
+      justify-content: center;">
+        <picture style="display: flex;
+        align-items: center;
+        justify-content: center;">
+            <img src="/static/images/icons/support-icon.png" alt="support-icon">
+        </picture>
+    </a>
+    <div style="z-index: 99999999;position: relative;">
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="container2">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+              </div>
+      
+              <div id="navbar" class="navbar-collapse collapse toLoad-show" aria-expanded="false">
+               <img height="90px" src="/static/images/logo.png" alt="logo" onclick="location.href='/'">
+                <ul class="nav navbar-nav" style="display:flex;flex-direction: row;">
+      
+                  <li><a href="/" class="text2">Home</a></li>
+      
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle text2" data-toggle="dropdown" role="button" aria-expanded="false">Products<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li class="dropdown">
+                        <a href="/productsSearch/" class="text2 toRep2">Product Search</a>
+                        <a href="/colors/" class="text2">Colors</a>
+                        <a href="/ral-colors/" class="text2 toRep2">RAL Colors</a>
+                        <a href="/catalogs/" class="text2 toRep2">Catalogs</a>
+                        <a href="/TechnicalDatasheets/" class="text2 toRep2">TechnicalDatasheets</a>
+
+                        
+                      </li>
+                    </ul>
+                  </li>
+      
+                  
+                  <li class="dropdown hidden">
+                    <a href="#" class="dropdown-toggle text2" data-toggle="dropdown" role="button" aria-expanded="false">Personal Use<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="/products/" class="text2 hidden">Find A Product</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="/categories/" class="text2">Our Categories</a></li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle text2" data-toggle="dropdown" role="button" aria-expanded="false">Our Story<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="/about/" class="text2">About Us</a></li>
+                      <li><a href="/certificates/" class="text2">Our Certificates</a></li>
+                      <li><a href="/approvals/" class="text2">Approvals</a></li>
+                      <li><a href="/FindStore/" class="text2">Find A Store</a></li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle text2" data-toggle="dropdown" role="button" aria-expanded="false">Language<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a href="#" class="lang" id="lang-ar">عربي</a></li>
+                      <li><a href="#" class="lang"  id="lang-en">English</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+    </div>
+    <script src="/static/js/languages/sec.js"></script>
+    <script>
+      //language
+      var userLang
+          if(!localStorage.getItem('nobleLang')){
+              userLang = navigator.language || navigator.userLanguage; 
+              localStorage.setItem('nobleLang','en')
+          }
+          userLang = localStorage.getItem('nobleLang')
+          function getLang(){
+            return userLang;
+          }
+          if(this.localStorage.getItem('nobleLang')=='ar'){
+            document.documentElement.style.setProperty("--title-font", 'Cairo , sans-serif');
+            document.documentElement.style.setProperty("--text-box-left", 'unset');
+            document.documentElement.style.setProperty("--text-box-right", '7%');
+          }
+          document.documentElement.style.setProperty("--title-font", 'Cairo , sans-serif');
+    </script>
+    {% block content %}
+    {% endblock %}
+    <section class="paintspart" style="overflow: hidden;background: #f8f9fa;
+    height: fit-content;
+    width: 100vw;">
+        <div class="container2">
+            <div class="col-xs-12 ctitle">
+                <h1 class="text-center py-5"><span class="text-bg-blue text2" style="">ESSENTIAL</span><span style="" class="text-bg-red text2">TOOLS</span> </h1>
+            </div>
+        </div>
+        <div class="lists">
+            <div class="col-lg-3 col-sm-6 col-xs-12 paintbox">
+                <div class="imgbox">
+                    <img src="/static/images/catalogs2.webp" alt="">
+                </div>
+                <div class="details">
+                    <div class="icon"><img src="/static/images/icons/book-icon.png" alt=""></div>
+                    <h4 class="text2">
+                        CATALOGS
+                        <br><br>
+                    </h4>
+                    <p class="text2">
+                        Explore a world of paint products, textures and shades for your next personal or professional product.
+                    </p>
+                    <a href="/catalogs/" class="selectbtn text2">SELECT</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-xs-12 paintbox">
+                <div class="imgbox">
+                    <img src="/static/images/paintspart01.jpg" alt="">
+                </div>
+                <div class="details">
+                    <div class="icon"><img src="/static/images/icons/palitr-icon.png" alt=""></div>
+                    <h4 class="text2">Color <br>palette</h4>
+                    <p class="text2">
+                        Find the exact color, shade and hue you want from our most popular color schemes.
+                    </p>
+                    <a href="/ral-colors/" class="selectbtn text2">SELECT</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-xs-12 paintbox">
+                <div class="imgbox">
+                    <img src="/static/images/spray.jpg" alt="">
+                </div>
+                <div class="details">
+                    <div class="icon"><img src="/static/images/icons/calculator-icon.png" alt=""></div>
+                    <h4 class="text2">Paint<br>Calculator </h4>
+                    <p class="text2">
+                        Calculate how much paint you’ll<br>need for your project.
+                    </p>
+                    <a href="/calculator" class="selectbtn text2">SELECT</a>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 col-xs-12 paintbox">
+                <div class="imgbox">
+                    <img src="/static/images/boxes01.jpg" alt="">
+                </div>
+                <div class="details">
+                    <div class="icon"><img src="/static/images/icons/location-icon.png" alt=""></div>
+                    <h4 class="text2">Store <br>locator</h4>
+                    <p class="text2"></p>
+                    <a href="/FindStore/" class="selectbtn text2">SELECT</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="">
+        <div class="top-side" style="background-color: #126a9a;color:white;padding-top: 40px;direction: ltr;">
+          <div class="container2">
+              <div class="row">
+                  <div class="col-md-3">
+                      <a href="/" title="logo" class="logo">
+                          <picture>
+                              <img width="100%"  src="/static/images/logo_png.png" alt="logo-footer">
+                          </picture>
+                      </a>
+                  </div>
+                  <div class="col-xs-12  col-sm-12 col-md-9 text-right">
+                      <div class="menu-wrap">
+                          <a href="#" onclick="location.href=`/news/?lang=${localStorage.getItem('nobleLang')}`">
+                              <span class="title text2">Our News</span>
+                          </a>
+                      </div>
+                      <div class="menu-wrap">
+                          <a href="/FindStore/" >
+                              <span class="title text2">Store Locator</span>
+                          </a>
+                      </div>
+                      <div class="menu-wrap hidden">
+                          <a  href="/socialMedia/">
+                              <span class="title text2">Social Media</span>
+                          </a>
+                      </div>
+                      
+                      <div class="menu-wrap">
+                          <a  href="/contact/">
+                              <span class="title text2">Contact Us</span>
+                          </a>
+                      </div>
+
+
+                  </div>
+              </div>
+          </div>
+      </div>
+        <div style="background: #002d4a;color: white;font-size: 16px;">
+            <div class="d-flex flex-column flex-sm-row justify-content-center py-4 container2">
+            <p>Copyright © 2022, Noble Paints Company Ltd.</p>
+            </div>
+        </div>
+        <section class="mb-4" id="socialIconsCont" style="display: flex;background: #126a9a;
+        margin-bottom: 0!important;
+        justify-content: center;
+        flex-wrap: wrap;">
+        <a
+        class="btn-link btn-floating btn-lg text-dark m-1"
+        href="mailto:info@noblepaints.com.sa" target="_blank"
+        role="button"
+        data-mdb-ripple-color="dark"
+        ><i class="fa fa-envelope" style="font-size:25px;color: white;"></i
+      ></a>
+        </section>
+      </footer>
+      <script>
+        if(localStorage.getItem('nobleLang')=='ar'){
+              document.dir = 'rtl'
+              document.documentElement.setAttribute("lang", localStorage.getItem('nobleLang'));
+              document.querySelector('body').style.textAlign = "start"
+              document.querySelector('body').style.fontFamily = "'Cairo','sans-serif"
+              document.querySelectorAll('.btn')?.forEach(e=>{
+                e.style.fontFamily = "'Cairo','sans-serif"
+              })
+              navbar.querySelectorAll('a')?.forEach(e=>{
+                e.style.fontFamily = "'Cairo','sans-serif"
+              })
+              if(document.querySelector('header.subpage')?.querySelector('h1')){
+                document.querySelector('header.subpage').querySelector('h1').style.fontFamily = "'Cairo','sans-serif"
+                document.documentElement.setAttribute("headerGradient", `linear-gradient(to left,var(--blue),transparent)`);
+              }
+              if(document.querySelector('.breadcrubms')){
+                document.querySelector('.breadcrubms').querySelectorAll('a').forEach(e=>{
+                  if( e.querySelector('span'))
+                  e.querySelector('span').style.fontFamily = "'Cairo','sans-serif"
+                })
+              }
+              document.querySelector('footer').querySelectorAll('a').forEach(e=>{
+                  e.style.fontFamily = "'Cairo','sans-serif"
+              })
+          }
+          
+          document.querySelectorAll('.lang').forEach(e=>{
+              e.addEventListener('click',function(){
+                  localStorage.setItem('nobleLang',this.id.split('-')[1])
+                  const urlParams = new URLSearchParams(window.location.search);
+                  urlParams.set('lang', localStorage.getItem('nobleLang'));
+                  window.location.search = urlParams;
+                  //location.reload()
+              })
+          })
+
+
+        document.querySelectorAll('.text').forEach((e,i)=>{
+            e.innerHTML = langs[userLang][i]
+          })
+
+                    
+          document.querySelectorAll('.text2').forEach((e,i)=>{
+            e.innerHTML = langs2[userLang][i]
+          })
+
+          $(document).ready(function() {
+	// Will wait for everything on the page to load.
+    $(window).bind('load', function() {
+      $('.overlay, body').addClass('loaded');
+      setTimeout(function() {
+        $('.overlay').css({'display':'none'})
+      }, 2000)
+    });
+
+	
+	// Will remove overlay after 1min for users cannnot load properly.
+	setTimeout(function() {
+		$('.overlay, body').addClass('loaded');
+	}, 6000);
+})
+
+document.querySelectorAll('.toRep2').forEach(e=>{
+  e.href = e.href + `?lang=${localStorage.getItem('nobleLang')}`
+})
+
+async function getsocialIcons(){
+  await fetch(`/getsocialIcons/`)
+.then(res=>res.json())
+.then(async (res)=>{
+  for(let x of res)
+  socialIconsCont.insertAdjacentHTML('beforeend',`
+      <a
+        class="btn-link btn-floating btn-lg text-dark m-1"
+        href="${x.link}" target="_blank"
+        role="button"
+        data-mdb-ripple-color="dark"
+        ><i class="fa fa-${x.icon}" style="font-size:25px;color: white;"></i
+      ></a>
+`)
+})
+}
+
+getsocialIcons()
+
+document.querySelector('.toLoad-show').querySelectorAll('a').forEach(e=>{
+  if(!e.classList.contains('dropdown-toggle'))
+  e.addEventListener('click',function(){
+    document.querySelector('.overlay').style=''
+    document.querySelector('.overlay').classList.remove('loaded')
+  })
+})
+  
+          
+      </script>
+</body>
+</html>

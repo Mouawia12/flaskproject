@@ -1,0 +1,95 @@
+{% extends 'sec.html' %}
+{%block head%}
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+/>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/products.css" rel="stylesheet">
+<link href="/static/css/props.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/news.css">
+<title class="text">Noble paints | News</title>
+<style>
+    header{
+        background: url("/static/images/header09.jpg");
+    }
+</style>
+</style>
+{%endblock%}
+{%block content%}
+<header class="subpage medium">
+    <div class="breadcrubms">
+        <div class="container2">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav>
+                        <a href="/" class="home">
+                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
+                            <span class="text">Home</span>
+                        </a>
+                        <span class="text">News</span>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container2">
+        <h1 class="text"><span class="text-bg-red">News</span></h1>
+    </div>
+</header>
+<section id="news2" class="container2">
+    <section id="news">
+        {% for x in news[((page|int-1)*6):((page|int)*6)] %}
+        <div idNum="{{x.id}}" class="post" lang="{{x.lang}}" onclick="location.href=`/news/{{x.id}}/?lang=${localStorage.getItem('nobleLang')}`">
+            <div>
+                <img src="{{x.img}}">
+            </div>
+            <div>
+                <div class="post-info-small gray">
+                    <span class="post-date">{{x.date}}</span>
+                </div>
+                <div class="post-info-small">
+                    {%if x.type == '1'%}
+                    <span class="post-type">خدماتنا - our services</span>
+                    {%elif x.type == '2'%}
+                    <span class="post-type">نصائح - Tips</span>
+                    {%elif x.type == '3'%}
+                    <span class="post-type">سوشيال ميديا - social media</span>
+                    {%endif%}
+                </div>
+                <div class="post-info-small">
+                    <h2>{{x.title}}</h2>
+                </div>
+                <div class="post-info-small">
+                    <span>{{x.description|safe}}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+    <div class="col-md-12">
+        <div class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between" style="background: transparent;">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination mb-0">
+                    <li class="page-item {%if page|int<2%}disabled{%endif%}">
+                      <a class="page-link text" href="#" onclick="location.href=`/news/?page={{page|int - 1}}&lang=${localStorage.getItem('nobleLang')}`">Previous</a>
+                  </li>
+                    {% for i in range(1,((news|length)/(6))|round(0, 'ceil')|int + 1) %}
+                    <li class="page-item {%if i|string in page%}active{%endif%}">
+                        <a class="page-link" href="#" onclick="location.href=`/news/?page={{i}}&lang=${localStorage.getItem('nobleLang')}`">{{i}}</a>
+                    </li>
+                    {%endfor%}
+                    <li class="page-item {%if news[((page|int-1)*6):((page|int)*6)+1]|length<=6%}disabled{%endif%}">
+                      <a class="page-link text" href="#" onclick="location.href=`/news/?page={{page|int + 1}}&lang=${localStorage.getItem('nobleLang')}`">Next</a>
+                  </li>
+                </ul>
+            </nav>
+          </div>
+        </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
+<script src="/static/js/languages/news.js"></script>
+<script src="/static/js/news.js"></script>
+{%endblock%}
