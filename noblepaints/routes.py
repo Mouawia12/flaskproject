@@ -9,7 +9,22 @@ from sqlalchemy import insert, desc, func
 from sqlalchemy.orm import noload
 import pathlib
 import requests
-from flask import g, render_template,request,jsonify,send_from_directory,redirect,url_for,flash,session,abort,make_response,Response, send_file,json
+from flask import (
+    g,
+    render_template,
+    request,
+    jsonify,
+    send_from_directory,
+    redirect,
+    url_for,
+    flash,
+    session,
+    abort,
+    make_response,
+    Response,
+    send_file,
+    json,
+)
 from flask_login import login_user, logout_user, login_required, current_user
 from noblepaints.forms import LoginForm
 from noblepaints.models import Category,Product,Catalog,TechnicalDatasheet,Post,Certificate,Approval,ProductSchema,Upload,SocialSchema,Social,User
@@ -112,6 +127,24 @@ def inject_layout_helpers():
         't': translate,
         'base_translations': serialise_translations(),
     }
+
+
+def json_success(message='OK', status=200, **extra):
+    """Create a standard JSON success response."""
+    payload = {'success': True}
+    if message is not None:
+        payload['message'] = message
+    if extra:
+        payload.update(extra)
+    return jsonify(payload), status
+
+
+def json_error(message, status=400, **extra):
+    """Create a standard JSON error response."""
+    payload = {'success': False, 'message': message}
+    if extra:
+        payload.update(extra)
+    return jsonify(payload), status
 # create download function for download files
 @app.route('/download/<upload_id>')
 def download(upload_id):
@@ -145,19 +178,39 @@ def get_video():
                 yield data
                 data = f.read(1024)
     return Response(generate(), mimetype="video/mp4", headers={"Accept-Ranges": "bytes"})
-@app.route('/sendC/',methods=["POST","GET"])
+@app.route('/sendC/', methods=["POST", "GET"])
 def sendC():
-    data = request.get_json()  
-    print(data["type"],data["name"],data["phone"])
-    msg = Message(data["type"],sender = "noreply@demo.com",recipients = ["info@noblepaints.com.sa"])
-    msg.body = f'''
-    :Noble Paints Customers:\n
-    Name: {data["name"]}\n
-    Company Name: {data["comp"]}\n
-    Phone: {data["phone"]}\n
-    Message: {data["message"]}\n
-    '''
-    mail.send(msg)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    required_fields = ['type', 'name', 'phone']
+    missing = [field for field in required_fields if not data.get(field)]
+    if missing:
+        return json_error(
+            f"Missing required fields: {', '.join(missing)}",
+            status=400
+        )
+
+    msg = Message(
+        data["type"],
+        sender="noreply@demo.com",
+        recipients=["info@noblepaints.com.sa"],
+    )
+    msg.body = (
+        ":Noble Paints Customers:\n"
+        f"Name: {data.get('name')}\n"
+        f"Company Name: {data.get('comp', '')}\n"
+        f"Phone: {data.get('phone')}\n"
+        f"Message: {data.get('message', '')}\n"
+    )
+    try:
+        mail.send(msg)
+    except Exception as exc:
+        app.logger.exception("Failed to send contact form email: %s", exc)
+        return json_error('Unable to send message right now.', status=500)
+
+    return json_success('Message sent successfully.')
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -734,30 +787,48 @@ def cpanel_socialIcons():
 @app.route('/ControlPanel/socialIcons/add/',methods=['POST','GET'])
 @login_required
 def socialIcons_add():
-    data = request.get_json()
-    link = data['link']
-    icon = data['icon']
-    s1 = Social(link=link,icon=icon)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    link = (data.get('link') or '').strip()
+    icon = (data.get('icon') or '').strip()
+    if not link or not icon:
+        return json_error('Link and icon are required fields.')
+
+    s1 = Social(link=link, icon=icon)
     db.session.add(s1)
     db.session.commit()
-    return 'True'
+    return json_success('Social icon created successfully.', status=201, id=s1.id)
 @app.route('/ControlPanel/socialIcons/edit/<id>/',methods=['POST','GET'])
 @login_required
 def socialIcons_edit(id):
-    data = request.get_json()
-    link = data['link']
-    icon = data['icon']
-    query = db.session.query(Social).filter(Social.id==id).first()
-    if link!='' and link!=None and link!='undefined':
-        query.link = link
-    if icon!='' and icon!=None and icon!='undefined':
-        query.icon = icon
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    social = db.session.query(Social).filter(Social.id == id).first()
+    if not social:
+        return json_error('Social icon not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    link = data.get('link')
+    icon = data.get('icon')
+    if link and link != 'undefined':
+        social.link = link.strip()
+    if icon and icon != 'undefined':
+        social.icon = icon.strip()
     db.session.commit()
+    return json_success('Social icon updated successfully.')
 @app.route('/ControlPanel/socialIcons/del/<id>/')
 @login_required
 def socialIcons_del(id):
-    db.session.delete(db.session.query(Social).filter(Social.id==id).first())
+    social = db.session.query(Social).filter(Social.id == id).first()
+    if not social:
+        return json_error('Social icon not found.', status=404)
+
+    db.session.delete(social)
     db.session.commit()
+    return json_success('Social icon deleted successfully.')
 ###################################################
 @app.route('/ControlPanel/news/')
 @login_required
@@ -772,45 +843,65 @@ def cpanel_news():
 @app.route('/ControlPanel/news/add/',methods=['POST','GET'])
 @login_required
 def news_add():
-    data = request.get_json()
-    title = data['title']
-    img = data['img']
-    description = data['description']
-    date = data['date']
-    lang = data['lang']
-    s1 = Post(title=title,img=img,description=description,lang=lang,date=date)
-    db.session.add(s1)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get('title') or '').strip()
+    description = (data.get('description') or '').strip()
+    lang = (data.get('lang') or '').strip() or getattr(g, 'current_lang', 'en')
+    if not title or not description:
+        return json_error('Title and description are required.')
+
+    post = Post(
+        title=title,
+        img=data.get('img'),
+        description=description,
+        lang=lang,
+        date=data.get('date'),
+    )
+    db.session.add(post)
     db.session.commit()
-    return 'True'
+    return json_success('News item created successfully.', status=201, id=post.id)
 @app.route('/ControlPanel/news/edit/<id>/',methods=['POST','GET'])
 @login_required
 def news_edit(id):
-    data = request.get_json()
-    title = data['title']
-    lang = data['lang']
-    img = data['img']
-    date = data['date']
-    description = data['description']
-    date = data['date']
-    query = db.session.query(Post).filter(Post.id==id).first()
-    if title!='' and title!=None and title!='undefined':
-        query.title = title
-    if description!='' and description!=None and description!='undefined':
-        query.description = description
-    if date!='' and date!=None and date!='undefined':
-        query.date = date
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
-    if lang!='' and lang!=None and lang!='undefined':
-        query.lang = lang
-    if date!='' and date!=None and date!='undefined':
-        query.date = date
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    post = db.session.query(Post).filter(Post.id == id).first()
+    if not post:
+        return json_error('News item not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    title = data.get('title')
+    description = data.get('description')
+    date = data.get('date')
+    img = data.get('img')
+    lang = data.get('lang')
+    if title and title != 'undefined':
+        post.title = title.strip()
+    if description and description != 'undefined':
+        post.description = description.strip()
+    if date and date != 'undefined':
+        post.date = date
+    if img and img != 'undefined':
+        post.img = img
+    if lang and lang != 'undefined':
+        post.lang = lang.strip()
+
     db.session.commit()
+    return json_success('News item updated successfully.')
 @app.route('/ControlPanel/news/del/<id>/')
 @login_required
 def news_del(id):
-    db.session.delete(db.session.query(Post).filter(Post.id==id).first())
+    post = db.session.query(Post).filter(Post.id == id).first()
+    if not post:
+        return json_error('News item not found.', status=404)
+
+    db.session.delete(post)
     db.session.commit()
+    return json_success('News item deleted successfully.')
 ################################################
 @app.route('/ControlPanel/certificates/')
 @login_required
@@ -824,38 +915,60 @@ def cpanel_certificates():
 @app.route('/ControlPanel/certificates/add/',methods=['POST','GET'])
 @login_required
 def certificates_add():
-    data = request.get_json()
-    title = data['title']
-    img = data['img']
-    description = data['description']
-    link = data['link']
-    s1 = Certificate(title=title,img=img,description=description,link=link)
-    db.session.add(s1)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get('title') or '').strip()
+    description = (data.get('description') or '').strip()
+    if not title or not description:
+        return json_error('Title and description are required.')
+
+    certificate = Certificate(
+        title=title,
+        img=data.get('img'),
+        description=description,
+        link=data.get('link'),
+    )
+    db.session.add(certificate)
     db.session.commit()
-    return 'True'
+    return json_success('Certificate created successfully.', status=201, id=certificate.id)
 @app.route('/ControlPanel/certificates/edit/<id>/',methods=['POST','GET'])
 @login_required
 def certificates_edit(id):
-    data = request.get_json()
-    title = data['title']
-    img = data['img']
-    description = data['description']
-    link = data['link']
-    query = db.session.query(Certificate).filter(Certificate.id==id).first()
-    if title!='' and title!=None and title!='undefined':
-        query.title = title
-    if description!='' and description!=None and description!='undefined':
-        query.description = description
-    if link!='' and link!=None and link!='undefined':
-        query.link = link
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    certificate = db.session.query(Certificate).filter(Certificate.id == id).first()
+    if not certificate:
+        return json_error('Certificate not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    title = data.get('title')
+    description = data.get('description')
+    link = data.get('link')
+    img = data.get('img')
+    if title and title != 'undefined':
+        certificate.title = title.strip()
+    if description and description != 'undefined':
+        certificate.description = description.strip()
+    if link and link != 'undefined':
+        certificate.link = link
+    if img and img != 'undefined':
+        certificate.img = img
+
     db.session.commit()
+    return json_success('Certificate updated successfully.')
 @app.route('/ControlPanel/certificates/del/<id>/')
 @login_required
 def certificates_del(id):
-    db.session.delete(db.session.query(Certificate).filter(Certificate.id==id).first())
+    certificate = db.session.query(Certificate).filter(Certificate.id == id).first()
+    if not certificate:
+        return json_error('Certificate not found.', status=404)
+
+    db.session.delete(certificate)
     db.session.commit()
+    return json_success('Certificate deleted successfully.')
 ###############################################
 @app.route('/ControlPanel/approvals/')
 @login_required
@@ -869,38 +982,60 @@ def cpanel_approvals():
 @app.route('/ControlPanel/approvals/add/',methods=['POST','GET'])
 @login_required
 def approvals_add():
-    data = request.get_json()
-    title = data['title']
-    img = data['img']
-    description = data['description']
-    link = data['link']
-    s1 = Approval(title=title,img=img,description=description,link=link)
-    db.session.add(s1)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get('title') or '').strip()
+    description = (data.get('description') or '').strip()
+    if not title or not description:
+        return json_error('Title and description are required.')
+
+    approval = Approval(
+        title=title,
+        img=data.get('img'),
+        description=description,
+        link=data.get('link'),
+    )
+    db.session.add(approval)
     db.session.commit()
-    return 'True'
+    return json_success('Approval created successfully.', status=201, id=approval.id)
 @app.route('/ControlPanel/approvals/edit/<id>/',methods=['POST','GET'])
 @login_required
 def approvals_edit(id):
-    data = request.get_json()
-    title = data['title']
-    img = data['img']
-    description = data['description']
-    link = data['link']
-    query = db.session.query(Approval).filter(Approval.id==id).first()
-    if title!='' and title!=None and title!='undefined':
-        query.title = title
-    if description!='' and description!=None and description!='undefined':
-        query.description = description
-    if link!='' and link!=None and link!='undefined':
-        query.link = link
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    approval = db.session.query(Approval).filter(Approval.id == id).first()
+    if not approval:
+        return json_error('Approval not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    title = data.get('title')
+    description = data.get('description')
+    link = data.get('link')
+    img = data.get('img')
+    if title and title != 'undefined':
+        approval.title = title.strip()
+    if description and description != 'undefined':
+        approval.description = description.strip()
+    if link and link != 'undefined':
+        approval.link = link
+    if img and img != 'undefined':
+        approval.img = img
+
     db.session.commit()
+    return json_success('Approval updated successfully.')
 @app.route('/ControlPanel/approvals/del/<id>/')
 @login_required
 def approvals_del(id):
-    db.session.delete(db.session.query(Approval).filter(Approval.id==id).first())
+    approval = db.session.query(Approval).filter(Approval.id == id).first()
+    if not approval:
+        return json_error('Approval not found.', status=404)
+
+    db.session.delete(approval)
     db.session.commit()
+    return json_success('Approval deleted successfully.')
 ################################################
 @app.route('/ControlPanel/products/')
 @login_required
@@ -916,40 +1051,69 @@ def cpanel_products():
 @app.route('/ControlPanel/products/add/',methods=['POST','GET'])
 @login_required
 def products_add():
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    if 'data' not in request.form:
+        return json_error('Missing product data payload.')
+
     data = json.loads(request.form['data'])
-    name = data['name']
-    img = data['img']
-    desc = data['desc']
-    category = data['category']
-    country = data['country']
-    lang = data['lang']
+    name = (data.get('name') or '').strip()
+    desc = (data.get('desc') or '').strip()
+    if not name or not desc:
+        return json_error('Name and description are required.')
+
+    img = data.get('img')
+    category = data.get('category')
+    country = data.get('country')
+    lang = data.get('lang') or 'en'
+
+    datasheet_id = ""
     if request.files:
-        datasheet = request.files['file']
-        upload = Upload(filename=datasheet.filename, data=datasheet.read())
-        db.session.add(upload)
-        db.session.commit()
-        s1 = Product(name=name,img=img,desc=desc,category=category,country=country,lang=lang,datasheet=upload.id)
-    else:
-        s1 = Product(name=name,img=img,desc=desc,category=category,country=country,lang=lang,datasheet="")
-    db.session.add(s1)
-    #db.session.execute(insert(Product).values(s1))
+        datasheet = request.files.get('file')
+        if datasheet and datasheet.filename:
+            upload = Upload(filename=datasheet.filename, data=datasheet.read())
+            db.session.add(upload)
+            db.session.commit()
+            datasheet_id = upload.id
+
+    product = Product(
+        name=name,
+        img=img,
+        desc=desc,
+        category=category,
+        country=country,
+        lang=lang,
+        datasheet=datasheet_id,
+    )
+    db.session.add(product)
     db.session.commit()
-    return 'True'
+    return json_success('Product created successfully.', status=201, id=product.id)
 @app.route('/ControlPanel/products/edit/<id>/',methods=['POST','GET'])
 @login_required
 def products_edit(id):
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    product = db.session.query(Product).filter(Product.id == id).first()
+    if not product:
+        return json_error('Product not found.', status=404)
+
+    if 'data' not in request.form:
+        return json_error('Missing product data payload.')
+
     data = json.loads(request.form['data'])
-    name = data['name']
-    img = data['img']
-    desc = data['desc']
-    category = data['category']
-    country = data['country']
-    lang = data['lang']
-    query = db.session.query(Product).filter(Product.id==id).first()
+    name = data.get('name')
+    img = data.get('img')
+    desc = data.get('desc')
+    category = data.get('category')
+    country = data.get('country')
+    lang = data.get('lang')
+
     if request.files:
-        datasheet = request.files['file']
-        if datasheet!='' and datasheet!=None and datasheet!='undefined':
-            upload = db.session.query(Upload).filter(Upload.id==query.datasheet).first()
+        datasheet = request.files.get('file')
+        if datasheet and datasheet.filename and datasheet != 'undefined':
+            upload = db.session.query(Upload).filter(Upload.id == product.datasheet).first()
             if upload:
                 upload.filename = datasheet.filename
                 upload.data = datasheet.read()
@@ -957,26 +1121,33 @@ def products_edit(id):
                 upload = Upload(filename=datasheet.filename, data=datasheet.read())
                 db.session.add(upload)
                 db.session.commit()
-                query.datasheet = upload.id
-    if name!='' and name!=None and name!='undefined':
-        query.name = name
-    if desc!='' and desc!=None and desc!='undefined':
-        query.desc = desc
-    if category!='' and category!=None and category!='undefined':
-        query.category = category
-    if country!='' and country!=None and country!='undefined':
-        query.country = country
-    if lang!='' and lang!=None and lang!='undefined':
-        query.lang = lang
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
+                product.datasheet = upload.id
+
+    if name and name != 'undefined':
+        product.name = name.strip()
+    if desc and desc != 'undefined':
+        product.desc = desc.strip()
+    if category and category != 'undefined':
+        product.category = category
+    if country and country != 'undefined':
+        product.country = country
+    if lang and lang != 'undefined':
+        product.lang = lang
+    if img and img != 'undefined':
+        product.img = img
+
     db.session.commit()
-    return json.dumps(True)
+    return json_success('Product updated successfully.')
 @app.route('/ControlPanel/products/del/<id>/')
 @login_required
 def products_del(id):
-    db.session.delete(db.session.query(Product).filter(Product.id==id).first())
+    product = db.session.query(Product).filter(Product.id == id).first()
+    if not product:
+        return json_error('Product not found.', status=404)
+
+    db.session.delete(product)
     db.session.commit()
+    return json_success('Product deleted successfully.')
 ################################################
 @app.route('/ControlPanel/catalogs/')
 @login_required
@@ -992,34 +1163,64 @@ def cpanel_catalogs():
 @app.route('/ControlPanel/catalogs/add/',methods=['POST','GET'])
 @login_required
 def catalogs_add():
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    if 'data' not in request.form:
+        return json_error('Missing catalog data payload.')
+
     data = json.loads(request.form['data'])
-    name = data['name']
-    img = data['img']
-    link = request.files['file']
-    category = data['category']
-    lang = data['lang']
-    country = data['country']
-    upload = Upload(filename=link.filename, data=link.read())
+    name = (data.get('name') or '').strip()
+    img = data.get('img')
+    category = data.get('category')
+    lang = data.get('lang') or 'en'
+    country = data.get('country')
+    if not name:
+        return json_error('Catalog name is required.')
+
+    file_obj = request.files.get('file')
+    if not file_obj or not file_obj.filename:
+        return json_error('Catalog file upload is required.')
+
+    upload = Upload(filename=file_obj.filename, data=file_obj.read())
     db.session.add(upload)
     db.session.commit()
-    s1 = Catalog(name=name,img=img,link=upload.id,category=category,country=country,lang=lang)
-    db.session.add(s1)
+
+    catalog = Catalog(
+        name=name,
+        img=img,
+        link=upload.id,
+        category=category,
+        country=country,
+        lang=lang,
+    )
+    db.session.add(catalog)
     db.session.commit()
-    return 'True'
+    return json_success('Catalog created successfully.', status=201, id=catalog.id)
 @app.route('/ControlPanel/catalogs/edit/<id>/',methods=['POST','GET'])
 @login_required
 def catalogs_edit(id):
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    catalog = db.session.query(Catalog).filter(Catalog.id == id).first()
+    if not catalog:
+        return json_error('Catalog not found.', status=404)
+
+    if 'data' not in request.form:
+        return json_error('Missing catalog data payload.')
+
     data = json.loads(request.form['data'])
-    name = data['name']
-    img = data['img']
-    category = data['category']
-    lang = data['lang']
-    country = data['country']
-    query = db.session.query(Catalog).filter(Catalog.id==id).first()
+    name = data.get('name')
+    img = data.get('img')
+    category = data.get('category')
+    lang = data.get('lang')
+    country = data.get('country')
+
     if request.files:
-        link = request.files['file']
-        if link!='' and link!=None and link!='undefined':
-            upload = db.session.query(Upload).filter(Upload.id==query.link).first()
+        link = request.files.get('file')
+        if link and link.filename and link != 'undefined':
+            upload = db.session.query(Upload).filter(Upload.id == catalog.link).first()
             if upload:
                 upload.filename = link.filename
                 upload.data = link.read()
@@ -1027,24 +1228,31 @@ def catalogs_edit(id):
                 upload = Upload(filename=link.filename, data=link.read())
                 db.session.add(upload)
                 db.session.commit()
-                query.link = upload.id
-    if name!='' and name!=None and name!='undefined':
-        query.name = name
-    if category!='' and category!=None and category!='undefined':
-        query.category = category
-    if country!='' and country!=None and country!='undefined':
-        query.country = country
-    if lang!='' and lang!=None and lang!='undefined':
-        query.lang = lang
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
+                catalog.link = upload.id
+
+    if name and name != 'undefined':
+        catalog.name = name.strip()
+    if category and category != 'undefined':
+        catalog.category = category
+    if country and country != 'undefined':
+        catalog.country = country
+    if lang and lang != 'undefined':
+        catalog.lang = lang
+    if img and img != 'undefined':
+        catalog.img = img
+
     db.session.commit()
-    return 'True'
+    return json_success('Catalog updated successfully.')
 @app.route('/ControlPanel/catalogs/del/<id>/')
 @login_required
 def catalogs_del(id):
-    db.session.delete(db.session.query(Catalog).filter(Catalog.id==id).first())
+    catalog = db.session.query(Catalog).filter(Catalog.id == id).first()
+    if not catalog:
+        return json_error('Catalog not found.', status=404)
+
+    db.session.delete(catalog)
     db.session.commit()
+    return json_success('Catalog deleted successfully.')
 ####################################################
 @app.route('/ControlPanel/TechnicalDatasheets/')
 @login_required
@@ -1060,42 +1268,68 @@ def cpanel_TechnicalDatasheets():
 @app.route('/ControlPanel/TechnicalDatasheets/add/',methods=['POST','GET'])
 @login_required
 def TechnicalDatasheets_add():
-    data = request.get_json()
-    name = data['name']
-    link = data['link']
-    category = data['category']
-    country = data['country']
-    lang = data['lang']
-    s1 = TechnicalDatasheet(name=name,link=link,category=category,country=country,lang=lang)
-    db.session.add(s1)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    link = data.get('link')
+    category = data.get('category')
+    country = data.get('country')
+    lang = data.get('lang') or 'en'
+    if not name or not link:
+        return json_error('Name and link are required.')
+
+    datasheet = TechnicalDatasheet(
+        name=name,
+        link=link,
+        category=category,
+        country=country,
+        lang=lang,
+    )
+    db.session.add(datasheet)
     db.session.commit()
-    return 'True'
+    return json_success('Technical datasheet created successfully.', status=201, id=datasheet.id)
 @app.route('/ControlPanel/TechnicalDatasheets/edit/<id>/',methods=['POST','GET'])
 @login_required
 def TechnicalDatasheets_edit(id):
-    data = request.get_json()
-    name = data['name']
-    link = data['link']
-    category = data['category']
-    country = data['country']
-    lang = data['lang']
-    query = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id==id).first()
-    if name!='' and name!=None and name!='undefined':
-        query.name = name
-    if link!='' and link!=None and link!='undefined':
-        query.link = link
-    if category!='' and category!=None and category!='undefined':
-        query.category = category
-    if country!='' and country!=None and country!='undefined':
-        query.country = country
-    if lang!='' and lang!=None and lang!='undefined':
-        query.lang = lang
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    datasheet = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id == id).first()
+    if not datasheet:
+        return json_error('Technical datasheet not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    name = data.get('name')
+    link = data.get('link')
+    category = data.get('category')
+    country = data.get('country')
+    lang = data.get('lang')
+
+    if name and name != 'undefined':
+        datasheet.name = name.strip()
+    if link and link != 'undefined':
+        datasheet.link = link
+    if category and category != 'undefined':
+        datasheet.category = category
+    if country and country != 'undefined':
+        datasheet.country = country
+    if lang and lang != 'undefined':
+        datasheet.lang = lang
+
     db.session.commit()
+    return json_success('Technical datasheet updated successfully.')
 @app.route('/ControlPanel/TechnicalDatasheets/del/<id>/')
 @login_required
 def TechnicalDatasheets_del(id):
-    db.session.delete(db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id==id).first())
+    datasheet = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id == id).first()
+    if not datasheet:
+        return json_error('Technical datasheet not found.', status=404)
+
+    db.session.delete(datasheet)
     db.session.commit()
+    return json_success('Technical datasheet deleted successfully.')
 ####################################################
 @app.route('/ControlPanel/')
 @app.route('/ControlPanel/categories/')
@@ -1116,38 +1350,61 @@ def cpanel_categories():
 @app.route('/ControlPanel/categories/add/',methods=['POST','GET'])
 @login_required
 def categories_add():
-    data = request.get_json()
-    name = data['name']
-    nameArabic = data['namearabic']
-    img = data['img']
-    desc = data['desc']
-    s1 = Category(name=name,img=img,desc=desc,nameArabic=nameArabic)
-    db.session.add(s1)
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    desc = (data.get('desc') or '').strip()
+    if not name or not desc:
+        return json_error('Name and description are required.')
+
+    category = Category(
+        name=name,
+        img=data.get('img'),
+        desc=desc,
+        nameArabic=data.get('namearabic'),
+    )
+    db.session.add(category)
     db.session.commit()
-    return 'True'
+    return json_success('Category created successfully.', status=201, id=category.id)
 @app.route('/ControlPanel/categories/edit/<id>/',methods=['POST','GET'])
 @login_required
 def categories_edit(id):
-    data = request.get_json()
-    name = data['name']
-    nameArabic = data['namearabic']
-    img = data['img']
-    desc = data['desc']
-    query = db.session.query(Category).filter(Category.id==id).first()
-    if name!='' and name!=None and name!='undefined':
-        query.name = name
-    if desc!='' and desc!=None and desc!='undefined':
-        query.desc = desc
-    if nameArabic!='' and nameArabic!=None and nameArabic!='undefined':
-        query.nameArabic = nameArabic
-    if img!='' and img!=None and img!='undefined':
-        query.img = img
+    if request.method != 'POST':
+        return json_error('Method not allowed', status=405)
+
+    category = db.session.query(Category).filter(Category.id == id).first()
+    if not category:
+        return json_error('Category not found.', status=404)
+
+    data = request.get_json(silent=True) or {}
+    name = data.get('name')
+    desc = data.get('desc')
+    name_arabic = data.get('namearabic')
+    img = data.get('img')
+
+    if name and name != 'undefined':
+        category.name = name.strip()
+    if desc and desc != 'undefined':
+        category.desc = desc.strip()
+    if name_arabic and name_arabic != 'undefined':
+        category.nameArabic = name_arabic.strip()
+    if img and img != 'undefined':
+        category.img = img
+
     db.session.commit()
+    return json_success('Category updated successfully.')
 @app.route('/ControlPanel/categories/del/<id>/')
 @login_required
 def categories_del(id):
-    db.session.delete(db.session.query(Category).filter(Category.id==id).first())
+    category = db.session.query(Category).filter(Category.id == id).first()
+    if not category:
+        return json_error('Category not found.', status=404)
+
+    db.session.delete(category)
     db.session.commit()
+    return json_success('Category deleted successfully.')
 @app.route('/getProducts/')
 def get_products():
     lang=request.args.get('lang')
