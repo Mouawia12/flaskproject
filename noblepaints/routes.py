@@ -26,6 +26,10 @@ from flask import (
     json,
 )
 from flask_login import login_user, logout_user, login_required, current_user
+try:
+    from deep_translator import GoogleTranslator  # type: ignore
+except Exception:  # pragma: no cover - translation is optional at runtime
+    GoogleTranslator = None
 from noblepaints.forms import LoginForm
 from noblepaints.models import (
     Category,
@@ -62,6 +66,20 @@ FEATURED_PRODUCT_IDS = (
     104,
     76,
 )
+
+
+def _translate_text(text, target_lang="ar", source_lang="auto"):
+    """Translate *text* into *target_lang* if translation services are available."""
+
+    if not text or not GoogleTranslator:
+        return None
+
+    try:
+        translator = GoogleTranslator(source=source_lang, target=target_lang)
+        return translator.translate(text)
+    except Exception as exc:  # pragma: no cover - network/transient failures
+        app.logger.warning("Auto-translation failed: %s", exc)
+        return None
 
 
 def _normalise_lang(candidate):
@@ -562,171 +580,42 @@ def products_cat_page(cat):
             title="kids",                    
             )
 @app.route('/productsSearch/')
-def productsSearch_page_filter_none():  
-    cat = request.args.get('category')
-    page = request.args.get('page')
-    search = request.args.get('search')
-    country = request.args.get('country')
-    #lang = request.args.get('lang')
-    lang = 'en'
-    if search == None or search == "null" or search == "":
-        if country == "All" or country == None or country == "null" or country == "":
-            if page == None or page == "null":
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.lang==lang,Product.name.contains("")).all(),
-                        page="1",
-                        category="All",
-                        search="",
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.category==cat,Product.lang==lang,Product.name.contains("")).all(),
-                        page="1",
-                        category=cat,
-                        search="",
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-            else:
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.lang==lang,Product.lang==lang,Product.name.contains("")).all(),
-                        page=page,
-                        category="All",
-                        search="",
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                        )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.category==cat,Product.lang==lang,Product.name.contains("")).all(),
-                        page=page,
-                        category=cat,
-                        search="",
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-        else:
-            if page == None or page == "null":
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains("")).all(),
-                        page="1",
-                        category="All",
-                        search="",
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains("")).all(),
-                        page="1",
-                        category=cat,
-                        search="",
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-            else:
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains("")).all(),
-                        page=page,
-                        category="All",
-                        search="",
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains("")).all(),
-                        page=page,
-                        category=cat,
-                        search="",
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-    else:
-        if country == "All" or country == None or country == "null" or country == "":
-            if page == None or page == "null":
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.lang==lang,Product.name.contains(search)).all(),
-                        page="1",
-                        category="All",
-                        search=search,
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.category==cat,Product.lang==lang,Product.name.contains(search)).all(),
-                        page="1",
-                        category=cat,
-                        search=search,
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-            else:
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.lang==lang,Product.name.contains(search)).all(),
-                        page=page,
-                        category="All",
-                        search=search,
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                        )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.category==cat,Product.lang==lang,Product.name.contains(search)).all(),
-                        page=page,
-                        category=cat,
-                        search=search,
-                        country="All",
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-        else:
-            if page == None or page == "null":
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains(search)).all(),
-                        page="1",
-                        category="All",
-                        search=search,
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains(search)).all(),
-                        page="1",
-                        category=cat,
-                        search=search,
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-            else:
-                if cat == "All" or cat == None or cat == "null":
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains(search)).all(),
-                        page=page,
-                        category="All",
-                        search=search,
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
-                else:
-                    return render_template('productsSearch.html',items = db.session.query(Product).filter(Product.country==country,Product.lang==lang,Product.name.contains(search)).all(),
-                        page=page,
-                        category=cat,
-                        search=search,
-                        country=country,
-                        categories = db.session.query(Category).all(),
-                        template = 'products'
-                    )
+def productsSearch_page_filter_none():
+    lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+    category_filter = (request.args.get('category') or 'All').strip() or 'All'
+    search_term = (request.args.get('search') or '').strip()
+    country_filter = (request.args.get('country') or 'All').strip() or 'All'
+    page = request.args.get('page', default='1')
+
+    try:
+        page_number = max(int(page), 1)
+    except (TypeError, ValueError):
+        page_number = 1
+
+    query = db.session.query(Product).filter(Product.lang == lang)
+
+    if category_filter not in (None, '', 'All', 'null'):
+        query = query.filter(Product.category == category_filter)
+
+    if country_filter not in (None, '', 'All', 'null'):
+        query = query.filter(Product.country == country_filter)
+
+    if search_term:
+        query = query.filter(Product.name.ilike(f'%{search_term}%'))
+
+    items = query.order_by(Product.id.desc()).all()
+
+    return render_template(
+        'productsSearch.html',
+        items=items,
+        page=str(page_number),
+        category='All' if category_filter in (None, '', 'All', 'null') else category_filter,
+        search=search_term,
+        country='All' if country_filter in (None, '', 'All', 'null') else country_filter,
+        categories=get_cached_categories(),
+        template='products',
+        lang=lang,
+    )
 @app.route('/catalogs/')
 def catalogs_page_filter_none():  
     try:
@@ -1456,7 +1345,19 @@ def categories_add():
 
     data = request.get_json(silent=True) or {}
     name = (data.get('name') or '').strip()
+    name_arabic = (data.get('namearabic') or '').strip()
     desc = (data.get('desc') or '').strip()
+
+    if not name and name_arabic:
+        translated = _translate_text(name_arabic, target_lang="en")
+        if translated:
+            name = translated
+
+    if not name_arabic and name:
+        translated = _translate_text(name, target_lang="ar")
+        if translated:
+            name_arabic = translated
+
     if not name or not desc:
         return json_error('Name and description are required.')
 
@@ -1464,7 +1365,7 @@ def categories_add():
         name=name,
         img=data.get('img'),
         desc=desc,
-        nameArabic=data.get('namearabic'),
+        nameArabic=name_arabic or None,
     )
     db.session.add(category)
     db.session.commit()
@@ -1486,11 +1387,26 @@ def categories_edit(id):
     name_arabic = data.get('namearabic')
     img = data.get('img')
 
-    if name and name != 'undefined':
+    if name == '' or name == 'undefined':
+        name = None
+    if name_arabic == '' or name_arabic == 'undefined':
+        name_arabic = None
+
+    if not name and name_arabic:
+        translated = _translate_text(name_arabic, target_lang="en")
+        if translated:
+            name = translated
+
+    if not name_arabic and name:
+        translated = _translate_text(name, target_lang="ar")
+        if translated:
+            name_arabic = translated
+
+    if name:
         category.name = name.strip()
     if desc and desc != 'undefined':
         category.desc = desc.strip()
-    if name_arabic and name_arabic != 'undefined':
+    if name_arabic:
         category.nameArabic = name_arabic.strip()
     if img and img != 'undefined':
         category.img = img

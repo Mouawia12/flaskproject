@@ -19,12 +19,14 @@ function getParams(query) {
 }
 
 const activeLang = getActiveLang();
-const checkWraps = Array.from(document.querySelectorAll('.check-wrap'));
-const radioWraps = Array.from(document.querySelectorAll('.radio-wrap'));
+const optionElements = Array.from(document.querySelectorAll('[data-category-option]'));
+const checkWraps = optionElements
+    .map((option) => option.querySelector('.check-wrap'))
+    .filter(Boolean);
 
 const clearSelection = () => {
     checkWraps.forEach((wrap) => wrap.classList.remove('checked'));
-    radioWraps.forEach((wrap) => wrap.classList.remove('is-selected'));
+    optionElements.forEach((wrap) => wrap.classList.remove('is-selected'));
 };
 
 const highlightSelection = (wrap) => {
@@ -35,6 +37,20 @@ const highlightSelection = (wrap) => {
     const parent = wrap.parentElement;
     if (parent && parent.classList) {
         parent.classList.add('is-selected');
+    }
+};
+
+const updateCategoryLabels = () => {
+    const lang = getActiveLang();
+    document.querySelectorAll('[data-label-en]').forEach((label) => {
+        const text = lang === 'ar' ? label.getAttribute('data-label-ar') : label.getAttribute('data-label-en');
+        if (text) {
+            label.textContent = text;
+        }
+    });
+    const allLabel = document.querySelector('[data-category-value="All"]');
+    if (allLabel) {
+        allLabel.textContent = lang === 'ar' ? 'الكل' : 'All';
     }
 };
 
@@ -49,13 +65,21 @@ const navigateWithCategory = (category) => {
     window.location.href = `/productsSearch/?category=${targetCategory}&page=1&search=${search}&country=${country}&lang=${activeLang}`;
 };
 
-checkWraps.forEach((wrap) => {
+optionElements.forEach((option) => {
+    const wrap = option.querySelector('.check-wrap');
+    if (!wrap) {
+        return;
+    }
     wrap.addEventListener('click', () => {
+        const label = option.querySelector('[data-category-value]');
+        const value = label ? label.getAttribute('data-category-value') : '';
+        const input = option.querySelector('input[type="radio"]');
+        if (input) {
+            input.checked = true;
+        }
         clearSelection();
         highlightSelection(wrap);
-        const label = wrap.parentElement.querySelector('label');
-        const category = label ? label.getAttribute('name') : '';
-        navigateWithCategory(category);
+        navigateWithCategory(value);
     });
 });
 
@@ -65,26 +89,19 @@ if (activeLang === 'ar') {
     });
 }
 
-radioWraps
-    .filter((wrap, index) => wrap.getAttribute('lang') === activeLang && index > 0)
-    .forEach((wrap) => {
-        wrap.classList.remove('hidden');
-    });
+updateCategoryLabels();
 
 clearSelection();
 const currentCategory = getParams('category');
 if (!currentCategory) {
     highlightSelection(checkWraps[0]);
 } else {
-    const selected = checkWraps.find((wrap) => {
-        const parent = wrap.parentElement;
-        if (!parent || parent.classList.contains('hidden')) {
-            return false;
-        }
-        const label = parent.querySelector('label');
-        return label && label.getAttribute('name') === currentCategory;
+    const selectedOption = optionElements.find((option) => {
+        const label = option.querySelector('[data-category-value]');
+        return label && label.getAttribute('data-category-value') === currentCategory;
     });
-    highlightSelection(selected || checkWraps[0]);
+    const wrap = selectedOption ? selectedOption.querySelector('.check-wrap') : null;
+    highlightSelection(wrap || checkWraps[0]);
 }
 
 const searchButton = document.getElementById('Searchbtn');
@@ -120,9 +137,3 @@ if (countrySelect) {
     });
 }
 
-if (radioWraps.length) {
-    const allLabel = radioWraps[0].querySelector('label');
-    if (allLabel) {
-        allLabel.innerHTML = activeLang === 'ar' ? 'الكل' : 'All';
-    }
-}
