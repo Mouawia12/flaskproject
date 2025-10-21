@@ -148,28 +148,64 @@ main .products .products-wrap .product-item {
 
 main .filters .filed-wrap .radio-wrap {
     margin-bottom: 6px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    -webkit-transition: background-color .2s ease, color .2s ease;
+    -o-transition: background-color .2s ease, color .2s ease;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+main .filters .filed-wrap .radio-wrap:hover {
+    background-color: #f5f7fa;
+}
+
+main .filters .filed-wrap .radio-wrap.is-selected {
+    background-color: #fff5f5;
 }
 
 main .filters .filed-wrap .check-wrap {
-    border: 1px solid #ebeced;
-    display: inline-block;
-    vertical-align: top;
+    border: 2px solid #d0d5db;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
     width: 22px;
     height: 22px;
     position: relative;
-    -webkit-border-radius: 10em;
-    border-radius: 10em;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background-color: #fff;
     cursor: pointer;
+    -webkit-transition: border-color .2s ease, -webkit-box-shadow .2s ease;
+    transition: border-color .2s ease, -webkit-box-shadow .2s ease;
+    -o-transition: border-color .2s ease, box-shadow .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    transition: border-color .2s ease, box-shadow .2s ease, -webkit-box-shadow .2s ease;
 }
 
-main .filters .filed-wrap .radio-wrap span, main .filters .filed-wrap .radio-wrap label {
+main .filters .filed-wrap .radio-wrap span,
+main .filters .filed-wrap .radio-wrap label {
     display: inline-block;
     font-size: 15px;
-    color: #868e96;
+    color: #495057;
     line-height: 22px;
     vertical-align: middle;
     margin-left: 0;
     cursor: pointer;
+    font-weight: 500;
 }
 
 main .filters .filed-wrap .check-wrap input {
@@ -183,16 +219,27 @@ main .filters .filed-wrap .check-wrap input {
     cursor: pointer;
 }
 
+main .filters .filed-wrap .check-wrap.checked {
+    border-color: #d82028;
+    -webkit-box-shadow: 0 0 0 3px rgba(216, 32, 40, 0.15);
+    box-shadow: 0 0 0 3px rgba(216, 32, 40, 0.15);
+}
+
 main .filters .filed-wrap .check-wrap.checked:after {
     background-color: #d82028;
-    width: 10px;
-    height: 10px;
-    -webkit-border-radius: 10em;
-    border-radius: 10em;
+    width: 12px;
+    height: 12px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
     display: block;
-    margin: 5px auto 0;
+    margin: 3px auto 0;
     text-align: center;
     content: '';
+}
+
+main .filters .filed-wrap .check-wrap.checked + label {
+    color: #d82028;
+    font-weight: 600;
 }
 
 main .filters .filed-wrap div select, main .filters .filed-wrap div input[type="text"] {

@@ -3,6 +3,20 @@
     const TRANSLATIONS = window.BASE_TRANSLATIONS || {};
     const PAGE_TRANSLATIONS = window.PAGE_TRANSLATIONS || {};
 
+    const getStoredLanguage = () => {
+        try {
+            return (
+                window.localStorage.getItem("nobleLangCPanel") ||
+                window.localStorage.getItem("nobleLang") ||
+                null
+            );
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const resolvePreferredLanguage = () => getStoredLanguage() || ACTIVE_LANG || "en";
+
     const mergeTranslations = () => {
         const merged = {};
         const langs = new Set([
@@ -66,15 +80,16 @@
     };
 
     const updateDirection = () => {
-        const dir = ACTIVE_LANG === "ar" ? "rtl" : "ltr";
-        document.documentElement.setAttribute("lang", ACTIVE_LANG);
+        const lang = resolvePreferredLanguage();
+        const dir = lang === "ar" ? "rtl" : "ltr";
+        document.documentElement.setAttribute("lang", lang);
         document.documentElement.setAttribute("dir", dir);
         document.body.dir = dir;
     };
 
     const rememberLanguage = () => {
         try {
-            window.localStorage.setItem("nobleLang", ACTIVE_LANG);
+            window.localStorage.setItem("nobleLang", resolvePreferredLanguage());
         } catch (error) {
             // Ignore storage errors (private mode etc.)
         }
@@ -201,6 +216,7 @@
     };
 
     window.AppOverlay = overlay;
+    window.getLang = resolvePreferredLanguage;
 
     document.addEventListener("DOMContentLoaded", () => {
         updateDirection();
