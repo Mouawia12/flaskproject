@@ -370,182 +370,175 @@
 
 
 </main>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.css"></script>
 <script>
-  document.querySelector('#entriesNumber').querySelectorAll('a').forEach(e=>{
-    e.addEventListener('click',function(){
-      //localStorage.setItem('entriesNumber',e.innerHTML)
-      location.replace(`/ControlPanel/products/?page=${new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
-}).page}&show=${e.innerHTML}&lang=${localStorage.getItem('nobleLangCPanel')}`)
-    })
-  })
-  
+document.addEventListener('DOMContentLoaded', () => {
+  const api = window.AdminApi;
+  if (!api) {
+    console.error('AdminApi is not available.');
+    return;
+  }
 
+  const { request, requestFormData, notifySuccess, notifyWarning, notifyError, confirmDelete, resolveAdminLang } = api;
 
-    const resolveAdminLang = () => localStorage.getItem('nobleLangCPanel') || 'en';
-
-    const showRequestError = (message) => {
-      const fallback = message || 'حدث خطأ غير متوقع. حاول مرة أخرى.';
-      if (window.Swal && typeof window.Swal.fire === 'function') {
-        window.Swal.fire({
-          icon: 'error',
-          title: 'خطأ',
-          text: fallback,
-          confirmButtonText: 'حسناً',
-        });
-      } else {
-        window.alert(fallback);
-      }
-    };
-
-    const submitMultipartForm = async (url, formData) => {
-      const response = await fetch(url, {
-        method: 'POST',
-        body: formData,
+  const entriesMenu = document.querySelector('#entriesNumber');
+  if (entriesMenu) {
+    entriesMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get('page') || '1';
+        const show = link.textContent.trim();
+        const lang = resolveAdminLang();
+        window.location.replace(`/ControlPanel/products/?page=${page}&show=${show}&lang=${lang}`);
       });
+    });
+  }
 
-      const contentType = response.headers.get('content-type') || '';
-      let payload = null;
-      if (contentType.includes('application/json')) {
-        try {
-          payload = await response.json();
-        } catch (error) {
-          payload = null;
-        }
-      }
-
-      const success = response.ok && (!payload || payload.success !== false);
-      if (!success) {
-        const message = payload && (payload.message || payload.error);
-        throw new Error(message || 'تعذر تنفيذ الطلب.');
-      }
-
-      return payload;
-    };
-
-    document.querySelectorAll('.imgInput').forEach(e=>{
-      e.addEventListener('input',function(){
-        var fileInput = this;
-        var file = fileInput.files[0];
-          if (file.type.match(/image.*/)) {
-            var reader = new FileReader();
-            reader.onload = async function(e) {
-              fileInput.setAttribute('image',reader.result)
-              if(fileInput.classList.contains('secPhotosInput')){
-                newProjectForm.querySelector('.col-lg-4.col-sm-6').insertAdjacentHTML('beforeend',`
-                <div class="form-file mb-3">
-                    <input image=${fileInput.getAttribute('image')} type="file" class="form-file-input imgInput secPhotosInput" id="customFile">
-                    <label class="form-file-label" for="customFile">
-                        <span class="form-file-text">اختر ملفاً</span>
-                        <span class="form-file-button">تصفح</span>
-                    </label>
-                </div>
-                `)
-              }
-            }
-            reader.readAsDataURL(file);	
-          }
-      })
-    })
-    newProjectForm.querySelector('#saveBtn').addEventListener('click',async function(evt){
-      evt.preventDefault()
-      const formData = new FormData();
-      const datasheetFile = newAddfile.files[0];
-      if (datasheetFile) {
-        formData.append('file', datasheetFile);
-      }
-      const imageData = newAddimg.getAttribute('image');
-      if (!imageData) {
-        showRequestError('يرجى رفع صورة للمنتج قبل الحفظ.');
+  const bindImageInput = (input) => {
+    input.addEventListener('input', () => {
+      const file = input.files && input.files[0];
+      if (!file || !file.type.match(/image.*/)) {
         return;
       }
-      let data = {
-        'name':newAddname.value,
-        'img':imageData,
-        'category':newAddcategory.value,
-        'desc':newAdddesc.value.replaceAll('\n', '<br>'),
-        'country':newAddcountry.value,
-        'lang':resolveAdminLang(),
-      }
-      formData.append('data', JSON.stringify(data));
-      try {
-        AdminLoader.show()
-        await submitMultipartForm('/ControlPanel/products/add/', formData);
-        AdminLoader.hide()
-        location.reload()
-      } catch (error) {
-        AdminLoader.hide()
-        showRequestError(error.message)
-      }
-    })
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        input.setAttribute('image', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
-    document.querySelectorAll('.delete').forEach(e=>{
-      e.addEventListener('click',async function(){
-        Swal.fire({
-        title: "تأكيد",
-        text: 'هل أنت متأكد من حذف العنصر ؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: "نعم",
-        cancelButtonText: "لا"
-        })
-        .then(async(result)=>{
-          if (result.isConfirmed){
-            await fetch(`/ControlPanel/products/del/${e.closest('tr').getAttribute('id-num')}/`)
-        .then(()=>{location.reload()})
-          }
-        })
-        
-      })
-    })
+  document.querySelectorAll('.imgInput').forEach(bindImageInput);
 
-    function getParams(query){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
+  const createModal = document.getElementById('newProjectForm');
+  if (createModal) {
+    const saveButton = createModal.querySelector('#saveBtn');
+    if (saveButton) {
+      saveButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const imageData = createModal.querySelector('#newAddimg').getAttribute('image');
+        const payload = {
+          name: createModal.querySelector('#newAddname').value.trim(),
+          img: imageData,
+          category: createModal.querySelector('#newAddcategory').value,
+          desc: createModal.querySelector('#newAdddesc').value.replaceAll('\\n', '<br>').trim(),
+          country: createModal.querySelector('#newAddcountry').value,
+          lang: resolveAdminLang(),
+        };
+        if (!payload.name || !payload.desc) {
+          await notifyWarning({
+            text: 'يرجى إدخال الاسم والوصف قبل الحفظ.',
+          });
+          return;
+        }
+        if (!payload.img) {
+          await notifyWarning({
+            text: 'يرجى رفع صورة للمنتج قبل الحفظ.',
+          });
+          return;
+        }
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(payload));
+        const datasheetFile = createModal.querySelector('#newAddfile').files[0];
+        if (datasheetFile) {
+          formData.append('file', datasheetFile);
+        }
+        try {
+          await requestFormData('/ControlPanel/products/add/', formData);
+          await notifySuccess({
+            title: 'تم الحفظ',
+            text: 'تم إضافة المنتج بنجاح.',
+          });
+          window.location.reload();
+        } catch (error) {
+          await notifyError(error.message);
+        }
       });
-      // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
-      return params[query];
-}
+    }
+  }
 
-document.querySelectorAll('.editBtn').forEach(e=>{
-  e.addEventListener('click',async function(evt){
-    evt.preventDefault()
-    const formData = new FormData();
-      let data = {
-        'name':e.closest('.modal').querySelector('#editname').value,
-        'desc':e.closest('.modal').querySelector('#editdesc').value.replaceAll('\n', '<br>'),
-        'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
-        'category':e.closest('.modal').querySelector('#editcategory').value,
-        'country':e.closest('.modal').querySelector('#editcountry').value,
-        'lang':resolveAdminLang(),
-
+  document.querySelectorAll('.delete').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const confirmed = await confirmDelete();
+      if (!confirmed) {
+        return;
       }
-      const editSheet = e.closest('.modal').querySelector('#editsheet');
-      if (editSheet && editSheet.files && editSheet.files[0]) {
-        formData.append('file', editSheet.files[0]);
+      const row = button.closest('tr');
+      const id = row ? row.getAttribute('id-num') : null;
+      if (!id) {
+        await notifyError('تعذر تحديد المنتج المطلوب حذفه.');
+        return;
       }
-      formData.append('data', JSON.stringify(data));
       try {
-        AdminLoader.show()
-        await submitMultipartForm(`/ControlPanel/products/edit/${e.closest('.modal').getAttribute('idNum')}/`, formData);
-        AdminLoader.hide()
-        location.reload()
+        await request(`/ControlPanel/products/del/${id}/`, { method: 'DELETE' });
+        await notifySuccess({
+          title: 'تم الحذف',
+          text: 'تم حذف المنتج بنجاح.',
+        });
+        window.location.reload();
       } catch (error) {
-        AdminLoader.hide()
-        showRequestError(error.message)
+        await notifyError(error.message);
       }
+    });
+  });
 
-  })
-});
+  document.querySelectorAll('.editBtn').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const modal = button.closest('.modal');
+      if (!modal) {
+        return;
+      }
+      const payload = {
+        name: modal.querySelector('#editname').value.trim(),
+        desc: modal.querySelector('#editdesc').value.replaceAll('\\n', '<br>').trim(),
+        img: modal.querySelector('#editimg').getAttribute('image') || undefined,
+        category: modal.querySelector('#editcategory').value,
+        country: modal.querySelector('#editcountry').value,
+        lang: resolveAdminLang(),
+      };
+      if (!payload.name || !payload.desc) {
+        await notifyWarning({
+          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.',
+        });
+        return;
+      }
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(payload));
+      const datasheetFile = modal.querySelector('#editsheet');
+      if (datasheetFile && datasheetFile.files && datasheetFile.files[0]) {
+        formData.append('file', datasheetFile.files[0]);
+      }
+      const id = modal.getAttribute('idNum');
+      if (!id) {
+        await notifyError('تعذر تحديد المنتج المطلوب تحديثه.');
+        return;
+      }
+      try {
+        await requestFormData(`/ControlPanel/products/edit/${id}/`, formData);
+        await notifySuccess({
+          title: 'تم التحديث',
+          text: 'تم تحديث المنتج بنجاح.',
+        });
+        window.location.reload();
+      } catch (error) {
+        await notifyError(error.message);
+      }
+    });
+  });
 
-[...document.querySelectorAll('.toRep')].filter((e,i)=>e.getAttribute('lang')==localStorage.getItem('nobleLangCPanel')).forEach(e=>{
-    e.classList.remove('hidden')
+  document.querySelectorAll('.toRep').forEach((element) => {
+    if (element.getAttribute('lang') === resolveAdminLang()) {
+      element.classList.remove('hidden');
+    }
+  });
+
+  const changeLangCont = document.getElementById('changeLangCont');
+  if (changeLangCont) {
+    changeLangCont.classList.add('hidden');
+  }
 });
-changeLangCont.classList.add('hidden')
-/********************************************/
 </script>
 {% endblock %}
-

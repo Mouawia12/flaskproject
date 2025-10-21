@@ -40,14 +40,16 @@
             </div>
         </div>
         <nav class="navbar navbar-expand-lg site-navbar" aria-label="Site navigation">
-            <div class="container2">
-                <a class="navbar-brand" href="{{ url_for_lang('home_page') }}" aria-label="{{ t('meta.site_name') }}">
-                    <img src="{{ url_for('static', filename='images/logo_png.png') }}" alt="{{ t('meta.site_name') }}">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNav" aria-controls="siteNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="siteNav">
+            <div class="container2 site-navbar__container">
+                <div class="site-navbar__brand-group">
+                    <a class="navbar-brand" href="{{ url_for_lang('home_page') }}" aria-label="{{ t('meta.site_name') }}">
+                        <img src="{{ url_for('static', filename='images/logo_png.png') }}" alt="{{ t('meta.site_name') }}">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteNav" aria-controls="siteNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse site-navbar__menu" id="siteNav">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for_lang('home_page') }}" data-nav-match="/" data-i18n-key="nav.home"></a>
@@ -55,7 +57,6 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="businessMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n-key="nav.business_solutions"></a>
                             <ul class="dropdown-menu" aria-labelledby="businessMenu">
-                                <li><a class="dropdown-item" data-nav-match="/products/" href="{{ url_for_lang('products_page') }}" data-i18n-key="nav.business_solutions.find_product"></a></li>
                                 <li><a class="dropdown-item" data-nav-match="/productsSearch/" href="{{ url_for_lang('productsSearch_page_filter_none') }}" data-i18n-key="nav.business_solutions.product_search"></a></li>
                                 <li><a class="dropdown-item" data-nav-match="/colors/" href="{{ url_for_lang('colors_page') }}" data-i18n-key="nav.business_solutions.noble_colors"></a></li>
                                 <li><a class="dropdown-item" data-nav-match="/ral-colors/" href="{{ url_for_lang('ralColors') }}" data-i18n-key="nav.business_solutions.ral_colors"></a></li>
