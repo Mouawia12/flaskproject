@@ -421,7 +421,7 @@
         'file':formData,
       }
       formData.append('data', JSON.stringify(data));
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       /*await fetch(`/ControlPanel/products/add/`,{
         method: 'POST',
         headers: {
@@ -490,7 +490,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
       }
       formData.append('file', e.closest('.modal').querySelector('#editsheet').files[0]);
       formData.append('data', JSON.stringify(data));
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       /*await fetch(`/ControlPanel/products/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {
@@ -501,7 +501,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
       .then(()=>{
         location.reload()
       })*/
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       $.ajax({
           url: `/ControlPanel/products/edit/${e.closest('.modal').getAttribute('idNum')}/`,
           data: formData,

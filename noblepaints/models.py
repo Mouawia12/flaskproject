@@ -1,3 +1,9 @@
+from datetime import datetime
+
+from flask_login import UserMixin
+
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+
 from noblepaints import db,app,ma
 from noblepaints import bcrypt
 
@@ -69,10 +75,12 @@ class Approval(db.Model):
     link = db.Column(db.String())
     img = db.Column(db.String())
 
-class ProductSchema(ma.Schema):
+class ProductSchema(SQLAlchemyAutoSchema):
     class Meta:
-        Model=Product
-        fields = ('id', 'img','name','desc','category','country','lang','datasheet')
+        model = Product
+        load_instance = False
+        include_fk = True
+        fields = ('id', 'img', 'name', 'desc', 'category', 'country', 'lang', 'datasheet')
 
 class Upload(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -85,7 +93,26 @@ class Social(db.Model):
     icon = db.Column(db.String())
     link = db.Column(db.String())
 
-class SocialSchema(ma.Schema):
+class SocialSchema(SQLAlchemyAutoSchema):
     class Meta:
-        Model=Social
-        fields = ('id', 'name','icon','link')
+        model = Social
+        load_instance = False
+        fields = ('id', 'name', 'icon', 'link')
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    email_address = db.Column(db.String(120), unique=True, nullable=True)
+    auth = db.Column(db.String(10), default='true')
+    full_name = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(40), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+
+    def set_password(self, raw_password):
+        self.password_hash = bcrypt.generate_password_hash(raw_password).decode('utf-8')
+
+    def check_password(self, raw_password):
+        return bcrypt.check_password_hash(self.password_hash, raw_password)

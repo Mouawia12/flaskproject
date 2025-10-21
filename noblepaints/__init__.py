@@ -1,15 +1,21 @@
+import os
+from datetime import timedelta
+
 from flask import Flask,session
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
+from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///noblepaints.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = '526af4fbd93bc393a6392db7'
-app.config['PERMANENT_SESSION_LIFETIME']
+# Keep a configurable default admin password so deployments can recover access easily.
+app.config['DEFAULT_ADMIN_PASSWORD'] = os.environ.get('DEFAULT_ADMIN_PASSWORD', '526af4fbd93bc393a6392db7')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 app.config['MAIL_SERVER'] = 'mail.noblepaints.com.sa'
@@ -21,5 +27,8 @@ app.config['MAIL_USERNAME'] ='info@noblepaints.com.sa'
 app.config['MAIL_PASSWORD'] = 'm^_EHej(LNG.@@@#*@@@@@@'
 mail = Mail(app)
 ma = Marshmallow(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'warning'
 
 from noblepaints import routes

@@ -266,7 +266,7 @@
         'link':newAddlink.value,
       }
       
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/socialIcons/add/`,{
         method: 'POST',
         headers: {
@@ -319,7 +319,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
         'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
         'lang':localStorage.getItem('nobleLangCPanel'),
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/socialIcons/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {

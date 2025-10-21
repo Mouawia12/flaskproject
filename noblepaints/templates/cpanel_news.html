@@ -240,7 +240,7 @@
         'lang':localStorage.getItem('nobleLangCPanel'),
       }
       
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/news/add/`,{
         method: 'POST',
         headers: {
@@ -293,7 +293,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
         'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
         'lang':localStorage.getItem('nobleLangCPanel'),
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/news/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {

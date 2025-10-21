@@ -371,7 +371,18 @@
     })
   })
   
-
+  const overlay = window.AppOverlay;
+  const showLoader = () => {
+    if (overlay && typeof overlay.show === 'function') {
+      overlay.show();
+    }
+  };
+  const hideLoader = () => {
+    if (overlay && typeof overlay.hide === 'function') {
+      overlay.hide();
+    }
+  };
+  hideLoader();
 
     document.querySelectorAll('.imgInput').forEach(e=>{
       e.addEventListener('input',function(){
@@ -409,7 +420,7 @@
         'lang':localStorage.getItem('nobleLangCPanel'),
       }
       formData.append('data', JSON.stringify(data));
-      document.querySelector('.load-wrapp').style=''
+      showLoader();
       /*await fetch(`/ControlPanel/products/add/`,{
         method: 'POST',
         headers: {
@@ -424,14 +435,22 @@
           contentType: false,
           processData: false,
           type: 'POST',
-          success: function (data) {
-            location.reload()
+          success: function () {
+            location.reload();
+          },
+          error: function () {
+            hideLoader();
+            Swal.fire({
+              icon: 'error',
+              title: 'خطأ',
+              text: 'تعذر حفظ الكتالوج، يرجى المحاولة مرة أخرى.'
+            });
+          },
+          complete: function () {
+            hideLoader();
           }
       })
-      .then(()=>{
-        location.reload()
-      })
-      /*document.querySelector('.load-wrapp').style=''
+      /*AdminLoader.show()
       await fetch(`/ControlPanel/catalogs/add/`,{
         method: 'POST',
         headers: {
@@ -458,8 +477,19 @@
         })
         .then(async(result)=>{
           if (result.isConfirmed){
+            showLoader();
             await fetch(`/ControlPanel/catalogs/del/${e.closest('tr').getAttribute('id-num')}/`)
-        .then(()=>{location.reload()})
+            .then(()=>{
+              location.reload()
+            })
+            .catch(()=>{
+              hideLoader();
+              Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text: 'تعذر حذف الكتالوج، يرجى المحاولة مرة أخرى.'
+              });
+            });
           }
         })
         
@@ -484,7 +514,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
         'country':e.closest('.modal').querySelector('#editcountry').value,
         'lang':localStorage.getItem('nobleLangCPanel'),
       }
-      /*document.querySelector('.load-wrapp').style=''
+      /*AdminLoader.show()
       await fetch(`/ControlPanel/catalogs/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {
@@ -498,7 +528,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
       const formData = new FormData();
       formData.append('file', e.closest('.modal').querySelector('#editlink').files[0]);
       formData.append('data', JSON.stringify(data));
-      document.querySelector('.load-wrapp').style=''
+      showLoader();
       /*await fetch(`/ControlPanel/products/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {
@@ -509,7 +539,6 @@ document.querySelectorAll('.editBtn').forEach(e=>{
       .then(()=>{
         location.reload()
       })*/
-      document.querySelector('.load-wrapp').style=''
       $.ajax({
           url: `/ControlPanel/catalogs/edit/${e.closest('.modal').getAttribute('idNum')}/`,
           data: formData,
@@ -517,12 +546,20 @@ document.querySelectorAll('.editBtn').forEach(e=>{
           contentType: false,
           processData: false,
           type: 'POST',
-          success: function (data) {
-            location.reload()
+          success: function () {
+            location.reload();
+          },
+          error: function () {
+            hideLoader();
+            Swal.fire({
+              icon: 'error',
+              title: 'خطأ',
+              text: 'تعذر تحديث الكتالوج، يرجى المحاولة مرة أخرى.'
+            });
+          },
+          complete: function () {
+            hideLoader();
           }
-      })
-      .then(()=>{
-        location.reload()
       })
   })
 });
@@ -534,4 +571,3 @@ changeLangCont.classList.add('hidden')
 /********************************************/
 </script>
 {% endblock %}
-

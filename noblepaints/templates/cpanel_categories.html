@@ -237,7 +237,7 @@
         'desc':newAdddesc.value.replaceAll('\n', '<br>'),
         'img':newAddimg.getAttribute('image'),
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/categories/add/`,{
         method: 'POST',
         headers: {
@@ -287,7 +287,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
         'desc':e.closest('.modal').querySelector('#editdesc').value.replaceAll('\n', '<br>'),
         'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/categories/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {

@@ -1,37 +1,60 @@
-from noblepaints import app,mail,db
+from noblepaints import app,mail,db,login_manager
 from datetime import datetime
+import math
 import time
 from io import BytesIO
 import os
-from sqlalchemy import insert
+from urllib.parse import urlparse
+from sqlalchemy import insert, desc, func
 from sqlalchemy.orm import noload
 import pathlib
 import requests
-from flask import render_template,request,jsonify,send_from_directory,redirect,url_for,flash,session,abort,make_response,Response, send_file,json
-from noblepaints.models import Category,Product,Catalog,TechnicalDatasheet,Post,Certificate,Approval,ProductSchema,Upload,SocialSchema,Social
-from sqlalchemy import desc
+from flask import g, render_template,request,jsonify,send_from_directory,redirect,url_for,flash,session,abort,make_response,Response, send_file,json
+from flask_login import login_user, logout_user, login_required, current_user
+from noblepaints.forms import LoginForm
+from noblepaints.models import Category,Product,Catalog,TechnicalDatasheet,Post,Certificate,Approval,ProductSchema,Upload,SocialSchema,Social,User
+from noblepaints.i18n import (
+    AVAILABLE_LANGUAGES,
+    get_translation,
+    serialise_translations,
+)
 from functools import lru_cache
-from flask_httpauth import HTTPBasicAuth
 from flask_mail import Message
-
 # Initialize database tables once at startup
 with app.app_context():
     db.create_all()
-    
     # Add database indexes for better performance
     try:
         # Create indexes if they don't exist (SQLite compatible)
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_category_id ON category(id)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_product_category ON product(category)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_product_lang ON product(lang)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalog_lang ON catalog(lang)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalog_category ON catalog(category)')
+        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_categories_id ON categories(category_id)')
+        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)')
+        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_products_lang ON products(lang)')
+        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalogs_lang ON catalogs(lang)')
+        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalogs_category ON catalogs(category)')
         print("Database indexes created/verified for better performance")
     except Exception as e:
         print(f"Note: Could not create indexes (may already exist): {e}")
-
+    try:
+        default_username = os.environ.get('ADMIN_INITIAL_USERNAME', 'admin')
+        configured_password = os.environ.get('ADMIN_INITIAL_PASSWORD') or app.config.get('DEFAULT_ADMIN_PASSWORD')
+        fallback_password = configured_password or 'ChangeMe123!'
+        existing_admin = db.session.query(User).filter(func.lower(User.username) == default_username.lower()).first()
+        if not existing_admin:
+            admin_user = User(username=default_username, full_name='Administrator')
+            admin_user.set_password(fallback_password)
+            db.session.add(admin_user)
+            db.session.commit()
+            if configured_password:
+                print(f"Created default admin user '{default_username}' using configured credentials.")
+            else:
+                print(f"Created default admin user '{default_username}' with fallback password '{fallback_password}'. Change it immediately.")
+        elif configured_password and not existing_admin.check_password(configured_password):
+            existing_admin.set_password(configured_password)
+            db.session.commit()
+            print(f"Updated default admin user '{default_username}' password from configuration.")
+    except Exception as e:
+        print(f"Could not ensure default admin user: {e}")
 # Cache will be pre-warmed after function definitions
-
 #pip install Flask-HTTPAuth
 #pip install email_validator
 #pip install flask_bcrypt
@@ -39,24 +62,62 @@ with app.app_context():
 #pip install flask-mail
 #pip install itsdangerous==2.0.1
 #Authlib==0.14.3
-
 #os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-app.secret_key = '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'
-
-auth = HTTPBasicAuth()
-
-@auth.verify_password
-def verify_password(username,password):
-    if password == '526af4fbd93bc393a6392db7' and username == 'admin':
-        return True
- 
+app.secret_key = os.environ.get('SECRET_KEY', 'change-me-please')
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        return db.session.get(User, int(user_id))
+    except (TypeError, ValueError):
+        return None
+def _resolve_language_from_request():
+    """Determine the active language for the current request."""
+    candidate = request.args.get('lang')
+    if candidate in AVAILABLE_LANGUAGES:
+        return candidate
+    stored = session.get('lang')
+    if stored in AVAILABLE_LANGUAGES:
+        return stored
+    return 'en'
+@app.before_request
+def _set_language_context():
+    lang = _resolve_language_from_request()
+    session['lang'] = lang
+    g.current_lang = lang
+@app.context_processor
+def inject_layout_helpers():
+    current_lang = getattr(g, 'current_lang', 'en')
+    def url_for_lang(endpoint, **values):
+        values.setdefault('lang', current_lang)
+        return url_for(endpoint, **values)
+    def switch_lang_url(lang_code):
+        try:
+            endpoint = request.endpoint or 'home_page'
+            values = dict(request.view_args or {})
+            query_args = request.args.to_dict()
+        except RuntimeError:
+            endpoint = 'home_page'
+            values = {}
+            query_args = {}
+        values.update(query_args)
+        values['lang'] = lang_code
+        return url_for(endpoint, **values)
+    def translate(key, default=None):
+        return get_translation(key, current_lang, default)
+    return {
+        'current_lang': current_lang,
+        'available_languages': AVAILABLE_LANGUAGES,
+        'url_for_lang': url_for_lang,
+        'switch_lang_url': switch_lang_url,
+        't': translate,
+        'base_translations': serialise_translations(),
+    }
 # create download function for download files
 @app.route('/download/<upload_id>')
 def download(upload_id):
     upload = Upload.query.filter_by(id=upload_id).first()
     return send_file(BytesIO(upload.data),
                      download_name=upload.filename, as_attachment=True)
-
 @app.route('/show/<upload_id>/')
 def show_static_pdf(upload_id):
     upload = Upload.query.filter_by(id=upload_id).first()
@@ -64,7 +125,6 @@ def show_static_pdf(upload_id):
     pdf.write(upload.data)
     pdf.seek(0)
     return send_file(pdf, as_attachment=False, mimetype='application/pdf')
-
 @app.route('/home')
 @app.route('/en/')
 @app.route('/ar/')
@@ -73,11 +133,9 @@ def home_page():
     # Only load featured products or limit the query instead of all products
     featured_products = db.session.query(Product).limit(10).all()
     return render_template('index.html', products=featured_products)
-
 @app.route('/ral-colors/')
 def ralColors():
     return render_template('RalColors.html')
-
 @app.route('/video')
 def get_video():  
     def generate():
@@ -86,9 +144,7 @@ def get_video():
             while data:
                 yield data
                 data = f.read(1024)
-
     return Response(generate(), mimetype="video/mp4", headers={"Accept-Ranges": "bytes"})
-
 @app.route('/sendC/',methods=["POST","GET"])
 def sendC():
     data = request.get_json()  
@@ -103,22 +159,46 @@ def sendC():
     '''
     mail.send(msg)
 
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('cpanel_categories', page=1))
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data.strip().lower()
+        user = db.session.query(User).filter(func.lower(User.username) == username).first()
+        if user and user.is_active and user.check_password(form.password.data):
+            login_user(user, remember=True)
+            flash(get_translation('auth.login.success', getattr(g, 'current_lang', 'en'), 'Welcome back!'), 'success')
+            next_url = request.args.get('next')
+            if next_url and urlparse(next_url).netloc == '':
+                return redirect(next_url)
+            return redirect(url_for('cpanel_categories', page=1))
+        flash(get_translation('auth.login.error', getattr(g, 'current_lang', 'en'), 'Incorrect username or password.'), 'danger')
+
+    return render_template('auth/login.html', form=form)
+
+
+@app.route('/logout/')
+@login_required
+def logout():
+    logout_user()
+    flash(get_translation('auth.logout.success', getattr(g, 'current_lang', 'en'), 'Signed out successfully.'), 'info')
+    return redirect(url_for('login'))
 @app.route('/about/')
 def about_page():  
         return render_template('about.html')
-
 @app.route('/calculator/')
 def calculator_page():  
         return render_template('calculator.html')
-
 @app.route('/socialMedia/')
 def socialMedia_page():  
         return render_template('social.html')
-
 @app.route('/products/')
 def products_page():  
         return render_template('products.html')
-
 @app.route('/product/')
 def product_page():
         id = request.args.get('id')  
@@ -131,36 +211,29 @@ def product_page():
             Product.id != id
         ).limit(6).all()
         return render_template('product.html', product=product, similar=similar)
-
 @app.route('/FindStore/')
 def locations_page():  
         return render_template('locations.html')
-
 @app.route('/colors/')
 def colors_page():  
         return render_template('colors.html')
-
 @app.route('/contact/')
 def contact_page():  
         return render_template('contact.html')
-
 # Categories cache - simple in-memory cache for categories
 categories_cache = {
     'data': None,
     'timestamp': 0,  # Force refresh on next load
     'ttl': 300  # Cache for 5 minutes
 }
-
 def get_cached_categories():
     """Get categories with caching to reduce database load - OPTIMIZED VERSION"""
     current_time = time.time()
-    
     # Check if cache is valid
     if (categories_cache['data'] is not None and 
         current_time - categories_cache['timestamp'] < categories_cache['ttl']):
         print(f"Returning cached categories: {len(categories_cache['data'])} items")
         return categories_cache['data']
-    
     try:
         print("Fetching categories from database...")
         # SUPER OPTIMIZED query: include img field for proper image loading
@@ -173,16 +246,13 @@ def get_cached_categories():
         ).filter(
             Category.id != 29
         ).order_by(Category.id).all()
-        
         print(f"Database returned {len(categories)} categories")
-        
         # Convert to lightweight dictionary format
         categories_list = []
         for cat in categories:
             # Use img directly from query result - debug what we're getting
             img_url = cat.img if cat.img else '/static/images/default.png'
             print(f"Category {cat.id} ({cat.name}): img = '{cat.img}'")  # Debug line
-                
             categories_list.append({
                 'id': cat.id,
                 'name': cat.name or 'Untitled',
@@ -190,27 +260,22 @@ def get_cached_categories():
                 'desc': (cat.desc or 'No description')[:200] + ('...' if len(cat.desc or '') > 200 else ''),  # Truncate long descriptions
                 'img': img_url  # Use actual image URL
             })
-        
         # Update cache
         categories_cache['data'] = categories_list
         categories_cache['timestamp'] = current_time
-        
         print(f"Cached {len(categories_list)} categories with optimized data")
         return categories_list
-        
     except Exception as e:
         print(f"Database error in get_cached_categories: {e}")
         # Return cached data if available, even if stale
         if categories_cache['data'] is not None:
             print(f"Returning stale cached data: {len(categories_cache['data'])} items")
             return categories_cache['data']
-        
         # Last resort: return minimal structure
         print("No cached data available, returning minimal fallback")
         return [
             {'id': 0, 'name': 'Loading...', 'nameArabic': 'جاري التحميل...', 'desc': 'Please wait', 'img': '/static/images/loading.gif'}
         ]
-
 @app.route('/categories/')
 def categories_page():
     """Categories page - optimized hybrid approach with fallback"""
@@ -218,23 +283,18 @@ def categories_page():
         # Get categories with minimal data first for fast page load
         categories = get_cached_categories()
         print(f"Categories page: got {len(categories)} categories for fallback")
-        
         # Return page immediately with cached data - AJAX will enhance if needed
         response = make_response(render_template('categories.html', categories=categories, template='cats'))
-        
         # Add caching headers for better performance
         response.headers['Cache-Control'] = 'public, max-age=300'  # Cache for 5 minutes
         response.headers['ETag'] = f'categories-{len(categories)}-{int(categories_cache["timestamp"])}'
-        
         return response
-        
     except Exception as e:
         print(f"Error in categories_page: {e}")
         # Return minimal page structure if there's an error
         response = make_response(render_template('categories.html', categories=[], template='cats'))
         response.headers['Cache-Control'] = 'public, max-age=60'  # Shorter cache for errors
         return response
-
 @app.route('/api/categories/')
 def api_categories():
     """API endpoint for loading categories asynchronously - OPTIMIZED"""
@@ -242,13 +302,10 @@ def api_categories():
         # Check if client has cached version using ETag
         if_none_match = request.headers.get('If-None-Match')
         current_etag = f'api-categories-{int(categories_cache.get("timestamp", 0))}'
-        
         if if_none_match == current_etag:
             # Client has current version, return 304 Not Modified
             return '', 304
-        
         categories = get_cached_categories()
-        
         # For API, include actual image URLs for better UX
         enhanced_categories = []
         for cat in categories:
@@ -262,7 +319,6 @@ def api_categories():
                 except:
                     enhanced_cat['img'] = '/static/images/default-category.jpg'
             enhanced_categories.append(enhanced_cat)
-        
         response_data = {
             'categories': enhanced_categories,
             'count': len(enhanced_categories),
@@ -270,15 +326,12 @@ def api_categories():
             'success': True,
             'timestamp': int(time.time())
         }
-        
         response = jsonify(response_data)
         # Add caching headers
         response.headers['Cache-Control'] = 'public, max-age=300'
         response.headers['ETag'] = current_etag
-        
         print(f"API Categories: Returning {len(enhanced_categories)} categories with images")
         return response
-        
     except Exception as e:
         print(f"Error in api_categories: {e}")
         return jsonify({
@@ -289,12 +342,11 @@ def api_categories():
             'error': 'Failed to load categories',
             'timestamp': int(time.time())
         }), 500
-
 @app.route('/news/')
 def news_page():  
     page = request.args.get('page')
     type = request.args.get('type') 
-    lang = request.args.get('lang') 
+    lang = getattr(g, 'current_lang', 'en')
     if(page !='' and page !='undefined' and page != None):
         if(type !='' and type !='undefined' and type != None):
             return render_template('news.html',news = db.session.query(Post).filter(Post.type==type,Post.lang==lang),page=page,type=type)
@@ -305,7 +357,6 @@ def news_page():
             return render_template('news.html',news = db.session.query(Post).filter(Post.type==type,Post.lang==lang),page='1',type=type)
         else:
             return render_template('news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page='1',type=type)
-
 @app.route('/certificates/')
 def certificates_page():  
     page = request.args.get('page')
@@ -320,7 +371,6 @@ def certificates_page():
             return render_template('certificates.html',certificates = db.session.query(Certificate).filter(Certificate.type==type),page='1',type=type)
         else:
             return render_template('certificates.html',certificates = db.session.query(Certificate).all(),page='1',type=type)
-
 @app.route('/approvals/')
 def approvals_page():  
     page = request.args.get('page')
@@ -335,32 +385,27 @@ def approvals_page():
             return render_template('approvals.html',approvals = db.session.query(Certificate).filter(Certificate.type==type),page='1',type=type)
         else:
             return render_template('approvals.html',approvals = db.session.query(Certificate).all(),page='1',type=type)
-
 @app.route('/news/<id>/')
 def news_page_details(id):  
-    lang = request.args.get('lang') 
+    lang = getattr(g, 'current_lang', 'en')
     # Single query to get the post
     post = db.session.query(Post).filter(Post.id==id).first()
     if not post:
         abort(404)
-    
     # Update views efficiently
     if post.views:
         post.views = int(post.views) + 1
     else:
         post.views = '1'
     db.session.commit()
-    
     # Optimize queries with limits
     latest = db.session.query(Post).filter(Post.lang==lang).limit(5).all()
     allNews = Post.query.order_by(desc(Post.views)).filter(Post.lang==lang).limit(10).all()
-    
     return render_template('news_details.html',
         post=post,
         latest=latest,
         allNews=allNews
     )
-
 @app.route('/products/<cat>/')
 def products_cat_page(cat):
         category = db.session.query(Product).filter(Product.category==cat)
@@ -373,7 +418,6 @@ def products_cat_page(cat):
             return render_template('products_cat.html',
             title="kids",                    
             )
-
 @app.route('/productsSearch/')
 def productsSearch_page_filter_none():  
     cat = request.args.get('category')
@@ -540,83 +584,81 @@ def productsSearch_page_filter_none():
                         categories = db.session.query(Category).all(),
                         template = 'products'
                     )
-
-
 @app.route('/catalogs/')
 def catalogs_page_filter_none():  
     try:
-        # Get filter parameters with proper defaults and validation
         cat = request.args.get('category', 'All')
         search = request.args.get('search', '').strip()
         country = request.args.get('country', 'All')
-        lang = 'en'
-        
-        # Handle page parameter safely
+        lang = getattr(g, 'current_lang', 'en')
         try:
             page = int(request.args.get('page', 1))
             if page < 1:
                 page = 1
         except (ValueError, TypeError):
             page = 1
-        
-        # Build base query
-        query = db.session.query(Catalog).filter(Catalog.lang == lang)
-        
-        # Apply filters conditionally
-        if cat and cat != 'All' and cat != 'null':
-            query = query.filter(Catalog.category == cat)
-        
-        if country and country != 'All' and country != 'null':
-            query = query.filter(Catalog.country == country)
-            
-        if search:
-            query = query.filter(Catalog.name.contains(search.lower()))
-        
-        # Get total count for pagination
-        total_items = query.count()
-        
-        # Apply pagination - only get items for current page
         items_per_page = 12
+        query = db.session.query(Catalog).filter(Catalog.lang == lang)
+        if cat and cat not in ('All', 'null'):
+            query = query.filter(Catalog.category == cat)
+        if country and country not in ('All', 'null'):
+            query = query.filter(Catalog.country == country)
+        if search:
+            search_value = f"%{search.lower()}%"
+            query = query.filter(func.lower(Catalog.name).like(search_value))
+        query = query.order_by(desc(Catalog.id))
+        total_items = query.count()
+        total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
+        if page > total_pages:
+            page = total_pages
         offset = (page - 1) * items_per_page
         items = query.offset(offset).limit(items_per_page).all()
-        
-        # Get categories once
-        categories = db.session.query(Category).all()
-        
-        return render_template('catalogs.html',
+        categories_query = db.session.query(Catalog.category).filter(Catalog.lang == lang).distinct()
+        catalog_categories = sorted([row[0] for row in categories_query if row[0]])
+        countries_query = db.session.query(Catalog.country).filter(Catalog.lang == lang).distinct()
+        catalog_countries = sorted([row[0] for row in countries_query if row[0]])
+        window_start = max(1, page - 2)
+        window_end = min(total_pages, page + 2)
+        page_numbers = list(range(window_start, window_end + 1))
+        return render_template(
+            'catalogs.html',
             items=items,
             total_items=total_items,
-            page=str(page),
+            page=page,
+            total_pages=total_pages,
+            page_numbers=page_numbers,
             category=cat,
             search=search,
             country=country,
-            categories=categories,
             template='catalogs',
-            items_per_page=items_per_page
+            items_per_page=items_per_page,
+            catalog_categories=catalog_categories,
+            catalog_countries=catalog_countries,
+            lang=lang
         )
     except Exception as e:
-        # Fallback to basic functionality if something goes wrong
         print(f"Error in catalogs route: {e}")
         try:
-            # Simple fallback query
-            items = db.session.query(Catalog).filter(Catalog.lang == 'en').limit(12).all()
-            categories = db.session.query(Category).all()
-            return render_template('catalogs.html',
+            items = db.session.query(Catalog).filter(Catalog.lang == 'en').order_by(desc(Catalog.id)).limit(12).all()
+            return render_template(
+                'catalogs.html',
                 items=items,
                 total_items=len(items),
-                page="1",
-                category="All", 
+                page=1,
+                total_pages=1,
+                page_numbers=[1],
+                category="All",
                 search="",
                 country="All",
-                categories=categories,
                 template='catalogs',
-                items_per_page=12
+                items_per_page=12,
+                catalog_categories=[],
+                catalog_countries=[],
+                lang='en'
             )
         except Exception as fallback_error:
             print(f"Fallback error: {fallback_error}")
             return "Internal server error in catalogs page", 500
-
-
 @app.route('/TechnicalDatasheets/')
 def TechnicalDatasheets_page_filter_none():  
     try:
@@ -625,7 +667,6 @@ def TechnicalDatasheets_page_filter_none():
         search = request.args.get('search', '').strip()
         country = request.args.get('country', 'All')
         lang = 'en'
-        
         # Handle page parameter safely
         try:
             page = int(request.args.get('page', 1))
@@ -633,31 +674,23 @@ def TechnicalDatasheets_page_filter_none():
                 page = 1
         except (ValueError, TypeError):
             page = 1
-        
         # Build base query for Products (TechnicalDatasheets uses Product model)
         query = db.session.query(Product).filter(Product.lang == lang)
-        
         # Apply filters conditionally
         if cat and cat != 'All' and cat != 'null':
             query = query.filter(Product.category == cat)
-        
         if country and country != 'All' and country != 'null':
             query = query.filter(Product.country == country)
-            
         if search:
             query = query.filter(Product.name.contains(search))
-        
         # Get total count for pagination
         total_items = query.count()
-        
         # Apply pagination - only get items for current page
         items_per_page = 12
         offset = (page - 1) * items_per_page
         items = query.offset(offset).limit(items_per_page).all()
-        
         # Get categories once
         categories = db.session.query(Category).all()
-        
         return render_template('TechnicalDatasheets.html',
             items=items,
             total_items=total_items,
@@ -688,13 +721,9 @@ def TechnicalDatasheets_page_filter_none():
         except Exception as fallback_error:
             print(f"TechnicalDatasheets fallback error: {fallback_error}")
             return "Internal server error in TechnicalDatasheets page", 500
-
-
 ################################################
-
-
 @app.route('/ControlPanel/socialIcons/')
-@auth.login_required
+@login_required
 def cpanel_socialIcons():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -702,9 +731,8 @@ def cpanel_socialIcons():
         return render_template('cpanel_socialIcons.html',socialIcons = db.session.query(Social).all(),page=page,show=show)
     else:
         return render_template('cpanel_socialIcons.html',socialIcons = db.session.query(Social).all(),page=page,show='10')
-
 @app.route('/ControlPanel/socialIcons/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def socialIcons_add():
     data = request.get_json()
     link = data['link']
@@ -713,10 +741,8 @@ def socialIcons_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/socialIcons/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def socialIcons_edit(id):
     data = request.get_json()
     link = data['link']
@@ -727,30 +753,24 @@ def socialIcons_edit(id):
     if icon!='' and icon!=None and icon!='undefined':
         query.icon = icon
     db.session.commit()
-
-
 @app.route('/ControlPanel/socialIcons/del/<id>/')
-@auth.login_required
+@login_required
 def socialIcons_del(id):
     db.session.delete(db.session.query(Social).filter(Social.id==id).first())
     db.session.commit()
-
 ###################################################
-
 @app.route('/ControlPanel/news/')
-@auth.login_required
+@login_required
 def cpanel_news():
     page = request.args.get('page')
     show = request.args.get('show')
-    lang = request.args.get('lang')
+    lang = request.args.get('lang') or getattr(g, 'current_lang', 'en')
     if show:
         return render_template('cpanel_news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page=page,show=show)
     else:
         return render_template('cpanel_news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page=page,show='10')
-
-
 @app.route('/ControlPanel/news/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def news_add():
     data = request.get_json()
     title = data['title']
@@ -762,10 +782,8 @@ def news_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/news/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def news_edit(id):
     data = request.get_json()
     title = data['title']
@@ -788,19 +806,14 @@ def news_edit(id):
     if date!='' and date!=None and date!='undefined':
         query.date = date
     db.session.commit()
-
-
 @app.route('/ControlPanel/news/del/<id>/')
-@auth.login_required
+@login_required
 def news_del(id):
     db.session.delete(db.session.query(Post).filter(Post.id==id).first())
     db.session.commit()
-
 ################################################
-
-
 @app.route('/ControlPanel/certificates/')
-@auth.login_required
+@login_required
 def cpanel_certificates():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -808,10 +821,8 @@ def cpanel_certificates():
         return render_template('cpanel_certificates.html',certificates = db.session.query(Certificate).all(),page=page,show=show)
     else:
         return render_template('cpanel_certificates.html',certificates = db.session.query(Certificate).all(),page=page,show='10')
-
-
 @app.route('/ControlPanel/certificates/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def certificates_add():
     data = request.get_json()
     title = data['title']
@@ -822,10 +833,8 @@ def certificates_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/certificates/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def certificates_edit(id):
     data = request.get_json()
     title = data['title']
@@ -842,19 +851,14 @@ def certificates_edit(id):
     if img!='' and img!=None and img!='undefined':
         query.img = img
     db.session.commit()
-
-
 @app.route('/ControlPanel/certificates/del/<id>/')
-@auth.login_required
+@login_required
 def certificates_del(id):
     db.session.delete(db.session.query(Certificate).filter(Certificate.id==id).first())
     db.session.commit()
-
 ###############################################
-
-
 @app.route('/ControlPanel/approvals/')
-@auth.login_required
+@login_required
 def cpanel_approvals():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -862,10 +866,8 @@ def cpanel_approvals():
         return render_template('cpanel_approvals.html',approvals = db.session.query(Approval).all(),page=page,show=show)
     else:
         return render_template('cpanel_approvals.html',approvals = db.session.query(Approval).all(),page=page,show='10')
-
-
 @app.route('/ControlPanel/approvals/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def approvals_add():
     data = request.get_json()
     title = data['title']
@@ -876,10 +878,8 @@ def approvals_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/approvals/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def approvals_edit(id):
     data = request.get_json()
     title = data['title']
@@ -896,19 +896,14 @@ def approvals_edit(id):
     if img!='' and img!=None and img!='undefined':
         query.img = img
     db.session.commit()
-
-
 @app.route('/ControlPanel/approvals/del/<id>/')
-@auth.login_required
+@login_required
 def approvals_del(id):
     db.session.delete(db.session.query(Approval).filter(Approval.id==id).first())
     db.session.commit()
-
 ################################################
-
-
 @app.route('/ControlPanel/products/')
-@auth.login_required
+@login_required
 def cpanel_products():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -918,10 +913,8 @@ def cpanel_products():
         return render_template('cpanel_products.html',products = db.session.query(Product).filter(Product.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
     else:
         return render_template('cpanel_products.html',products = db.session.query(Product).filter(Product.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
-
-
 @app.route('/ControlPanel/products/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def products_add():
     data = json.loads(request.form['data'])
     name = data['name']
@@ -942,10 +935,8 @@ def products_add():
     #db.session.execute(insert(Product).values(s1))
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/products/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def products_edit(id):
     data = json.loads(request.form['data'])
     name = data['name']
@@ -979,23 +970,16 @@ def products_edit(id):
         query.lang = lang
     if img!='' and img!=None and img!='undefined':
         query.img = img
-    
     db.session.commit()
     return json.dumps(True)
-
-
 @app.route('/ControlPanel/products/del/<id>/')
-@auth.login_required
+@login_required
 def products_del(id):
     db.session.delete(db.session.query(Product).filter(Product.id==id).first())
     db.session.commit()
-    
-
 ################################################
-
-
 @app.route('/ControlPanel/catalogs/')
-@auth.login_required
+@login_required
 def cpanel_catalogs():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -1005,10 +989,8 @@ def cpanel_catalogs():
         return render_template('cpanel_catalogs.html',catalogs = db.session.query(Catalog).filter(Catalog.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
     else:
         return render_template('cpanel_catalogs.html',catalogs = db.session.query(Catalog).filter(Catalog.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
-
-
 @app.route('/ControlPanel/catalogs/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def catalogs_add():
     data = json.loads(request.form['data'])
     name = data['name']
@@ -1024,10 +1006,8 @@ def catalogs_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/catalogs/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def catalogs_edit(id):
     data = json.loads(request.form['data'])
     name = data['name']
@@ -1060,19 +1040,14 @@ def catalogs_edit(id):
         query.img = img
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/catalogs/del/<id>/')
-@auth.login_required
+@login_required
 def catalogs_del(id):
     db.session.delete(db.session.query(Catalog).filter(Catalog.id==id).first())
     db.session.commit()
-
 ####################################################
-
-
 @app.route('/ControlPanel/TechnicalDatasheets/')
-@auth.login_required
+@login_required
 def cpanel_TechnicalDatasheets():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -1082,10 +1057,8 @@ def cpanel_TechnicalDatasheets():
         return render_template('cpanel_TechnicalDatasheets.html',TechnicalDatasheets = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
     else:
         return render_template('cpanel_TechnicalDatasheets.html',TechnicalDatasheets = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
-
-
 @app.route('/ControlPanel/TechnicalDatasheets/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def TechnicalDatasheets_add():
     data = request.get_json()
     name = data['name']
@@ -1097,10 +1070,8 @@ def TechnicalDatasheets_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/TechnicalDatasheets/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def TechnicalDatasheets_edit(id):
     data = request.get_json()
     name = data['name']
@@ -1120,20 +1091,15 @@ def TechnicalDatasheets_edit(id):
     if lang!='' and lang!=None and lang!='undefined':
         query.lang = lang
     db.session.commit()
-
-
 @app.route('/ControlPanel/TechnicalDatasheets/del/<id>/')
-@auth.login_required
+@login_required
 def TechnicalDatasheets_del(id):
     db.session.delete(db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id==id).first())
     db.session.commit()
-
 ####################################################
-
-
 @app.route('/ControlPanel/')
 @app.route('/ControlPanel/categories/')
-@auth.login_required
+@login_required
 def cpanel_categories():
     page = request.args.get('page')
     show = request.args.get('show')
@@ -1147,10 +1113,8 @@ def cpanel_categories():
             return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page='1',show=show)
         else:
             return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page='1',show='10')
-
-
 @app.route('/ControlPanel/categories/add/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def categories_add():
     data = request.get_json()
     name = data['name']
@@ -1161,10 +1125,8 @@ def categories_add():
     db.session.add(s1)
     db.session.commit()
     return 'True'
-
-
 @app.route('/ControlPanel/categories/edit/<id>/',methods=['POST','GET'])
-@auth.login_required
+@login_required
 def categories_edit(id):
     data = request.get_json()
     name = data['name']
@@ -1181,14 +1143,11 @@ def categories_edit(id):
     if img!='' and img!=None and img!='undefined':
         query.img = img
     db.session.commit()
-
-
 @app.route('/ControlPanel/categories/del/<id>/')
-@auth.login_required
+@login_required
 def categories_del(id):
     db.session.delete(db.session.query(Category).filter(Category.id==id).first())
     db.session.commit()
-
 @app.route('/getProducts/')
 def get_products():
     lang=request.args.get('lang')
@@ -1196,16 +1155,13 @@ def get_products():
     x = ProductSchema(many=True)
     z = x.dump(y)
     return jsonify(z)
-
 @app.route('/getsocialIcons/')
 def getsocialIcons():
     y = db.session.query(Social).all()
     x = SocialSchema(many=True)
     z = x.dump(y)
     return jsonify(z)
-
 ################################################################
-
 # Performance: Pre-warm the categories cache on startup
 try:
     with app.app_context():

@@ -237,7 +237,7 @@
         'img':newAddimg.getAttribute('image'),
         'link':newAddlink.value,
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/approvals/add/`,{
         method: 'POST',
         headers: {
@@ -288,7 +288,7 @@ document.querySelectorAll('.editBtn').forEach(e=>{
         'link':e.closest('.modal').querySelector('#editlink').value,
         'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
       }
-      document.querySelector('.load-wrapp').style=''
+      AdminLoader.show()
       await fetch(`/ControlPanel/approvals/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
         method: 'POST',
         headers: {

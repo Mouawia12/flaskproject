@@ -1,0 +1,52 @@
+{% extends 'sec.html' %}
+{% set page_title_key = 'auth.login.title' %}
+
+{% block hero %}
+<section class="hero-banner" style="background-image: linear-gradient(135deg, rgba(18,106,154,0.85), rgba(0,45,74,0.8));">
+    <div class="container2 hero-banner__content">
+        <div class="hero-breadcrumb">
+            <a href="{{ url_for_lang('home_page') }}" data-i18n-key="nav.home"></a>
+            <span class="mx-2">/</span>
+            <span data-i18n-key="auth.login.title"></span>
+        </div>
+        <h1 class="hero-banner__title" data-i18n-key="auth.login.title"></h1>
+        <p class="lead" data-i18n-key="auth.login.subtitle"></p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container2">
+        <div class="row justify-content-center">
+            <div class="col-xl-4 col-lg-5 col-md-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <form method="post" novalidate>
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                <label class="form-label" for="username" data-i18n-key="auth.login.username"></label>
+                                {{ form.username(class_='form-control form-control-lg', id='username', placeholder=t('auth.login.username', 'Username')) }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="password" data-i18n-key="auth.login.password"></label>
+                                {{ form.password(class_='form-control form-control-lg', id='password', placeholder=t('auth.login.password', 'Password')) }}
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-brand btn-lg" data-i18n-key="auth.login.submit"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
