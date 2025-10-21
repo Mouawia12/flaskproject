@@ -144,3 +144,74 @@ html[dir="rtl"] .admin-sidebar__nav a:hover,
 html[dir="rtl"] .admin-sidebar__nav a.active {
     border-right-color: var(--brand-primary);
 }
+
+.btn-admin {
+    border: none;
+    border-radius: 999px;
+    padding: 0.55rem 1.35rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+    box-shadow: 0 6px 18px rgba(17, 46, 77, 0.12);
+    text-decoration: none;
+}
+
+.btn-admin:focus-visible {
+    outline: 3px solid rgba(18, 106, 154, 0.35);
+    outline-offset: 2px;
+}
+
+.btn-admin i {
+    font-size: 0.95rem;
+}
+
+.btn-admin--primary {
+    background: var(--brand-primary);
+    color: #ffffff;
+}
+
+.btn-admin--primary:hover,
+.btn-admin--primary:focus {
+    background: #0f5c87;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(17, 46, 77, 0.2);
+}
+
+.btn-admin--danger {
+    background: var(--brand-accent);
+    color: #ffffff;
+}
+
+.btn-admin--danger:hover,
+.btn-admin--danger:focus {
+    background: #9c1824;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(190, 30, 45, 0.25);
+}
+
+.btn-admin--ghost {
+    background: transparent;
+    color: var(--brand-secondary);
+    border: 1px solid rgba(17, 46, 77, 0.2);
+    box-shadow: none;
+}
+
+.btn-admin--ghost:hover,
+.btn-admin--ghost:focus {
+    background: rgba(17, 46, 77, 0.08);
+    color: var(--brand-secondary);
+}
+
+.modal-footer .btn-admin {
+    min-width: 7rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-admin {
+        transition: none;
+    }
+}
