@@ -1,178 +1,125 @@
 {% extends 'sec.html' %}
+{% set page_title_key = 'home.meta.title' %}
 {% block head %}
-<link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
-<title>Noble paints</title>
-<meta name="keywords" content="نوبل للدهانات, noble paints, مصنع دهانات, دهانات صناعية, دهان ضد الحريق, دهانات نوبل, مصنع الدهانات, شركة دهانات نهوبل, شركة دهانات بالسعودية">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<script defer src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
 
 {% block hero %}
-<section class="hero-slider">
-    <div id="homeHero" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="1" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="2" aria-label="Slide 3"></button>
-        </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active" style="--hero-image: url('/static/images/bg1.jpg');">
-                <div class="hero-overlay"></div>
-                <div class="container2">
-                    <div class="carousel-caption text-start">
-                        <span class="eyebrow">Innovation</span>
-                        <h1>High-performance coatings engineered for the Gulf.</h1>
-                        <p>From infrastructure to interiors, Noble protects every surface with science-led solutions.</p>
-                        <div class="cta-group">
-                            <a href="{{ url_for_lang('productsSearch_page_filter_none') }}" class="btn btn-primary">Explore Products</a>
-                            <a href="{{ url_for_lang('catalogs_page_filter_none') }}" class="btn btn-outline-light">View Catalogs</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="carousel-item" style="--hero-image: url('/static/images/bg4.jpg');">
-                <div class="hero-overlay"></div>
-                <div class="container2">
-                    <div class="carousel-caption text-start">
-                        <span class="eyebrow">Expertise</span>
-                        <h1>Trusted industrial protection for energy, marine and heavy industry.</h1>
-                        <p>Rely on our certified systems to withstand harsh climates and demanding specifications.</p>
-                        <div class="cta-group">
-                            <a href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}" class="btn btn-primary">Technical Datasheets</a>
-                            <a href="{{ url_for_lang('approvals_page') }}" class="btn btn-outline-light">Global Approvals</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="carousel-item" style="--hero-image: url('/static/images/bg8.jpg');">
-                <div class="hero-overlay"></div>
-                <div class="container2">
-                    <div class="carousel-caption text-start">
-                        <span class="eyebrow">Partnership</span>
-                        <h1>Colour design, on-site support and aftercare for every project.</h1>
-                        <p>Partner with Noble for consultation, training and service that keep your finishes flawless.</p>
-                        <div class="cta-group">
-                            <a href="{{ url_for_lang('contact_page') }}" class="btn btn-primary">Talk to our team</a>
-                            <a href="{{ url_for_lang('locations_page') }}" class="btn btn-outline-light">Find a store</a>
-                        </div>
-                    </div>
-                </div>
+<section class="home-hero">
+    <div class="container2">
+        <div class="home-hero__content">
+            <span class="home-hero__eyebrow">{{ t('home.hero.eyebrow') }}</span>
+            <h1 class="home-hero__title">{{ t('home.hero.title') }}</h1>
+            <p class="home-hero__subtitle">{{ t('home.hero.subtitle') }}</p>
+            <div class="home-hero__actions">
+                <a class="btn btn-primary" href="{{ url_for_lang('productsSearch_page_filter_none') }}">{{ t('home.hero.cta_primary') }}</a>
+                <a class="btn btn-outline-light" href="{{ url_for_lang('catalogs_page_filter_none') }}">{{ t('home.hero.cta_secondary') }}</a>
             </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#homeHero" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#homeHero" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
-<section class="paintspart custom" id="productsCategories">
-    <div class="lists">
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/TechnicalDatasheets/?lang=${localStorage.getItem('nobleLang')}`">
-            <div class="imgbox">
-                <img src="/static/images/tech.png" alt="">
+<section class="section section--light">
+    <div class="container2 home-highlights">
+        <a class="home-highlight" href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}">
+            <div class="home-highlight__image" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/tech.png') }}" alt="{{ t('home.highlights.datasheets_alt') }}">
             </div>
-            <div class="details">
-                <div class="icon"><img src="/static/images/icons/palitr-icon.png" alt=""></div>
-                <h3 class="text">Technical<br>Data Sheets</h3>
+            <div class="home-highlight__body">
+                <span class="badge-pill"><i class="fa-solid fa-file-lines"></i>{{ t('home.highlights.datasheets_badge') }}</span>
+                <h2 class="home-highlight__title">{{ t('home.highlights.datasheets_title') }}</h2>
+                <p class="home-highlight__text">{{ t('home.highlights.datasheets_text') }}</p>
             </div>
+        </a>
+        <a class="home-highlight" href="{{ url_for_lang('productsSearch_page_filter_none') }}">
+            <div class="home-highlight__image" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/boxes02.png') }}" alt="{{ t('home.highlights.products_alt') }}">
+            </div>
+            <div class="home-highlight__body">
+                <span class="badge-pill"><i class="fa-solid fa-palette"></i>{{ t('home.highlights.products_badge') }}</span>
+                <h2 class="home-highlight__title">{{ t('home.highlights.products_title') }}</h2>
+                <p class="home-highlight__text">{{ t('home.highlights.products_text') }}</p>
+            </div>
+        </a>
+        <a class="home-highlight" href="{{ url_for_lang('catalogs_page_filter_none') }}">
+            <div class="home-highlight__image" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/boxes04.jpg') }}" alt="{{ t('home.highlights.catalogs_alt') }}">
+            </div>
+            <div class="home-highlight__body">
+                <span class="badge-pill"><i class="fa-solid fa-book"></i>{{ t('home.highlights.catalogs_badge') }}</span>
+                <h2 class="home-highlight__title">{{ t('home.highlights.catalogs_title') }}</h2>
+                <p class="home-highlight__text">{{ t('home.highlights.catalogs_text') }}</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="section section--muted">
+    <div class="container2">
+        <div class="section__header">
+            <span class="section__eyebrow">{{ t('home.story.eyebrow') }}</span>
+            <h2 class="section__title">{{ t('home.story.title') }}</h2>
+            <p class="section__subtitle">{{ t('home.story.subtitle') }}</p>
         </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/productsSearch/?lang=en`">
-            <div class="imgbox">
-                <img src="/static/images/boxes02.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/static/images/icons/icon6.png" alt=""></div>
-                <h3 class="text">Browse<br>Our Products</h3>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-12 col-xs-12 paintbox" onclick="location.href=`/catalogs/`">
-            <div class="imgbox">
-                <img src="/static/images/boxes04.jpg" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/static/images/icons/icon3.png" alt=""></div>
-                <h3 class="text">Browse<br>Our Catalogs</h3>
-            </div>
+        <div class="home-sections">
+            <article class="home-section">
+                <div class="home-section__content">
+                    <h3 class="home-section__title">{{ t('home.story.research_title') }}</h3>
+                    <p class="home-section__text">{{ t('home.story.research_text') }}</p>
+                    <ul class="list-check">
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_one') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_two') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_three') }}</span></li>
+                    </ul>
+                </div>
+                <div class="home-section__image" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/speces03.png') }}" alt="{{ t('home.story.research_alt') }}">
+                </div>
+            </article>
+            <article class="home-section">
+                <div class="home-section__content">
+                    <h3 class="home-section__title">{{ t('home.story.quality_title') }}</h3>
+                    <p class="home-section__text">{{ t('home.story.quality_text') }}</p>
+                    <ul class="list-check">
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_one') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_two') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_three') }}</span></li>
+                    </ul>
+                </div>
+                <div class="home-section__image" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/speces011.png') }}" alt="{{ t('home.story.quality_alt') }}">
+                </div>
+            </article>
+            <article class="home-section">
+                <div class="home-section__content">
+                    <h3 class="home-section__title">{{ t('home.story.support_title') }}</h3>
+                    <p class="home-section__text">{{ t('home.story.support_text') }}</p>
+                    <ul class="list-check">
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_one') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_two') }}</span></li>
+                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_three') }}</span></li>
+                    </ul>
+                </div>
+                <div class="home-section__image" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/speces02.png') }}" alt="{{ t('home.story.support_alt') }}">
+                </div>
+            </article>
         </div>
     </div>
 </section>
-<div style="position: relative;">
-    <div class="specesContainer">
-        <div>
-            <div class="container2">
-                <div class="descr">
-                    <h3 class="subTitle"><span class="text">Research &</span><br><span class="text">Development</span></h3>
-                    <p class="text">Besides conducting on- going research, with our international specialists, our original paints innovations have continually redefined the paint industry, at the same time adding value to life and the environment through our complete paint and coating solutions. <br>At any given time Noble evaluates between 10 and 20 products for areas of possible product improvement. A typical year sees the development of at least five new products and the upgrading about 5 to 15 products. This constant innovation and improvement has played a key role in the success of brand Noble. Our research & technical team along with experienced and qualified chemists constantly analyze the application, finish, aesthetics, and longevity and service requirement of our clients</p>
-                    <a href="#" class="btn text hidden">Learn More</a>
-                </div>
-                <img src="/static/images/speces03.png" alt="speces02">
-            </div>
+
+<section class="section section--light">
+    <div class="container2 home-tools">
+        <div class="section__header">
+            <span class="section__eyebrow">{{ t('home.tools.eyebrow') }}</span>
+            <h2 class="section__title">{{ t('home.tools.title') }}</h2>
+            <p class="section__subtitle">{{ t('home.tools.subtitle') }}</p>
         </div>
-        <div>
-            <div class="container2 inverse">
-                <img src="/static/images/speces02.png" alt="speces02">
-                <div class="descr">
-                    <h3 class="subTitle">
-                        <span class="text">Quality</span>
-                        <span class="text">Control</span>
-                    </h3>
-                    <p class="text">Noble Quality Standards are at the core.The quality assurance comes from various key aspects of the framework. Stakeholders are encouraged to work towards continuous improvement through engagement in the processes of planning and evaluation,<br>All Quality Control (QC) activities are carried out in accordance with ISO standards and rules of the authorities and International standards such as ASTM (American Standard) BS (British Standard) & SASO (Saudi Standard), safety regulations and company policies. The laboratory ensures consistent quality, relevant tests are conducted periodically ensuring results are well within the set standards. QC also monitors raw materials, shelf life, stability and packaging in order to make sure it is within specifications and under control led conditions.<br>The Research & Development and Quality Control labs are equipped with the most modern equipment to maintain the quality bench marks that have become the hallmark of Noble products.</p>
-                    <a href="#" class="btn text hidden">Learn More</a>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="container2">
-                <div class="descr">
-                    <h3 class="subTitle">
-                        <span class="text">Quality</span>
-                    </h3>
-                    <p class="text">Noble Quality Standards are at the core.The quality assurance comes from various key aspects of the framework. Stakeholders are encouraged to work towards continuous improvement through engagement in the processes of planning and evaluation,<br>All Quality Control (QC) activities are carried out in accordance with ISO standards and rules of the authorities and International standards such as ASTM (American Standard) BS (British Standard) & SASO (Saudi Standard), safety regulations and company policies. The laboratory ensures consistent quality, relevant tests are conducted periodically ensuring results are well within the set standards. QC also monitors raw materials, shelf life, stability and packaging in order to make sure it is within specifications and under control led conditions.<br>The Research & Development and Quality Control labs are equipped with the most modern equipment to maintain the quality bench marks that have become the hallmark of Noble products.</p>
-                    <a href="#" class="btn text hidden">Learn More</a>
-                </div>
-                <img src="/static/images/speces011.png" alt="speces02">
-            </div>
-        </div>
-        <div>
-            <div class="container2">
-                <div class="descr">
-                    <h3 class="subTitle">
-                        <span class="text">Technical Support &</span>
-                        <span class="text">After Sales Services</span>
-                    </h3>
-                    <p class="text">At Noble we believe that our customers deserve the best quality of service . We work hard to meet all of your needs and requirements efficiently and effectively with our technical support team and after sales services . An expression of Noble’s commitment is the construction of its Technical Services Centre within the factory premises in Riyadh . The centre is equipped with the most modern and advanced training equipment . The facility is supported with professional technical staff and applicators providing the following :</p>
-                    <ul>
-                        <li><img src="/static/images/icons01.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons02.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons03.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons04.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons05.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons06.PNG"><span class="text"></span></li>
-                        <li><img src="/static/images/icons07.PNG"><span class="text"></span></li>
-                    </ul>
-                    <a href="#" class="btn text hidden">Learn More</a>
-                </div>
-                <!--img src="/static/images/speces04.jpg" alt="speces02"-->
-            </div>
-        </div>
+        <div class="home-tools__grid" data-essential-tools></div>
+        <p class="home-tools__empty" data-essential-empty hidden>{{ t('home.tools.empty') }}</p>
     </div>
-</div>
-<div class="gray-bg-cus" id="prodsShowContainer">
-    <div class="col-xs-12 ctitle">
-        <h1 class="text-center py-5"><span class="text-bg-blue text">ESSENTIAL</span><span class="text-bg-red text">TOOLS</span></h1>
-    </div>
-    <div class="container2 productsShow2">
-        <div class="products-grid" data-essential-tools></div>
-        <p class="empty-state" data-essential-empty hidden>
-            Explore our latest innovations and hero products – check back soon for featured highlights.
-        </p>
-    </div>
-</div>
-<script src="/static/js/languages/index.js"></script>
-<script src="/static/js/index.js"></script>
-{%endblock%}
+</section>
+{% endblock %}
