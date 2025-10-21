@@ -156,11 +156,18 @@
     };
 
     const resolveAdminLang = () => {
-        return (
-            window.localStorage.getItem('nobleLangCPanel') ||
-            window.localStorage.getItem('nobleLang') ||
-            'en'
-        );
+        if (typeof window.getLang === 'function') {
+            return window.getLang();
+        }
+        try {
+            return (
+                window.localStorage.getItem('nobleLangCPanel') ||
+                window.localStorage.getItem('nobleLang') ||
+                'en'
+            );
+        } catch (error) {
+            return 'en';
+        }
     };
 
     window.AdminApi = {
