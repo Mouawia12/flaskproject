@@ -1,34 +1,38 @@
-<section class="section section--muted site-essential-tools" data-essential-tools-section>
+<section class="section section--muted site-essential-tools">
     <div class="container2">
-        <div class="home-tools">
-            <div class="section__header">
-                <span class="section__eyebrow">{{ t('home.tools.eyebrow') }}</span>
-                <h2 class="section__title">{{ t('home.tools.title') }}</h2>
-                <p class="section__subtitle">{{ t('home.tools.subtitle') }}</p>
-            </div>
-            {% set essential_tools = featured_products if featured_products is defined else [] %}
-            <div class="home-tools__grid" data-essential-tools>
-                {% for product in essential_tools %}
-                    {% set image = product.img or url_for('static', filename='images/prod01.png') %}
-                    {% set description = (product.desc or '') | striptags | replace('\xa0', ' ') | trim %}
-                    <article class="essential-tool-card" data-essential-card>
-                        <div class="essential-tool-card__media" style="background-image: url('{{ image }}');" role="img" aria-label="{{ product.name }}">
-                        </div>
-                        <div class="essential-tool-card__body">
-                            <h3>{{ product.name }}</h3>
-                            {% if description %}
-                                <p>{{ description | truncate(160, True, '…') }}</p>
-                            {% endif %}
-                            <div class="essential-tool-card__actions">
-                                <a class="btn btn-outline-primary w-100" href="{{ url_for_lang('product_page', id=product.id) }}">
-                                    {{ t('home.tools.cta', 'View product') }}
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-            <p class="home-tools__empty" data-essential-empty {% if essential_tools %}hidden{% endif %}>{{ t('home.tools.empty') }}</p>
+        <div class="section__header essential-tools__header">
+            <h2 class="section__title">{{ t('home.tools.title') }}</h2>
+            <p class="section__subtitle">{{ t('home.tools.subtitle') }}</p>
+        </div>
+        <div class="essential-tools__grid">
+            <a class="essential-tool-card essential-tool-card--catalogs" href="{{ url_for_lang('catalogs_page_filter_none') }}">
+                <div class="essential-tool-card__content">
+                    <h3 class="essential-tool-card__title">{{ t('home.tools.cards.catalogs.title') }}</h3>
+                    <p class="essential-tool-card__text">{{ t('home.tools.cards.catalogs.text') }}</p>
+                </div>
+                <span class="essential-tool-card__cta btn btn-light">{{ t('home.tools.cards.cta') }}</span>
+            </a>
+            <a class="essential-tool-card essential-tool-card--ral" href="{{ url_for_lang('ralColors') }}">
+                <div class="essential-tool-card__content">
+                    <h3 class="essential-tool-card__title">{{ t('home.tools.cards.ral.title') }}</h3>
+                    <p class="essential-tool-card__text">{{ t('home.tools.cards.ral.text') }}</p>
+                </div>
+                <span class="essential-tool-card__cta btn btn-light">{{ t('home.tools.cards.cta') }}</span>
+            </a>
+            <a class="essential-tool-card essential-tool-card--calculator" href="{{ url_for_lang('calculator_page') }}">
+                <div class="essential-tool-card__content">
+                    <h3 class="essential-tool-card__title">{{ t('home.tools.cards.calculator.title') }}</h3>
+                    <p class="essential-tool-card__text">{{ t('home.tools.cards.calculator.text') }}</p>
+                </div>
+                <span class="essential-tool-card__cta btn btn-light">{{ t('home.tools.cards.cta') }}</span>
+            </a>
+            <a class="essential-tool-card essential-tool-card--store" href="{{ url_for_lang('locations_page') }}">
+                <div class="essential-tool-card__content">
+                    <h3 class="essential-tool-card__title">{{ t('home.tools.cards.store.title') }}</h3>
+                    <p class="essential-tool-card__text">{{ t('home.tools.cards.store.text') }}</p>
+                </div>
+                <span class="essential-tool-card__cta btn btn-light">{{ t('home.tools.cards.cta') }}</span>
+            </a>
         </div>
     </div>
 </section>
