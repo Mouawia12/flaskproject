@@ -25,13 +25,13 @@
     card.className = 'essential-tool-card';
 
     const media = document.createElement('div');
-    media.className = 'card-media';
+    media.className = 'essential-tool-card__media';
     media.style.backgroundImage = `url('${imageUrl}')`;
     media.setAttribute('role', 'img');
     media.setAttribute('aria-label', product.name || 'Product image');
 
     const body = document.createElement('div');
-    body.className = 'card-body';
+    body.className = 'essential-tool-card__body';
 
     const title = document.createElement('h3');
     title.textContent = product.name || '';
@@ -40,7 +40,7 @@
     description.textContent = formatDescription(product.desc);
 
     const actions = document.createElement('div');
-    actions.className = 'card-actions';
+    actions.className = 'essential-tool-card__actions';
 
     const cta = document.createElement('a');
     cta.className = 'btn btn-outline-primary w-100';
