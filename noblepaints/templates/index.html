@@ -70,13 +70,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="steam-train">
-    <div class="train">
-      <div class="window"></div>
-    </div>
-  </div>
-<section class="paintspart custom" id="productsCategories" style="display:flex;">
-    <div class="lists" style="margin-top: 0;">
+<section class="paintspart custom" id="productsCategories">
+    <div class="lists">
         <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/TechnicalDatasheets/?lang=${localStorage.getItem('nobleLang')}`">
             <div class="imgbox">
                 <img src="/static/images/tech.png" alt="">
@@ -168,16 +163,14 @@
     </div>
 </div>
 <div class="gray-bg-cus" id="prodsShowContainer">
-    <div class="col-xs-12 ctitle" style="z-index: 999;">
-        <h1 class="text-center py-5"><span class="text-bg-blue text">ESSENTIAL</span><span class="text-bg-red text">TOOLS</span> </h1>
+    <div class="col-xs-12 ctitle">
+        <h1 class="text-center py-5"><span class="text-bg-blue text">ESSENTIAL</span><span class="text-bg-red text">TOOLS</span></h1>
     </div>
     <div class="container2 productsShow2">
-        <div class="swiper mySwiper" id="swiper2">
-            <div class="swiper-wrapper" id="gamesList_content2">
-            </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
+        <div class="products-grid" data-essential-tools></div>
+        <p class="empty-state" data-essential-empty hidden>
+            Explore our latest innovations and hero products – check back soon for featured highlights.
+        </p>
     </div>
 </div>
 <script src="/static/js/languages/index.js"></script>
