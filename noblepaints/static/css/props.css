@@ -1,0 +1,311 @@
+:root {
+    --subpage-overlay: rgba(0, 45, 74, 0.72);
+    --subpage-overlay-soft: rgba(0, 45, 74, 0.5);
+    --surface-bg: #ffffff;
+    --surface-border: rgba(20, 33, 61, 0.08);
+    --surface-shadow: 0 20px 40px rgba(0, 45, 74, 0.08);
+}
+
+header.subpage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: var(--brand-secondary);
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    min-height: clamp(260px, 45vh, 420px);
+    padding: clamp(4rem, 10vw, 6rem) 0 clamp(2.5rem, 8vw, 4.5rem);
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+    border-radius: 0 0 32px 32px;
+    overflow: hidden;
+}
+
+header.subpage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--subpage-overlay), var(--subpage-overlay-soft));
+    mix-blend-mode: multiply;
+}
+
+header.subpage > * {
+    position: relative;
+    z-index: 1;
+}
+
+header.subpage .container2 {
+    width: 100%;
+}
+
+header.subpage h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+header.subpage.medium {
+    min-height: clamp(220px, 35vh, 320px);
+}
+
+header.subpage .breadcrubms {
+    position: absolute;
+    inset: 0 0 auto 0;
+    padding: 0.85rem 0;
+    background: linear-gradient(90deg, rgba(0, 45, 74, 0.65), rgba(18, 106, 154, 0));
+}
+
+header.subpage .breadcrubms nav {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+header.subpage .breadcrubms nav a {
+    color: rgba(255, 255, 255, 0.85);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+header.subpage .breadcrubms nav a:hover,
+header.subpage .breadcrubms nav a:focus {
+    color: #ffffff;
+    opacity: 1;
+}
+
+header.subpage .breadcrubms svg {
+    width: 18px;
+    height: 18px;
+}
+
+header.subpage .breadcrubms span {
+    color: #ffffff;
+    opacity: 0.7;
+}
+
+header.subpage .breadcrubms span:last-child {
+    opacity: 1;
+}
+
+.text-bg-red,
+.text-bg-blue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 1.1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.text-bg-red {
+    background-color: var(--brand-accent);
+}
+
+.text-bg-blue {
+    background-color: var(--brand-primary);
+}
+
+.paintspart {
+    padding: clamp(3rem, 8vw, 4.5rem) 0;
+}
+
+.paintspart .lists {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .paintspart .lists {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 992px) {
+    .paintspart .lists {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.paintspart .paintbox {
+    position: relative;
+    background: var(--surface-bg);
+    border-radius: 28px;
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--surface-shadow);
+    overflow: hidden;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+}
+
+.paintspart .paintbox:hover,
+.paintspart .paintbox:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 55px rgba(0, 45, 74, 0.12);
+}
+
+.paintspart .paintbox .imgbox {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+}
+
+.paintspart .paintbox .imgbox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.paintspart .paintbox:hover .imgbox img {
+    transform: scale(1.05);
+}
+
+.paintspart .paintbox .details {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.paintspart .paintbox .details .icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: rgba(18, 106, 154, 0.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.paintspart .paintbox .details .icon img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.paintspart .paintbox .details .text {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--brand-text);
+}
+
+.paintspart.custom .details {
+    align-items: flex-start;
+}
+
+.paintspart.custom .paintbox {
+    border: none;
+    box-shadow: 0 18px 45px rgba(0, 45, 74, 0.1);
+}
+
+.paintspart.custom .paintbox .details .text {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.section-heading {
+    margin-bottom: clamp(2rem, 6vw, 3.5rem);
+    text-align: center;
+}
+
+.section-heading .text-bg-blue,
+.section-heading .text-bg-red {
+    margin-bottom: 0.75rem;
+}
+
+.content-section {
+    padding: clamp(3rem, 7vw, 5rem) 0;
+}
+
+.content-section.light {
+    background: #ffffff;
+}
+
+.content-section.alt {
+    background: #f2f6fb;
+}
+
+.content-section .section-body {
+    display: grid;
+    gap: 2rem;
+}
+
+@media (min-width: 992px) {
+    .content-section .section-body.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.card-grid {
+    display: grid;
+    gap: 1.75rem;
+}
+
+@media (min-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.surface-card {
+    background: var(--surface-bg);
+    border-radius: 24px;
+    border: 1px solid var(--surface-border);
+    padding: 1.75rem;
+    box-shadow: var(--surface-shadow);
+}
+
+.surface-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.surface-card p {
+    margin-bottom: 0;
+    color: var(--brand-muted);
+}
+
+.badge-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(18, 106, 154, 0.12);
+    color: var(--brand-primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 575px) {
+    header.subpage {
+        border-radius: 0 0 24px 24px;
+    }
+
+    header.subpage .breadcrubms nav {
+        font-size: 0.7rem;
+    }
+}
