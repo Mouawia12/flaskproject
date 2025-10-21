@@ -192,118 +192,164 @@
 
 
 </main>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.css"></script>
 <script>
-  document.querySelector('#entriesNumber').querySelectorAll('a').forEach(e=>{
-    e.addEventListener('click',function(){
-      //localStorage.setItem('entriesNumber',e.innerHTML)
-      location.replace(`/ControlPanel/approvals/?page=${new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
-}).page}&show=${e.innerHTML}&lang=${localStorage.getItem('nobleLangCPanel')}`)
-    })
-  })
-  
+document.addEventListener('DOMContentLoaded', () => {
+  const api = window.AdminApi;
+  if (!api) {
+    console.error('AdminApi is not available.');
+    return;
+  }
 
+  const { request, notifySuccess, notifyWarning, notifyError, confirmDelete, resolveAdminLang } = api;
 
-    document.querySelectorAll('.imgInput').forEach(e=>{
-      e.addEventListener('input',function(){
-        var fileInput = this;
-        var file = fileInput.files[0];
-          if (file.type.match(/image.*/)) {
-            var reader = new FileReader();
-            reader.onload = async function(e) {
-              fileInput.setAttribute('image',reader.result)
-              if(fileInput.classList.contains('secPhotosInput')){
-                newProjectForm.querySelector('.col-lg-4.col-sm-6').insertAdjacentHTML('beforeend',`
-                <div class="form-file mb-3">
-                    <input image=${fileInput.getAttribute('image')} type="file" class="form-file-input imgInput secPhotosInput" id="customFile">
-                    <label class="form-file-label" for="customFile">
-                        <span class="form-file-text">اختر ملفاً</span>
-                        <span class="form-file-button">تصفح</span>
-                    </label>
-                </div>
-                `)
-              }
-            }
-            reader.readAsDataURL(file);	
-          }
-      })
-    })
-    newProjectForm.querySelector('#saveBtn').addEventListener('click',async function(evt){
-      evt.preventDefault()
-      let data = {
-        'description':newAdddescription.value,
-        'title':newAddtitle.value,
-        'img':newAddimg.getAttribute('image'),
-        'link':newAddlink.value,
-      }
-      AdminLoader.show()
-      await fetch(`/ControlPanel/approvals/add/`,{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(()=>{
-        location.reload()
-      })
-    })
-
-    document.querySelectorAll('.delete').forEach(e=>{
-      e.addEventListener('click',async function(){
-        Swal.fire({
-        title: "تأكيد",
-        text: 'هل أنت متأكد من حذف العنصر ؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: "نعم",
-        cancelButtonText: "لا"
-        })
-        .then(async(result)=>{
-          if (result.isConfirmed){
-            await fetch(`/ControlPanel/approvals/del/${e.closest('tr').getAttribute('id-num')}/`)
-          .then(()=>{location.reload()})
-          }
-        })
-      })
-    })
-
-    function getParams(query){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
+  const entriesMenu = document.querySelector('#entriesNumber');
+  if (entriesMenu) {
+    entriesMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get('page') || '1';
+        const show = link.textContent.trim();
+        const lang = resolveAdminLang();
+        window.location.replace(`/ControlPanel/approvals/?page=${page}&show=${show}&lang=${lang}`);
       });
-      // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
-      return params[query];
-}
+    });
+  }
 
-document.querySelectorAll('.editBtn').forEach(e=>{
-  e.addEventListener('click',async function(evt){
-    evt.preventDefault()
-      let data = {
-        'title':e.closest('.modal').querySelector('#edittitle').value,
-        'description':e.closest('.modal').querySelector('#editdescription').value,
-        'link':e.closest('.modal').querySelector('#editlink').value,
-        'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
+  const bindImageInput = (input) => {
+    input.addEventListener('input', () => {
+      const file = input.files && input.files[0];
+      if (!file || !file.type.match(/image.*/)) {
+        return;
       }
-      AdminLoader.show()
-      await fetch(`/ControlPanel/approvals/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(()=>{
-        location.reload()
-      })
-  })
-})
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        input.setAttribute('image', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
-changeLangCont.classList.add('hidden')
-/********************************************/
+  document.querySelectorAll('.imgInput').forEach(bindImageInput);
+
+  const createModal = document.getElementById('newProjectForm');
+  if (createModal) {
+    const saveButton = createModal.querySelector('#saveBtn');
+    if (saveButton) {
+      saveButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const payload = {
+          title: createModal.querySelector('#newAddtitle').value.trim(),
+          description: createModal.querySelector('#newAdddescription').value.trim(),
+          link: createModal.querySelector('#newAddlink').value.trim(),
+        };
+        const imageValue = createModal.querySelector('#newAddimg').getAttribute('image');
+        if (imageValue) {
+          payload.img = imageValue;
+        }
+        if (!payload.title || !payload.description) {
+          await notifyWarning({
+            text: 'يرجى إدخال العنوان والوصف قبل الحفظ.',
+          });
+          return;
+        }
+        try {
+          await request('/ControlPanel/approvals/add/', {
+            method: 'POST',
+            body: payload,
+          });
+          await notifySuccess({
+            title: 'تم الحفظ',
+            text: 'تم إنشاء الاعتماد بنجاح.',
+          });
+          window.location.reload();
+        } catch (error) {
+          await notifyError(error.message);
+        }
+      });
+    }
+  }
+
+  document.querySelectorAll('.delete').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const confirmed = await confirmDelete();
+      if (!confirmed) {
+        return;
+      }
+      const row = button.closest('tr');
+      const id = row ? row.getAttribute('id-num') : null;
+      if (!id) {
+        await notifyError('تعذر تحديد الاعتماد المطلوب حذفه.');
+        return;
+      }
+      try {
+        await request(`/ControlPanel/approvals/del/${id}/`, { method: 'DELETE' });
+        await notifySuccess({
+          title: 'تم الحذف',
+          text: 'تم حذف الاعتماد بنجاح.',
+        });
+        window.location.reload();
+      } catch (error) {
+        await notifyError(error.message);
+      }
+    });
+  });
+
+  document.querySelectorAll('.editBtn').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const modal = button.closest('.modal');
+      if (!modal) {
+        return;
+      }
+      const payload = {
+        title: modal.querySelector('#edittitle').value.trim(),
+        description: modal.querySelector('#editdescription').value.trim(),
+        link: modal.querySelector('#editlink').value.trim(),
+      };
+      const imageValue = modal.querySelector('#editimg').getAttribute('image');
+      if (imageValue) {
+        payload.img = imageValue;
+      }
+      if (!payload.title || !payload.description) {
+        await notifyWarning({
+          text: 'يرجى إدخال العنوان والوصف قبل الحفظ.',
+        });
+        return;
+      }
+      const id = modal.getAttribute('idNum');
+      if (!id) {
+        await notifyError('تعذر تحديد الاعتماد المطلوب تحديثه.');
+        return;
+      }
+      try {
+        await request(`/ControlPanel/approvals/edit/${id}/`, {
+          method: 'POST',
+          body: payload,
+        });
+        await notifySuccess({
+          title: 'تم التحديث',
+          text: 'تم تحديث الاعتماد بنجاح.',
+        });
+        window.location.reload();
+      } catch (error) {
+        await notifyError(error.message);
+      }
+    });
+  });
+
+  document.querySelectorAll('.toRep').forEach((element) => {
+    if (element.getAttribute('lang') === resolveAdminLang()) {
+      element.classList.remove('hidden');
+    }
+  });
+
+  const changeLangCont = document.getElementById('changeLangCont');
+  if (changeLangCont) {
+    changeLangCont.classList.add('hidden');
+  }
+});
 </script>
 {% endblock %}
-

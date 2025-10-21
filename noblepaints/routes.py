@@ -909,7 +909,7 @@ def socialIcons_edit(id):
         social.icon = icon.strip()
     db.session.commit()
     return json_success('Social icon updated successfully.')
-@app.route('/ControlPanel/socialIcons/del/<id>/')
+@app.route('/ControlPanel/socialIcons/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def socialIcons_del(id):
     social = db.session.query(Social).filter(Social.id == id).first()
@@ -982,7 +982,7 @@ def news_edit(id):
 
     db.session.commit()
     return json_success('News item updated successfully.')
-@app.route('/ControlPanel/news/del/<id>/')
+@app.route('/ControlPanel/news/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def news_del(id):
     post = db.session.query(Post).filter(Post.id == id).first()
@@ -1049,7 +1049,7 @@ def certificates_edit(id):
 
     db.session.commit()
     return json_success('Certificate updated successfully.')
-@app.route('/ControlPanel/certificates/del/<id>/')
+@app.route('/ControlPanel/certificates/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def certificates_del(id):
     certificate = db.session.query(Certificate).filter(Certificate.id == id).first()
@@ -1116,7 +1116,7 @@ def approvals_edit(id):
 
     db.session.commit()
     return json_success('Approval updated successfully.')
-@app.route('/ControlPanel/approvals/del/<id>/')
+@app.route('/ControlPanel/approvals/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def approvals_del(id):
     approval = db.session.query(Approval).filter(Approval.id == id).first()
@@ -1228,7 +1228,7 @@ def products_edit(id):
 
     db.session.commit()
     return json_success('Product updated successfully.')
-@app.route('/ControlPanel/products/del/<id>/')
+@app.route('/ControlPanel/products/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def products_del(id):
     product = db.session.query(Product).filter(Product.id == id).first()
@@ -1333,7 +1333,7 @@ def catalogs_edit(id):
 
     db.session.commit()
     return json_success('Catalog updated successfully.')
-@app.route('/ControlPanel/catalogs/del/<id>/')
+@app.route('/ControlPanel/catalogs/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def catalogs_del(id):
     catalog = db.session.query(Catalog).filter(Catalog.id == id).first()
@@ -1410,7 +1410,7 @@ def TechnicalDatasheets_edit(id):
 
     db.session.commit()
     return json_success('Technical datasheet updated successfully.')
-@app.route('/ControlPanel/TechnicalDatasheets/del/<id>/')
+@app.route('/ControlPanel/TechnicalDatasheets/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def TechnicalDatasheets_del(id):
     datasheet = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.id == id).first()

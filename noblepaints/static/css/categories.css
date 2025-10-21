@@ -1,3 +1,11 @@
+.page-hero--categories {
+    --page-hero-image: url('../images/speces01.png');
+}
+
+.page-hero--categories .page-hero__overlay {
+    background: linear-gradient(135deg, rgba(0, 45, 74, 0.85), rgba(18, 106, 154, 0.55));
+}
+
 .category-intro {
     display: grid;
     gap: 1.5rem;
@@ -56,6 +64,11 @@
     gap: 1.25rem;
 }
 
+.category-card__text-wrapper {
+    display: grid;
+    gap: 0.75rem;
+}
+
 .category-card__title {
     font-size: clamp(1.65rem, 4vw, 2.1rem);
     font-weight: 700;
@@ -65,6 +78,18 @@
 .category-card__text {
     margin: 0;
     color: var(--brand-muted);
+}
+
+.category-card__extras {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(17, 46, 77, 0.08);
+}
+
+.category-card__extras img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .category-card__actions {
@@ -91,4 +116,35 @@
     background: rgba(17, 46, 77, 0.06);
     border-radius: 20px;
     padding: 2.5rem 1.5rem;
+}
+
+.category-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3rem 1.5rem;
+    color: var(--brand-muted);
+    text-align: center;
+}
+
+.category-status__spinner {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 3px solid rgba(17, 46, 77, 0.12);
+    border-top-color: var(--brand-primary);
+    animation: category-spinner 0.8s linear infinite;
+}
+
+.category-status--error {
+    background: rgba(190, 30, 45, 0.08);
+    border-radius: 20px;
+}
+
+@keyframes category-spinner {
+    to {
+        transform: rotate(1turn);
+    }
 }
