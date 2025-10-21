@@ -194,196 +194,161 @@
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/dropzone.css"></script>
 <script>
-  document.querySelector('#entriesNumber').querySelectorAll('a').forEach(e=>{
-    e.addEventListener('click',function(){
-      //localStorage.setItem('entriesNumber',e.innerHTML)
-      location.replace(`/ControlPanel/categories/?page=${new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
-}).page}&show=${e.innerHTML}&lang=${localStorage.getItem('nobleLangCPanel')}`)
-    })
-  })
-  
+document.addEventListener('DOMContentLoaded', () => {
+  const api = window.AdminApi;
+  if (!api) {
+    console.error('AdminApi is not available.');
+    return;
+  }
 
+  const { request, notifySuccess, notifyWarning, notifyError, confirmDelete, resolveAdminLang } = api;
 
-    document.querySelectorAll('.imgInput').forEach(e=>{
-      e.addEventListener('input',function(){
-        var fileInput = this;
-        var file = fileInput.files[0];
-          if (file.type.match(/image.*/)) {
-            var reader = new FileReader();
-            reader.onload = async function(e) {
-              fileInput.setAttribute('image',reader.result)
-              if(fileInput.classList.contains('secPhotosInput')){
-                newProjectForm.querySelector('.col-lg-4.col-sm-6').insertAdjacentHTML('beforeend',`
-                <div class="form-file mb-3">
-                    <input image=${fileInput.getAttribute('image')} type="file" class="form-file-input imgInput secPhotosInput" id="customFile">
-                    <label class="form-file-label" for="customFile">
-                        <span class="form-file-text">اختر ملفاً</span>
-                        <span class="form-file-button">تصفح</span>
-                    </label>
-                </div>
-                `)
-              }
-            }
-            reader.readAsDataURL(file);	
-          }
-      })
-    })
-    const notify = (options) => {
-      return Swal.fire(Object.assign({
-        icon: 'success',
-        confirmButtonText: 'حسناً'
-      }, options));
-    };
-
-    const apiRequest = async (url, options = {}) => {
-      const defaultOptions = {
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      const response = await fetch(url, Object.assign(defaultOptions, options));
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (err) {
-        // ignore JSON parse errors
-      }
-      if (!response.ok || data.success === false) {
-        const message = (data && data.message) ? data.message : 'حدث خطأ غير متوقع. حاول مرة أخرى.';
-        throw new Error(message);
-      }
-      return data;
-    };
-
-    const handleError = (error) => {
-      const message = error && error.message ? error.message : 'حدث خطأ غير متوقع. حاول مرة أخرى.';
-      return notify({
-        icon: 'error',
-        title: 'خطأ',
-        text: message
+  const entriesMenu = document.querySelector('#entriesNumber');
+  if (entriesMenu) {
+    entriesMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get('page') || '1';
+        const show = link.textContent.trim();
+        const lang = resolveAdminLang();
+        window.location.replace(`/ControlPanel/categories/?page=${page}&show=${show}&lang=${lang}`);
       });
-    };
+    });
+  }
 
-    newProjectForm.querySelector('#saveBtn').addEventListener('click',async function(evt){
-      evt.preventDefault();
-      const payload = {
-        name: newAddname.value.trim(),
-        namearabic: newAddnamearabic.value.trim(),
-        desc: newAdddesc.value.replaceAll('\n', '<br>').trim(),
-        img: newAddimg.getAttribute('image')
-      };
-      if (!payload.name || !payload.desc) {
-        notify({
-          icon: 'warning',
-          title: 'تنبيه',
-          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.'
-        });
+  const bindImageInput = (input) => {
+    input.addEventListener('input', () => {
+      const file = input.files && input.files[0];
+      if (!file || !file.type.match(/image.*/)) {
         return;
       }
-      AdminLoader.show();
-      try {
-        await apiRequest('/ControlPanel/categories/add/', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        await notify({
-          icon: 'success',
-          title: 'تم الحفظ',
-          text: 'تم إنشاء الفئة بنجاح.'
-        });
-        location.reload();
-      } catch (error) {
-        await handleError(error);
-      } finally {
-        AdminLoader.hide();
-      }
-    })
-    document.querySelectorAll('.delete').forEach(e=>{
-      e.addEventListener('click',async function(){
-        Swal.fire({
-        title: "تأكيد",
-        text: 'هل أنت متأكد من حذف العنصر ؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: "نعم",
-        cancelButtonText: "لا"
-        })
-        .then(async(result)=>{
-          if (result.isConfirmed){
-            AdminLoader.show();
-            try {
-              await apiRequest(`/ControlPanel/categories/del/${e.closest('tr').getAttribute('id-num')}/`, {
-                method: 'DELETE'
-              });
-              await notify({
-                icon: 'success',
-                title: 'تم الحذف',
-                text: 'تم حذف الفئة بنجاح.'
-              });
-              location.reload();
-            } catch (error) {
-              await handleError(error);
-            } finally {
-              AdminLoader.hide();
-            }
-          }
-        })
-      })
-    })
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        input.setAttribute('image', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
-    function getParams(query){
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
+  document.querySelectorAll('.imgInput').forEach(bindImageInput);
+
+  const newCategoryModal = document.getElementById('newProjectForm');
+  if (newCategoryModal) {
+    const saveButton = newCategoryModal.querySelector('#saveBtn');
+    if (saveButton) {
+      saveButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const payload = {
+          name: newCategoryModal.querySelector('#newAddname').value.trim(),
+          namearabic: newCategoryModal.querySelector('#newAddnamearabic').value.trim(),
+          desc: newCategoryModal.querySelector('#newAdddesc').value.replaceAll('\n', '<br>').trim(),
+        };
+        const imageValue = newCategoryModal.querySelector('#newAddimg').getAttribute('image');
+        if (imageValue) {
+          payload.img = imageValue;
+        }
+        if (!payload.name || !payload.desc) {
+          await notifyWarning({
+            text: 'يرجى إدخال الاسم والوصف قبل الحفظ.',
+          });
+          return;
+        }
+        try {
+          await request('/ControlPanel/categories/add/', {
+            method: 'POST',
+            body: payload,
+          });
+          await notifySuccess({
+            title: 'تم الحفظ',
+            text: 'تم إنشاء الفئة بنجاح.',
+          });
+          window.location.reload();
+        } catch (error) {
+          await notifyError(error.message);
+        }
       });
-      // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
-      return params[query];
-}
+    }
+  }
 
-document.querySelectorAll('.editBtn').forEach(e=>{
-  e.addEventListener('click',async function(evt){
-    evt.preventDefault()
-      const modal = e.closest('.modal');
+  document.querySelectorAll('.delete').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const confirmed = await confirmDelete();
+      if (!confirmed) {
+        return;
+      }
+      const row = button.closest('tr');
+      const id = row ? row.getAttribute('id-num') : null;
+      if (!id) {
+        await notifyError('تعذر تحديد الفئة المطلوب حذفها.');
+        return;
+      }
+      try {
+        await request(`/ControlPanel/categories/del/${id}/`, { method: 'DELETE' });
+        await notifySuccess({
+          title: 'تم الحذف',
+          text: 'تم حذف الفئة بنجاح.',
+        });
+        window.location.reload();
+      } catch (error) {
+        await notifyError(error.message);
+      }
+    });
+  });
+
+  document.querySelectorAll('.editBtn').forEach((button) => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const modal = button.closest('.modal');
+      if (!modal) {
+        return;
+      }
       const payload = {
         name: modal.querySelector('#editname').value.trim(),
         namearabic: modal.querySelector('#editnamearabic').value.trim(),
         desc: modal.querySelector('#editdesc').value.replaceAll('\n', '<br>').trim(),
-        img: modal.querySelector('#editimg').getAttribute('image')
       };
+      const imageValue = modal.querySelector('#editimg').getAttribute('image');
+      if (imageValue) {
+        payload.img = imageValue;
+      }
       if (!payload.name || !payload.desc) {
-        notify({
-          icon: 'warning',
-          title: 'تنبيه',
-          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.'
+        await notifyWarning({
+          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.',
         });
         return;
       }
-      AdminLoader.show()
-      try {
-        await apiRequest(`/ControlPanel/categories/edit/${modal.getAttribute('idNum')}/`,{
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        await notify({
-          icon: 'success',
-          title: 'تم التحديث',
-          text: 'تم تحديث الفئة بنجاح.'
-        });
-        location.reload()
-      } catch (error) {
-        await handleError(error);
-      } finally {
-        AdminLoader.hide();
+      const id = modal.getAttribute('idNum');
+      if (!id) {
+        await notifyError('تعذر تحديد الفئة المطلوب تحديثها.');
+        return;
       }
-  })
-})
+      try {
+        await request(`/ControlPanel/categories/edit/${id}/`, {
+          method: 'POST',
+          body: payload,
+        });
+        await notifySuccess({
+          title: 'تم التحديث',
+          text: 'تم تحديث الفئة بنجاح.',
+        });
+        window.location.reload();
+      } catch (error) {
+        await notifyError(error.message);
+      }
+    });
+  });
 
-changeLangCont.classList.add('hidden')
+  document.querySelectorAll('.toRep').forEach((element) => {
+    if (element.getAttribute('lang') === resolveAdminLang()) {
+      element.classList.remove('hidden');
+    }
+  });
 
-/********************************************/
+  const changeLangCont = document.getElementById('changeLangCont');
+  if (changeLangCont) {
+    changeLangCont.classList.add('hidden');
+  }
+});
 </script>
 {% endblock %}
-
