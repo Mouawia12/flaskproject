@@ -19,8 +19,26 @@
         <span class="page-overlay__spinner"></span>
     </div>
 
-    <header>
-        <nav class="navbar navbar-expand-lg site-navbar">
+    <header class="site-header">
+        <div class="site-topbar">
+            <div class="container2 d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                <span class="topbar-tagline">
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    {{ t('meta.tagline') }}
+                </span>
+                <div class="topbar-actions">
+                    <a class="topbar-link" href="tel:+966112265599" aria-label="Call Noble Paints">
+                        <i class="fa-solid fa-phone"></i>
+                        +966 11 226 5599
+                    </a>
+                    <a class="topbar-link" href="mailto:info@noblepaints.com.sa" aria-label="Email Noble Paints">
+                        <i class="fa-solid fa-envelope"></i>
+                        info@noblepaints.com.sa
+                    </a>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg site-navbar" aria-label="Site navigation">
             <div class="container2">
                 <a class="navbar-brand" href="{{ url_for_lang('home_page') }}" aria-label="{{ t('meta.site_name') }}">
                     <img src="{{ url_for('static', filename='images/logo_png.png') }}" alt="{{ t('meta.site_name') }}">
@@ -29,7 +47,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="siteNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for_lang('home_page') }}" data-nav-match="/" data-i18n-key="nav.home"></a>
                         </li>
@@ -77,7 +95,13 @@
                                 {% endfor %}
                             </ul>
                         </li>
+                        <li class="nav-item d-none d-lg-block">
+                            <a class="btn btn-primary nav-cta" href="{{ url_for_lang('contact_page') }}" data-i18n-key="footer.contact"></a>
+                        </li>
                     </ul>
+                    <div class="mt-3 d-lg-none">
+                        <a class="btn btn-primary w-100" href="{{ url_for_lang('contact_page') }}" data-i18n-key="footer.contact"></a>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -90,32 +114,60 @@
     </main>
 
     <footer class="site-footer">
-        <div class="footer-top">
-            <div class="container2">
-                <div class="row align-items-center">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <a href="{{ url_for_lang('home_page') }}" class="navbar-brand">
-                            <img src="{{ url_for('static', filename='images/logo_png.png') }}" alt="{{ t('meta.site_name') }}">
+        <div class="container2">
+            <div class="row g-4 align-items-start footer-main">
+                <div class="col-md-4">
+                    <a href="{{ url_for_lang('home_page') }}" class="footer-brand">
+                        <img src="{{ url_for('static', filename='images/logo_png.png') }}" alt="{{ t('meta.site_name') }}">
+                    </a>
+                    <p class="footer-text">{{ t('meta.tagline') }}</p>
+                    <div class="footer-contact">
+                        <a href="tel:+966112265599">
+                            <i class="fa-solid fa-phone"></i>
+                            +966 11 226 5599
+                        </a>
+                        <a href="mailto:info@noblepaints.com.sa">
+                            <i class="fa-solid fa-envelope"></i>
+                            info@noblepaints.com.sa
                         </a>
                     </div>
-                    <div class="col-md-8">
-                        <nav class="footer-links">
-                            <a href="{{ url_for_lang('news_page') }}" data-i18n-key="footer.news"></a>
-                            <a href="{{ url_for_lang('locations_page') }}" data-i18n-key="footer.store_locator"></a>
-                            <a href="{{ url_for_lang('socialMedia_page') }}" data-i18n-key="footer.social_media"></a>
-                            <a href="{{ url_for_lang('contact_page') }}" data-i18n-key="footer.contact"></a>
-                        </nav>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <h6 class="footer-heading" data-i18n-key="footer.quick_links"></h6>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for_lang('products_page') }}" data-i18n-key="nav.business_solutions.find_product"></a></li>
+                        <li><a href="{{ url_for_lang('catalogs_page_filter_none') }}" data-i18n-key="nav.business_solutions.catalogs"></a></li>
+                        <li><a href="{{ url_for_lang('news_page') }}" data-i18n-key="footer.news"></a></li>
+                        <li><a href="{{ url_for_lang('locations_page') }}" data-i18n-key="footer.store_locator"></a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <h6 class="footer-heading" data-i18n-key="footer.join"></h6>
+                    <p class="footer-text" data-i18n-key="footer.newsletter_blurb"></p>
+                    <form class="footer-form" action="{{ url_for_lang('contact_page') }}" method="get">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Email" aria-label="Email">
+                            <button class="btn btn-primary" type="submit" data-i18n-key="footer.subscribe"></button>
+                        </div>
+                    </form>
+                    <div class="footer-social" data-social-feed>
+                        <a class="social-link" href="mailto:info@noblepaints.com.sa" aria-label="Email">
+                            <i class="fa-solid fa-envelope"></i>
+                        </a>
+                        <a class="social-link" href="https://www.linkedin.com/company/noble-paints" target="_blank" rel="noopener" aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                        <a class="social-link" href="https://www.instagram.com/noblepaints" target="_blank" rel="noopener" aria-label="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="social-links" data-social-feed>
-            <a class="social-link" href="mailto:info@noblepaints.com.sa">
-                <i class="fa fa-envelope"></i>
-            </a>
-        </div>
         <div class="footer-bottom">
-            <p data-i18n-key="footer.copyright"></p>
+            <div class="container2">
+                <p data-i18n-key="footer.copyright"></p>
+            </div>
         </div>
     </footer>
 
