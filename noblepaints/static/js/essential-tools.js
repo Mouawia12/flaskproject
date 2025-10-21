@@ -1,18 +1,25 @@
 (function () {
-  const FEATURED_IDS = new Set([68, 71, 78, 80, 36, 20, 113, 64, 104, 76]);
-  const toolsGrid = document.querySelector('[data-essential-tools]');
-  if (!toolsGrid) {
+  const grid = document.querySelector('[data-essential-tools]');
+  if (!grid) {
     return;
   }
 
+  const FEATURED_IDS = new Set([68, 71, 78, 80, 36, 20, 113, 64, 104, 76]);
   const emptyState = document.querySelector('[data-essential-empty]');
-  const currentLang = window.APP_LANG || localStorage.getItem('nobleLang') || document.documentElement.lang || 'en';
+  const section = grid.closest('[data-essential-tools-section]');
+  const currentLang = window.APP_LANG ||
+    localStorage.getItem('nobleLang') ||
+    document.documentElement.lang ||
+    'en';
 
   const formatDescription = (value) => {
     if (!value) {
       return '';
     }
-    const withoutHtml = value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const withoutHtml = value
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
     if (withoutHtml.length <= 160) {
       return withoutHtml;
     }
@@ -58,23 +65,39 @@
   };
 
   const renderProducts = (products) => {
-    const featuredProducts = products.filter((item) => FEATURED_IDS.has(item.id));
+    grid.innerHTML = '';
 
-    if (!featuredProducts.length) {
+    const featured = products.filter((item) => FEATURED_IDS.has(item.id));
+    if (!featured.length) {
       if (emptyState) {
         emptyState.hidden = false;
+      }
+      if (section) {
+        section.setAttribute('data-essential-tools-empty', '');
       }
       return;
     }
 
     const fragment = document.createDocumentFragment();
-    featuredProducts.forEach((product) => {
+    featured.forEach((product) => {
       fragment.appendChild(createCard(product));
     });
 
-    toolsGrid.appendChild(fragment);
+    grid.appendChild(fragment);
     if (emptyState) {
       emptyState.hidden = true;
+    }
+    if (section) {
+      section.removeAttribute('data-essential-tools-empty');
+    }
+  };
+
+  const handleError = () => {
+    if (emptyState) {
+      emptyState.hidden = false;
+    }
+    if (section) {
+      section.setAttribute('data-essential-tools-error', '');
     }
   };
 
@@ -87,13 +110,10 @@
     })
     .then((data) => {
       if (!Array.isArray(data)) {
+        handleError();
         return;
       }
       renderProducts(data);
     })
-    .catch(() => {
-      if (emptyState) {
-        emptyState.hidden = false;
-      }
-    });
+    .catch(handleError);
 })();

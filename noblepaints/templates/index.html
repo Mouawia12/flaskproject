@@ -2,11 +2,17 @@
 {% set page_title_key = 'home.meta.title' %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-<script defer src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
 
 {% block hero %}
 <section class="home-hero">
+    <div class="home-hero__media" aria-hidden="true">
+        <img src="{{ url_for('static', filename='images/video.PNG') }}" alt="Noble Paints hero background">
+        <video width="100%" height="100%" loop autoplay muted playsinline preload="metadata" poster="{{ url_for('static', filename='images/video.PNG') }}">
+            <source src="{{ url_for('static', filename='videos/5.mp4') }}" type="video/mp4">
+        </video>
+    </div>
+    <div class="home-hero__overlay" aria-hidden="true"></div>
     <div class="container2">
         <div class="home-hero__content">
             <span class="home-hero__eyebrow">{{ t('home.hero.eyebrow') }}</span>
@@ -22,42 +28,38 @@
 {% endblock %}
 
 {% block content %}
-<section class="section section--light">
-    <div class="container2 home-highlights">
-        <a class="home-highlight" href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}">
-            <div class="home-highlight__image" aria-hidden="true">
-                <img src="{{ url_for('static', filename='images/tech.png') }}" alt="{{ t('home.highlights.datasheets_alt') }}">
-            </div>
-            <div class="home-highlight__body">
-                <span class="badge-pill"><i class="fa-solid fa-file-lines"></i>{{ t('home.highlights.datasheets_badge') }}</span>
-                <h2 class="home-highlight__title">{{ t('home.highlights.datasheets_title') }}</h2>
-                <p class="home-highlight__text">{{ t('home.highlights.datasheets_text') }}</p>
-            </div>
-        </a>
-        <a class="home-highlight" href="{{ url_for_lang('productsSearch_page_filter_none') }}">
-            <div class="home-highlight__image" aria-hidden="true">
-                <img src="{{ url_for('static', filename='images/boxes02.png') }}" alt="{{ t('home.highlights.products_alt') }}">
-            </div>
-            <div class="home-highlight__body">
-                <span class="badge-pill"><i class="fa-solid fa-palette"></i>{{ t('home.highlights.products_badge') }}</span>
-                <h2 class="home-highlight__title">{{ t('home.highlights.products_title') }}</h2>
-                <p class="home-highlight__text">{{ t('home.highlights.products_text') }}</p>
-            </div>
-        </a>
-        <a class="home-highlight" href="{{ url_for_lang('catalogs_page_filter_none') }}">
-            <div class="home-highlight__image" aria-hidden="true">
-                <img src="{{ url_for('static', filename='images/boxes04.jpg') }}" alt="{{ t('home.highlights.catalogs_alt') }}">
-            </div>
-            <div class="home-highlight__body">
-                <span class="badge-pill"><i class="fa-solid fa-book"></i>{{ t('home.highlights.catalogs_badge') }}</span>
-                <h2 class="home-highlight__title">{{ t('home.highlights.catalogs_title') }}</h2>
-                <p class="home-highlight__text">{{ t('home.highlights.catalogs_text') }}</p>
-            </div>
-        </a>
+<section class="section section--light home-quicklinks">
+    <div class="container2">
+        <div class="home-quicklinks__grid">
+            <a class="home-quicklink" href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}">
+                <div class="home-quicklink__media" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/tech.png') }}" alt="{{ t('home.quicklinks.datasheets_alt') }}">
+                    <span class="home-quicklink__icon"><i class="fa-solid fa-file-lines"></i></span>
+                </div>
+                <h2 class="home-quicklink__title">{{ t('home.quicklinks.datasheets_title') }}</h2>
+                <p class="home-quicklink__description">{{ t('home.quicklinks.datasheets_text') }}</p>
+            </a>
+            <a class="home-quicklink" href="{{ url_for_lang('productsSearch_page_filter_none') }}">
+                <div class="home-quicklink__media" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/boxes02.png') }}" alt="{{ t('home.quicklinks.products_alt') }}">
+                    <span class="home-quicklink__icon"><i class="fa-solid fa-palette"></i></span>
+                </div>
+                <h2 class="home-quicklink__title">{{ t('home.quicklinks.products_title') }}</h2>
+                <p class="home-quicklink__description">{{ t('home.quicklinks.products_text') }}</p>
+            </a>
+            <a class="home-quicklink" href="{{ url_for_lang('catalogs_page_filter_none') }}">
+                <div class="home-quicklink__media" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/boxes04.jpg') }}" alt="{{ t('home.quicklinks.catalogs_alt') }}">
+                    <span class="home-quicklink__icon"><i class="fa-solid fa-book"></i></span>
+                </div>
+                <h2 class="home-quicklink__title">{{ t('home.quicklinks.catalogs_title') }}</h2>
+                <p class="home-quicklink__description">{{ t('home.quicklinks.catalogs_text') }}</p>
+            </a>
+        </div>
     </div>
 </section>
 
-<section class="section section--muted">
+<section class="section section--muted home-story">
     <div class="container2">
         <div class="section__header">
             <span class="section__eyebrow">{{ t('home.story.eyebrow') }}</span>
@@ -68,58 +70,39 @@
             <article class="home-section">
                 <div class="home-section__content">
                     <h3 class="home-section__title">{{ t('home.story.research_title') }}</h3>
-                    <p class="home-section__text">{{ t('home.story.research_text') }}</p>
-                    <ul class="list-check">
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_one') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_two') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.research_list_three') }}</span></li>
-                    </ul>
+                    <p class="home-section__text">{{ t('home.story.research_text_part_one') }}</p>
+                    <p class="home-section__text">{{ t('home.story.research_text_part_two') }}</p>
                 </div>
                 <div class="home-section__image" aria-hidden="true">
                     <img src="{{ url_for('static', filename='images/speces03.png') }}" alt="{{ t('home.story.research_alt') }}">
                 </div>
             </article>
             <article class="home-section">
+                <div class="home-section__image" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/speces02.png') }}" alt="{{ t('home.story.quality_alt') }}">
+                </div>
                 <div class="home-section__content">
                     <h3 class="home-section__title">{{ t('home.story.quality_title') }}</h3>
-                    <p class="home-section__text">{{ t('home.story.quality_text') }}</p>
-                    <ul class="list-check">
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_one') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_two') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.quality_list_three') }}</span></li>
-                    </ul>
-                </div>
-                <div class="home-section__image" aria-hidden="true">
-                    <img src="{{ url_for('static', filename='images/speces011.png') }}" alt="{{ t('home.story.quality_alt') }}">
+                    <p class="home-section__text">{{ t('home.story.quality_text_part_one') }}</p>
+                    <p class="home-section__text">{{ t('home.story.quality_text_part_two') }}</p>
                 </div>
             </article>
             <article class="home-section">
                 <div class="home-section__content">
                     <h3 class="home-section__title">{{ t('home.story.support_title') }}</h3>
-                    <p class="home-section__text">{{ t('home.story.support_text') }}</p>
-                    <ul class="list-check">
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_one') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_two') }}</span></li>
-                        <li><i class="fa-solid fa-check"></i><span>{{ t('home.story.support_list_three') }}</span></li>
+                    <p class="home-section__text">{{ t('home.story.support_text_part_one') }}</p>
+                    <p class="home-section__text">{{ t('home.story.support_text_part_two') }}</p>
+                    <ul class="home-section__list">
+                        <li>{{ t('home.story.support_list_one') }}</li>
+                        <li>{{ t('home.story.support_list_two') }}</li>
+                        <li>{{ t('home.story.support_list_three') }}</li>
                     </ul>
                 </div>
                 <div class="home-section__image" aria-hidden="true">
-                    <img src="{{ url_for('static', filename='images/speces02.png') }}" alt="{{ t('home.story.support_alt') }}">
+                    <img src="{{ url_for('static', filename='images/speces011.png') }}" alt="{{ t('home.story.support_alt') }}">
                 </div>
             </article>
         </div>
-    </div>
-</section>
-
-<section class="section section--light">
-    <div class="container2 home-tools">
-        <div class="section__header">
-            <span class="section__eyebrow">{{ t('home.tools.eyebrow') }}</span>
-            <h2 class="section__title">{{ t('home.tools.title') }}</h2>
-            <p class="section__subtitle">{{ t('home.tools.subtitle') }}</p>
-        </div>
-        <div class="home-tools__grid" data-essential-tools></div>
-        <p class="home-tools__empty" data-essential-empty hidden>{{ t('home.tools.empty') }}</p>
     </div>
 </section>
 {% endblock %}

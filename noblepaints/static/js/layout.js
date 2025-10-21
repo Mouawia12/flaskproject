@@ -112,6 +112,42 @@
         });
     };
 
+    const resolveIconClass = (value) => {
+        if (!value) {
+            return null;
+        }
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return null;
+        }
+        if (trimmed.includes(" ")) {
+            return trimmed;
+        }
+        const normalised = trimmed.replace(/^fa-/, "");
+        const brands = new Set([
+            "facebook",
+            "facebook-f",
+            "instagram",
+            "linkedin",
+            "linkedin-in",
+            "youtube",
+            "x-twitter",
+            "twitter",
+            "snapchat",
+            "tiktok",
+            "whatsapp",
+            "behance",
+            "dribbble",
+        ]);
+        if (trimmed.startsWith("fa-solid") || trimmed.startsWith("fa-regular") || trimmed.startsWith("fa-brands")) {
+            return trimmed;
+        }
+        if (brands.has(normalised)) {
+            return `fa-brands fa-${normalised}`;
+        }
+        return `fa-solid fa-${normalised}`;
+    };
+
     const socialIcons = () => {
         const container = document.querySelector("[data-social-feed]");
         if (!container) {
@@ -128,12 +164,16 @@
                     if (!icon.link || !icon.icon) {
                         return;
                     }
+                    const iconClass = resolveIconClass(icon.icon);
+                    if (!iconClass) {
+                        return;
+                    }
                     const anchor = document.createElement("a");
                     anchor.className = "social-link";
                     anchor.href = icon.link;
                     anchor.target = "_blank";
                     anchor.rel = "noopener";
-                    anchor.innerHTML = `<i class="fa fa-${icon.icon}"></i>`;
+                    anchor.innerHTML = `<i class="${iconClass}"></i>`;
                     frag.appendChild(anchor);
                 });
                 if (frag.childNodes.length) {
