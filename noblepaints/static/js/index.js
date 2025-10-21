@@ -1,188 +1,99 @@
-$('ul.dropdown-menu [data-toggle=dropdown]').on('click', function(event) {
-    // Avoid following the href location when clicking
-    event.preventDefault(); 
-    // Avoid having the menu to close when clicking
-    event.stopPropagation(); 
-
-    // opening the one you clicked on and closing siblings that were already open
-    $(this).parent().siblings().removeClass('open'); /* removes open class on dropdowns that are already open*/
-    $(this).parent().toggleClass('open'); /* adds class open on the dropdown that is being clicked on*/
-    //$('.dropdown-submenu').not($(this)).parent().removeClass('open');
-
-    var menu = $(this).parent().find("ul");
-    var menupos = menu.offset();
-  
-    if ((menupos.left + menu.width()) + 30 > $(window).width()) {
-        var newpos = - menu.width();      
-    } else {
-        var newpos = $(this).parent().width();
-    }
-    menu.css({ left:newpos });
-
-});
-
-
-var swiper = new Swiper("#swiper1", {
-    effect: "fade",
-    autoplay: {
-        delay:3000,
-        disableOnInteraction: false,
-        observer: false,
-        observeParents: false
-    },
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-});
-
-
-/********************/
-
-
-if(this.localStorage.getItem('nobleLang')=='ar'){
-  document.documentElement.style.setProperty("--swipertrans", 'translate(-1000px,-50%)');
-  document.querySelectorAll('.containerAbs').forEach(e=>{
-    e.style.right = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    e.style.left = `unset`
-    if(e.style.right=='0px'){
-      e.style.right = '20px'
-    }
-  })
-  document.querySelectorAll('.swiper-text-box').forEach(e=>{
-    e.style.direction = 'rtl'
-  })
-}
-else{
-  document.querySelectorAll('.containerAbs').forEach(e=>{
-    e.style.left = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    if(e.style.left=='0px'){
-      e.style.left = '20px'
-    }
-  })
-  document.querySelectorAll('.swiper-text-box').forEach(e=>{
-    e.style.direction = 'ltr'
-  })
-}
-  
-
-if(this.localStorage.getItem('nobleLang')=='ar')
-  document.querySelectorAll('.swiper-img-box').forEach(e=>{
-    e.style.left = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    e.style.right = `unset`
-    e.querySelector('img').style.right = `unset`
-    e.querySelector('img').style.left = `0`
-})
-else
-document.querySelectorAll('.swiper-img-box').forEach(e=>{
-  e.style.right = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-})
-
-window.addEventListener('resize',function(){
-  if(this.localStorage.getItem('nobleLang')=='ar')
-  document.querySelectorAll('.containerAbs').forEach(e=>{
-    e.style.right = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    if(e.style.right=='0px'){
-      e.style.right = '20px'
-    }
-    e.style.left = `unset`
-  })
-  else
-  document.querySelectorAll('.containerAbs').forEach(e=>{
-    e.style.left = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    if(e.style.left=='0px'){
-      e.style.left = '20px'
-    }
-  })
-  if(this.localStorage.getItem('nobleLang')=='ar')
-  document.querySelectorAll('.swiper-img-box').forEach(e=>{
-    e.style.left = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-    e.style.right = `unset`
-    e.querySelector('img').style.right = `unset`
-    e.querySelector('img').style.left = `0`
-  })
-  else
-  document.querySelectorAll('.swiper-img-box').forEach(e=>{
-    e.style.right = `${(window.innerWidth - document.querySelector('#navbar').offsetWidth)/2}px`
-  })
-});
-var swiper5 
-/****************************************************/
-
-(async function(){
-  await fetch(`/getProducts/?lang=en`)
-.then(res=>res.json())
-.then(async (res)=>{
-  for([i,x] of Object.entries(res)){
-    if(x.id==68||x.id==71||x.id==78||x.id==80||x.id==36||x.id==20||x.id==113||x.id==64||x.id==104||x.id==76){
-      document.querySelector('#swiper2').querySelector('.swiper-wrapper').insertAdjacentHTML('beforeend',`
-      <div class='gamesList_content_div2 adventure popular all swiper-slide swiper-slide5'>
-      <img src="${x.img ? x.img : '/static/images/prod01.png'}">
-      <div>
-          <h3 style="color:#2c2c2c;height: fit-content;">${x.name}</h3>
-          <span>${x.desc}</span>
-      </div>
-      <div>
-          <a href="/product/?id=${x.id}" style="color:inherit;width:100%"><span style="width:100%" class="btn btn-success btn-block btn2 btn2radius-big btn2-width">${localStorage.getItem('nobleLang')!='ar'?'Learn More':'تصفح'}</span></a>
-      </div>
-      <span style="background-image:url('${x.img ? x.img : '/static/images/prod01.png'}')"></span>
-      </div>
-    `)
-    }
+(function () {
+  const FEATURED_IDS = new Set([68, 71, 78, 80, 36, 20, 113, 64, 104, 76]);
+  const toolsGrid = document.querySelector('[data-essential-tools]');
+  if (!toolsGrid) {
+    return;
   }
 
-  swiper5 = new Swiper("#swiper2", {
-    spaceBetween: 30,
-    loop:true,
-    navigation: {
-      nextEl: ".swiper-button-prev",
-      prevEl: ".swiper-button-next",
-    },
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-    mousewheel: false,
-    keyboard: true,
-    breakpoints: {
-      // when window width is <= 499px
-      499: {
-        slidesPerView: 2,
-      },
-      767: {
-          slidesPerView: 3,
-      },
-      1000: {
-        slidesPerView: 3,
-      },
-      1200: {
-          slidesPerView: 4,
-      },
-      3000: {
-        slidesPerView: 4,
-    },
-  }
-  });
-})
-})()
+  const emptyState = document.querySelector('[data-essential-empty]');
+  const currentLang = window.APP_LANG || localStorage.getItem('nobleLang') || document.documentElement.lang || 'en';
 
+  const formatDescription = (value) => {
+    if (!value) {
+      return '';
+    }
+    const withoutHtml = value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (withoutHtml.length <= 160) {
+      return withoutHtml;
+    }
+    return `${withoutHtml.slice(0, 157)}…`;
+  };
 
+  const createCard = (product) => {
+    const imageUrl = product.img || '/static/images/prod01.png';
+    const card = document.createElement('article');
+    card.className = 'essential-tool-card';
 
+    const media = document.createElement('div');
+    media.className = 'card-media';
+    media.style.backgroundImage = `url('${imageUrl}')`;
+    media.setAttribute('role', 'img');
+    media.setAttribute('aria-label', product.name || 'Product image');
 
-let videoS = function(){
-  if(document.querySelector('video').paused){
-    document.querySelector('video').play()
-    document.querySelector('header').querySelector('img').style.display = 'block'
-    document.querySelector('video').style.display = 'none'
-  }
-  else{
-    document.querySelector('header').querySelector('img').style.display = 'none'
-    document.querySelector('video').style.display = 'block'
-  }
-}
+    const body = document.createElement('div');
+    body.className = 'card-body';
 
-document.addEventListener('DOMContentLoaded',videoS)
+    const title = document.createElement('h3');
+    title.textContent = product.name || '';
 
-setInterval(()=>{
-  videoS()
-},1000)
+    const description = document.createElement('p');
+    description.textContent = formatDescription(product.desc);
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+
+    const cta = document.createElement('a');
+    cta.className = 'btn btn-outline-primary w-100';
+    cta.href = `/product/?id=${encodeURIComponent(product.id)}&lang=${encodeURIComponent(currentLang)}`;
+    cta.textContent = currentLang === 'ar' ? 'تصفح المنتج' : 'View product';
+
+    actions.appendChild(cta);
+    body.appendChild(title);
+    body.appendChild(description);
+    body.appendChild(actions);
+    card.appendChild(media);
+    card.appendChild(body);
+
+    return card;
+  };
+
+  const renderProducts = (products) => {
+    const featuredProducts = products.filter((item) => FEATURED_IDS.has(item.id));
+
+    if (!featuredProducts.length) {
+      if (emptyState) {
+        emptyState.hidden = false;
+      }
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    featuredProducts.forEach((product) => {
+      fragment.appendChild(createCard(product));
+    });
+
+    toolsGrid.appendChild(fragment);
+    if (emptyState) {
+      emptyState.hidden = true;
+    }
+  };
+
+  fetch(`/getProducts/?lang=${encodeURIComponent(currentLang)}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to load products');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (!Array.isArray(data)) {
+        return;
+      }
+      renderProducts(data);
+    })
+    .catch(() => {
+      if (emptyState) {
+        emptyState.hidden = false;
+      }
+    });
+})();
