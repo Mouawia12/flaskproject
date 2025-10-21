@@ -1,5 +1,4 @@
 (() => {
-    const ACTIVE_LANG = window.APP_LANG || "en";
     const TRANSLATIONS = window.BASE_TRANSLATIONS || {};
     const PAGE_TRANSLATIONS = window.PAGE_TRANSLATIONS || {};
 
@@ -15,7 +14,8 @@
         }
     };
 
-    const resolvePreferredLanguage = () => getStoredLanguage() || ACTIVE_LANG || "en";
+    const STORED_LANG = getStoredLanguage();
+    const ACTIVE_LANG = window.APP_LANG || STORED_LANG || "en";
 
     const mergeTranslations = () => {
         const merged = {};
@@ -80,16 +80,19 @@
     };
 
     const updateDirection = () => {
-        const lang = resolvePreferredLanguage();
-        const dir = lang === "ar" ? "rtl" : "ltr";
-        document.documentElement.setAttribute("lang", lang);
+        const dir = ACTIVE_LANG === "ar" ? "rtl" : "ltr";
+        document.documentElement.setAttribute("lang", ACTIVE_LANG);
         document.documentElement.setAttribute("dir", dir);
         document.body.dir = dir;
     };
 
     const rememberLanguage = () => {
         try {
-            window.localStorage.setItem("nobleLang", resolvePreferredLanguage());
+            const keys = ["nobleLang"];
+            if (document.body.classList.contains("admin-body")) {
+                keys.push("nobleLangCPanel");
+            }
+            keys.forEach((key) => window.localStorage.setItem(key, ACTIVE_LANG));
         } catch (error) {
             // Ignore storage errors (private mode etc.)
         }
@@ -216,7 +219,7 @@
     };
 
     window.AppOverlay = overlay;
-    window.getLang = resolvePreferredLanguage;
+    window.getLang = () => ACTIVE_LANG;
 
     document.addEventListener("DOMContentLoaded", () => {
         updateDirection();
