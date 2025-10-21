@@ -19,15 +19,26 @@
         }
     };
 
-    const parseJson = async (response) => {
+    const readResponse = async (response) => {
         const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            return null;
+        const text = await response.text();
+
+        if (!text) {
+            return { payload: null, rawText: '' };
         }
+
+        if (contentType.includes('application/json')) {
+            try {
+                return { payload: JSON.parse(text), rawText: text };
+            } catch (error) {
+                // Continue with fallback below.
+            }
+        }
+
         try {
-            return await response.json();
+            return { payload: JSON.parse(text), rawText: text };
         } catch (error) {
-            return null;
+            return { payload: null, rawText: text };
         }
     };
 
@@ -134,10 +145,25 @@
     const request = async (url, options = {}) => {
         return withLoader(async () => {
             const response = await fetch(url, buildFetchOptions(options));
-            const payload = await parseJson(response);
+            const { payload, rawText } = await readResponse(response);
             const requestSucceeded = response.ok && (!payload || payload.success !== false);
             if (!requestSucceeded) {
-                const message = (payload && (payload.message || payload.error)) || DEFAULT_ERROR;
+                let message = DEFAULT_ERROR;
+                if (payload && (payload.message || payload.error)) {
+                    message = payload.message || payload.error;
+                } else if (rawText) {
+                    const stripped = rawText
+                        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+                        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+                        .replace(/<[^>]+>/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    if (stripped) {
+                        message = stripped.length > 280 ? `${stripped.slice(0, 277)}…` : stripped;
+                    }
+                } else if (response.status) {
+                    message = `${response.status} ${response.statusText || ''}`.trim();
+                }
                 throw new Error(message);
             }
             return payload || { success: true };

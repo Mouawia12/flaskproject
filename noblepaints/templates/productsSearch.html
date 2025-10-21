@@ -1,311 +1,207 @@
 {% extends 'sec.html' %}
-{%block head%}
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
-/>
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
-<link href="/static/css/products.css" rel="stylesheet">
-<link href="/static/css/props.css" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/productsSearch.css">
-<title class="text">Noble paints | Products</title>
+{% set page_title_key = 'nav.business_solutions.product_search' %}
+{% set page_translations = {
+    'en': {
+        'products_search.hero.title': 'Product Search',
+        'products_search.hero.subtitle': 'Find the right coating by category, country or keyword.',
+        'products_search.filters.heading': 'Filter products',
+        'products_search.filters.search_placeholder': 'Search products…',
+        'products_search.filters.country': 'Select a country',
+        'products_search.filters.category': 'Category',
+        'products_search.filters.all': 'All',
+        'products_search.empty': 'No products match your filters yet. Try another search.',
+    },
+    'ar': {
+        'products_search.hero.title': 'البحث عن المنتجات',
+        'products_search.hero.subtitle': 'اعثر على الطلاء المناسب حسب الفئة أو الدولة أو الكلمات المفتاحية.',
+        'products_search.filters.heading': 'فلترة المنتجات',
+        'products_search.filters.search_placeholder': 'ابحث عن المنتجات…',
+        'products_search.filters.country': 'اختر الدولة',
+        'products_search.filters.category': 'الفئة',
+        'products_search.filters.all': 'الكل',
+        'products_search.empty': 'لا توجد منتجات مطابقة للبحث حتى الآن. جرّب كلمات أخرى.',
+    }
+} %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/props.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/productsSearch.css') }}">
 <style>
-    header{
-        background: url("/static/images/header02.jpg");
+    .subpage--product-search {
+        position: relative;
+        padding: 120px 0 90px;
+        background-size: cover;
+        background-position: center;
+        color: #fff;
+    }
+
+    .subpage--product-search::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(4, 32, 58, 0.82), rgba(4, 32, 58, 0.35));
+    }
+
+    .subpage--product-search .subpage__inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .subpage--product-search h1 {
+        font-size: clamp(2rem, 2.6vw, 3rem);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .subpage--product-search p {
+        max-width: 640px;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .product-empty-state {
+        padding: 3rem 1.5rem;
+        text-align: center;
+        border-radius: 24px;
+        background: rgba(17, 46, 77, 0.04);
+        border: 1px solid rgba(17, 46, 77, 0.08);
+        color: var(--brand-secondary);
+        font-weight: 600;
     }
 </style>
-</style>
-{%endblock%}
-{%block content%}
-<header class="subpage">
-    <div class="breadcrubms">
-        <div class="container2">
-            <div class="row">
-                <div class="col-md-12">
-                    <nav>
-                        <a href="/" class="home">
-                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
-                            <span class="text">Home</span>
-                        </a>
-                        <span class="text">Products</span>
+{% endblock %}
 
-                    </nav>
-                </div>
-            </div>
+{% block hero %}
+<header class="subpage subpage--product-search" style="background-image: url('{{ url_for('static', filename='images/header10.jpg') }}');">
+    <div class="container2 subpage__inner">
+        <nav class="breadcrumb" aria-label="breadcrumb">
+            <a class="breadcrumb-item" href="{{ url_for_lang('home_page') }}" data-i18n-key="nav.home"></a>
+            <span class="breadcrumb-item active" data-i18n-key="nav.business_solutions.product_search"></span>
+        </nav>
+        <div>
+            <h1 data-i18n-key="products_search.hero.title"></h1>
+            <p data-i18n-key="products_search.hero.subtitle"></p>
         </div>
     </div>
-    <div class="container2">
-    </div>
 </header>
-<main style="padding-top: 35px;">
+{% endblock %}
+
+{% block content %}
+{% set country_options = [
+    'All', 'Algeria', 'Bahrain', 'Canada', 'Denmark', 'Egypt', 'France', 'Germany', 'India', 'Iraq',
+    'Italy', 'Kuwait', 'Kyrgyzstan', 'Libya', 'Morocco', 'Oman', 'Qatar', 'Saudi Arabia', 'Sudan',
+    'Tanzania', 'South Africa', 'UAE', 'United States', 'Yemen'
+] %}
+<section class="product-search__content py-5">
     <div class="container2 products">
         <div class="row">
             <aside class="filters">
-                <h3 class="title text">Filter Products</h3>
+                <h3 class="title" data-i18n-key="products_search.filters.heading"></h3>
                 <div class="filter-professionals">
                     <form>
                         <div class="filed-wrap search-wrap">
-                                {% if search == None %}
-                                <input type="text" id="SearchKeywords">
-                                {% else %}
-                                <input type="text" id="SearchKeywords" value="{{search}}">
-                                {% endif %}
-                                <button id="Searchbtn">
-                                    <img src="/static/images/icons/search-icon-2.png" alt="icon">
-                                </button>
-                            
+                            <input type="text" id="SearchKeywords" value="{{ search or '' }}" placeholder="" data-i18n-key="products_search.filters.search_placeholder" data-i18n-attr="placeholder">
+                            <button id="Searchbtn" type="submit" aria-label="Search">
+                                <i class="fa fa-search"></i>
+                            </button>
                         </div>
                         <div class="filed-wrap">
-
-                                    <label for="country" class="field-title text">Select a country </label>
-                                    <div class="select-wrap">
-                                        <select name="country" id="selectCountries" value="{{country}}">
-                                                <option></option>
-                                                {%if country == 'All'%}
-                                                <option selected>All</option>
-                                                {%else%}
-                                                <option>All</option>
-                                                {%endif%}
-                                                {%if country == 'Algeria'%}
-                                                <option selected>Algeria</option>
-                                                {%else%}
-                                                <option>Algeria</option>
-                                                {%endif%}
-                                                {%if country == 'Bahrain'%}
-                                                <option selected>Bahrain</option>
-                                                {%else%}
-                                                <option>Bahrain</option>
-                                                {%endif%}
-                                                {%if country == 'Canada'%}
-                                                <option selected>Canada</option>
-                                                {%else%}
-                                                <option>Canada</option>
-                                                {%endif%}
-                                                {%if country == 'Denmark'%}
-                                                <option selected>Denmark</option>
-                                                {%else%}
-                                                <option>Denmark</option>
-                                                {%endif%}
-                                                {%if country == 'Egypt'%}
-                                                <option selected>Egypt</option>
-                                                {%else%}
-                                                <option>Egypt</option>
-                                                {%endif%}
-                                                {%if country == 'France'%}
-                                                <option selected>France</option>
-                                                {%else%}
-                                                <option>France</option>
-                                                {%endif%}
-                                                {%if country == 'Germany'%}
-                                                <option selected>Germany</option>
-                                                {%else%}
-                                                <option>Germany</option>
-                                                {%endif%}
-                                                {%if country == 'India'%}
-                                                <option selected>India</option>
-                                                {%else%}
-                                                <option>India</option>
-                                                {%endif%}
-                                                {%if country == 'Iraq'%}
-                                                <option selected>Iraq</option>
-                                                {%else%}
-                                                <option>Iraq</option>
-                                                {%endif%}
-                                                {%if country == 'Italy'%}
-                                                <option selected>Italy</option>
-                                                {%else%}
-                                                <option>Italy</option>
-                                                {%endif%}
-                                                {%if country == 'Kuwait'%}
-                                                <option selected>Kuwait</option>
-                                                {%else%}
-                                                <option>Kuwait</option>
-                                                {%endif%}
-                                                {%if country == 'Kyrgyzstan'%}
-                                                <option selected>Kyrgyzstan</option>
-                                                {%else%}
-                                                <option>Kyrgyzstan</option>
-                                                {%endif%}
-                                                {%if country == 'Libya'%}
-                                                <option selected>Libya</option>
-                                                {%else%}
-                                                <option>Libya</option>
-                                                {%endif%}
-                                                {%if country == 'Morocco'%}
-                                                <option selected>Morocco</option>
-                                                {%else%}
-                                                <option>Morocco</option>
-                                                {%endif%}
-                                                {%if country == 'Oman'%}
-                                                <option selected>Oman</option>
-                                                {%else%}
-                                                <option>Oman</option>
-                                                {%endif%}
-                                                {%if country == 'Qatar'%}
-                                                <option selected>Qatar</option>
-                                                {%else%}
-                                                <option>Qatar</option>
-                                                {%endif%}
-                                                {%if country == 'Saudi Arabia'%}
-                                                <option selected>Saudi Arabia</option>
-                                                {%else%}
-                                                <option>Saudi Arabia</option>
-                                                {%endif%}
-                                                {%if country == 'Sudan'%}
-                                                <option selected>Sudan</option>
-                                                {%else%}
-                                                <option>Sudan</option>
-                                                {%endif%}
-                                                {%if country == 'Tanzania'%}
-                                                <option selected>Tanzania</option>
-                                                {%else%}
-                                                <option>Tanzania</option>
-                                                {%endif%}
-                                                {%if country == 'South Africa'%}
-                                                <option selected>South Africa</option>
-                                                {%else%}
-                                                <option>South Africa</option>
-                                                {%endif%}
-                                                {%if country == 'UAE'%}
-                                                <option selected>UAE</option>
-                                                {%else%}
-                                                <option>UAE</option>
-                                                {%endif%}
-                                                {%if country == 'United States'%}
-                                                <option selected>United States</option>
-                                                {%else%}
-                                                <option>United States</option>
-                                                {%endif%}
-                                                {%if country == 'Yemen'%}
-                                                <option selected>Yemen</option>
-                                                {%else%}
-                                                <option>Yemen</option>
-                                                {%endif%}
-                                        </select>
-                                    </div>
-
-
+                            <label for="selectCountries" class="field-title" data-i18n-key="products_search.filters.country"></label>
+                            <div class="select-wrap">
+                                <select name="country" id="selectCountries" value="{{ country }}">
+                                    {% for option in country_options %}
+                                        <option value="{{ option }}" {% if country == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                         <div class="filed-wrap radio-fields">
-                            <label class="field-title text">Category</label>
-                            <div class="radio-wrap checked">
+                            <label class="field-title" data-i18n-key="products_search.filters.category"></label>
+                            <div class="radio-wrap" data-category-option>
                                 <div class="check-wrap checked">
-                                    <input type="radio" class="radioSegments" value="All" id="seg0">
+                                    <input type="radio" class="radioSegments" value="All" id="seg0" {% if category == 'All' %}checked{% endif %}>
                                 </div>
-                                <label for="seg0" name="All">All</label>
+                                <label for="seg0" data-category-value="All" data-i18n-key="products_search.filters.all"></label>
                             </div>
-                            <div class="">
+                            <div class="category-options">
                                 {% for x in categories %}
-                                {% if x.id != 29 %}
-                                <div class="radio-wrap hidden" lang="en">
-                                    <div class="check-wrap  23">
-                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
-                                    </div>
-                                    <label name="{{x.id}}" for="seg23">{{x.name}}</label>
-                                </div>
-                                <div class="radio-wrap hidden" lang="ar">
-                                    <div class="check-wrap  23">
-                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
-                                    </div>
-                                    <label name="{{x.id}}" for="seg23">{{x.nameArabic}}</label>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="show-on-mobile hidden">
-                                {% for x in categories %}
-                                {% if loop.index < 5 %}
-                                <div class="radio-wrap hidden" lang="en">
-                                    <div class="check-wrap  23">
-                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
-                                    </div>
-                                    <label name="{{x.name}}" for="seg23">{{x.name}}</label>
-                                </div>
-                                <div class="radio-wrap hidden" lang="ar">
-                                    <div class="check-wrap  23">
-                                        <input type="radio" name="radioSegments" class="radioSegments" value="23" id="seg23" data-name="{{x.name}}">
-                                    </div>
-                                    <label name="{{x.name}}" for="seg23">{{x.nameArabic}}</label>
-                                </div>
-                                {% endif %}
-                                {% endfor %}
-                                {% if categories|length >= 5 %}
-                                <!--button onclick="myFunction()" id="myBtn" type="button">See All</button-->
-                                <div class="more">
-                                {% for x in categories %}
-                                {% if loop.index >= 5 %}
-                                    <div class="radio-wrap hidden" lang="en">
-                                        <div class="check-wrap  22">
-                                            <input type="radio" name="radioSegments" class="radioSegments" value="22" id="seg22" data-name="{{x.name}}">
+                                    {% set option_id = 'seg' ~ x.id %}
+                                    <div class="radio-wrap" data-category-option>
+                                        <div class="check-wrap">
+                                            <input type="radio" name="radioSegments" class="radioSegments" value="{{ x.id }}" id="{{ option_id }}" data-category-name="{{ x.name }}">
                                         </div>
-                                        <label name="{{x.name}}" for="seg22">{{x.name}}</label>
+                                        <label for="{{ option_id }}" data-category-value="{{ x.id }}" data-label-en="{{ x.name }}" data-label-ar="{{ x.nameArabic or x.name }}">{{ x.name }}</label>
                                     </div>
-                                    <div class="radio-wrap hidden" lang="ar">
-                                        <div class="check-wrap  22">
-                                            <input type="radio" name="radioSegments" class="radioSegments" value="22" id="seg22" data-name="{{x.name}}">
-                                        </div>
-                                        <label name="{{x.name}}" for="seg22">{{x.nameArabic}}</label>
-                                    </div>
-                                {% endif %}
                                 {% endfor %}
-                                </div>
-                                {% endif %}
                             </div>
-
-                </div>
+                        </div>
                     </form>
                 </div>
             </aside>
             <section class="products">
-                <div class="top-info">
-                    <!--<span class="results">Results: <b>24</b> products</span>-->
-                    <div class="category">
-
-                        
-                        
-                    </div>
-                </div>
                 <div class="products-wrap">
-                    {% for x in items[((page|int-1)*(12|int)):((page|int)*(12|int))]%}
-                    <div class="product-item" lang="{{x.lang}}" idNum="{{x.id}}">
-                        <a href="/product/?id={{x.id}}">
-                        <picture>
-                            {% if x.img != None %}
-                            <img src="{{x.img}}" alt="product">
-                            {% else %}
-                            <img src="/static/images/prod01.png" alt="product">
-                            {% endif %}
-                        </picture>
-                        <h3>{{x.name}}</h3>
-                        <p>{{x.desc|safe}}</p>
-                        </a><a href="/product/?id={{x.id}}" class="LearnMore">Learn More</a>
-                    </div>
-                    {% endfor %}
+                    {% set page_size = 12 %}
+                    {% set start = (page|int - 1) * page_size %}
+                    {% set end = start + page_size %}
+                    {% set paginated_items = items[start:end] %}
+                    {% if paginated_items %}
+                        {% for x in paginated_items %}
+                            <div class="product-item" lang="{{ x.lang }}" idNum="{{ x.id }}">
+                                <a href="/product/?id={{ x.id }}">
+                                    <picture>
+                                        {% if x.img %}
+                                            <img src="{{ x.img }}" alt="product">
+                                        {% else %}
+                                            <img src="{{ url_for('static', filename='images/prod01.png') }}" alt="product">
+                                        {% endif %}
+                                    </picture>
+                                    <h3>{{ x.name }}</h3>
+                                    <p>{{ x.desc|safe }}</p>
+                                </a>
+                                <a href="/product/?id={{ x.id }}" class="LearnMore">Learn More</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="product-empty-state" data-i18n-key="products_search.empty"></div>
+                    {% endif %}
                 </div>
+                {% set total_pages = ((items|length) / page_size)|round(0, 'ceil')|int %}
+                {% if total_pages > 1 %}
                 <div class="col-md-12">
                     <div class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between" style="background: transparent;">
-                        <nav aria-label="Page navigation example">
+                        <nav aria-label="Product pagination">
                             <ul class="pagination mb-0">
-                                <li class="page-item {%if page|int<2%}disabled{%endif%}">
-                                  <a class="page-link text" href="#" onclick="location.href=`/productsSearch/?page={{page|int - 1}}&category=${getParams('category')}&search=${getParams('search')}&country=${getParams('country')}&lang=${getLang()}`">Previous</a>
-                              </li>
-                                {% for i in range(1,((items|length)/(12))|round(0, 'ceil')|int + 1) %}
-                                <li class="page-item {%if i|string in page%}active{%endif%}">
-                                    <a class="page-link" href="#" onclick="location.href=`/productsSearch/?page={{i}}&category=${getParams('category')}&search=${getParams('search')}&country=${getParams('country')}&lang=${getLang()}`">{{i}}</a>
+                                <li class="page-item {% if page|int < 2 %}disabled{% endif %}">
+                                    <a class="page-link text" href="#" onclick="location.href=`/productsSearch/?page={{ page|int - 1 }}&category=${getParams('category') || 'All'}&search=${getParams('search') || ''}&country=${getParams('country') || 'All'}&lang=${getLang()}`">Previous</a>
                                 </li>
-                                {%endfor%}
-                                <li class="page-item {%if items[((page|int-1)*(12|int)):((page|int)*(12|int)+1)]|length <= 12%}disabled{%endif%}">
-                                  <a class="page-link text" href="#" onclick="location.href=`/productsSearch/?page={{page|int + 1}}&category=${getParams('category')}&search=${getParams('search')}&country=${getParams('country')}&lang=${getLang()}`">Next</a>
-                              </li>
-                              
+                                {% for i in range(1, total_pages + 1) %}
+                                    <li class="page-item {% if i|string in page %}active{% endif %}">
+                                        <a class="page-link" href="#" onclick="location.href=`/productsSearch/?page={{ i }}&category=${getParams('category') || 'All'}&search=${getParams('search') || ''}&country=${getParams('country') || 'All'}&lang=${getLang()}`">{{ i }}</a>
+                                    </li>
+                                {% endfor %}
+                                <li class="page-item {% if paginated_items|length < page_size or (page|int) >= total_pages %}disabled{% endif %}">
+                                    <a class="page-link text" href="#" onclick="location.href=`/productsSearch/?page={{ page|int + 1 }}&category=${getParams('category') || 'All'}&search=${getParams('search') || ''}&country=${getParams('country') || 'All'}&lang=${getLang()}`">Next</a>
+                                </li>
                             </ul>
                         </nav>
-                      </div>
+                    </div>
+                </div>
+                {% endif %}
             </section>
         </div>
-
     </div>
-</main>
-<script src="/static/js/languages/productsSearch.js"></script>
-<script src="/static/js/productsSearch.js"></script>
-{%endblock%}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.PAGE_TRANSLATIONS = Object.assign(window.PAGE_TRANSLATIONS || {}, {{ page_translations | tojson }});
+</script>
+<script src="{{ url_for('static', filename='js/productsSearch.js') }}"></script>
+{% endblock %}
