@@ -277,6 +277,12 @@ categories_cache = {
     'timestamp': 0,  # Force refresh on next load
     'ttl': 300  # Cache for 5 minutes
 }
+
+
+def invalidate_categories_cache():
+    """Clear the cached categories so subsequent requests fetch fresh data."""
+    categories_cache['data'] = None
+    categories_cache['timestamp'] = 0
 def get_cached_categories():
     """Get categories with caching to reduce database load - OPTIMIZED VERSION"""
     current_time = time.time()
@@ -1365,6 +1371,7 @@ def categories_add():
     )
     db.session.add(category)
     db.session.commit()
+    invalidate_categories_cache()
     return json_success('Category created successfully.', status=201, id=category.id)
 @app.route('/ControlPanel/categories/edit/<id>/',methods=['POST','GET'])
 @login_required
@@ -1392,8 +1399,9 @@ def categories_edit(id):
         category.img = img
 
     db.session.commit()
+    invalidate_categories_cache()
     return json_success('Category updated successfully.')
-@app.route('/ControlPanel/categories/del/<id>/')
+@app.route('/ControlPanel/categories/del/<id>/', methods=['DELETE', 'POST', 'GET'])
 @login_required
 def categories_del(id):
     category = db.session.query(Category).filter(Category.id == id).first()
@@ -1402,6 +1410,7 @@ def categories_del(id):
 
     db.session.delete(category)
     db.session.commit()
+    invalidate_categories_cache()
     return json_success('Category deleted successfully.')
 @app.route('/getProducts/')
 def get_products():
