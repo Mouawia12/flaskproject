@@ -229,25 +229,76 @@
           }
       })
     })
-    newProjectForm.querySelector('#saveBtn').addEventListener('click',async function(evt){
-      evt.preventDefault()
-      let data = {
-        'name':newAddname.value,
-        'namearabic':newAddnamearabic.value,
-        'desc':newAdddesc.value.replaceAll('\n', '<br>'),
-        'img':newAddimg.getAttribute('image'),
-      }
-      AdminLoader.show()
-      await fetch(`/ControlPanel/categories/add/`,{
-        method: 'POST',
+    const notify = (options) => {
+      return Swal.fire(Object.assign({
+        icon: 'success',
+        confirmButtonText: 'حسناً'
+      }, options));
+    };
+
+    const apiRequest = async (url, options = {}) => {
+      const defaultOptions = {
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(()=>{
-        location.reload()
-      })
+        }
+      };
+      const response = await fetch(url, Object.assign(defaultOptions, options));
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (err) {
+        // ignore JSON parse errors
+      }
+      if (!response.ok || data.success === false) {
+        const message = (data && data.message) ? data.message : 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+        throw new Error(message);
+      }
+      return data;
+    };
+
+    const handleError = (error) => {
+      const message = error && error.message ? error.message : 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+      return notify({
+        icon: 'error',
+        title: 'خطأ',
+        text: message
+      });
+    };
+
+    newProjectForm.querySelector('#saveBtn').addEventListener('click',async function(evt){
+      evt.preventDefault();
+      const payload = {
+        name: newAddname.value.trim(),
+        namearabic: newAddnamearabic.value.trim(),
+        desc: newAdddesc.value.replaceAll('\n', '<br>').trim(),
+        img: newAddimg.getAttribute('image')
+      };
+      if (!payload.name || !payload.desc) {
+        notify({
+          icon: 'warning',
+          title: 'تنبيه',
+          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.'
+        });
+        return;
+      }
+      AdminLoader.show();
+      try {
+        await apiRequest('/ControlPanel/categories/add/', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        await notify({
+          icon: 'success',
+          title: 'تم الحفظ',
+          text: 'تم إنشاء الفئة بنجاح.'
+        });
+        location.reload();
+      } catch (error) {
+        await handleError(error);
+      } finally {
+        AdminLoader.hide();
+      }
     })
     document.querySelectorAll('.delete').forEach(e=>{
       e.addEventListener('click',async function(){
@@ -263,8 +314,22 @@
         })
         .then(async(result)=>{
           if (result.isConfirmed){
-            await fetch(`/ControlPanel/categories/del/${e.closest('tr').getAttribute('id-num')}/`)
-        .then(()=>{location.reload()})
+            AdminLoader.show();
+            try {
+              await apiRequest(`/ControlPanel/categories/del/${e.closest('tr').getAttribute('id-num')}/`, {
+                method: 'DELETE'
+              });
+              await notify({
+                icon: 'success',
+                title: 'تم الحذف',
+                text: 'تم حذف الفئة بنجاح.'
+              });
+              location.reload();
+            } catch (error) {
+              await handleError(error);
+            } finally {
+              AdminLoader.hide();
+            }
           }
         })
       })
@@ -281,23 +346,38 @@
 document.querySelectorAll('.editBtn').forEach(e=>{
   e.addEventListener('click',async function(evt){
     evt.preventDefault()
-      let data = {
-        'name':e.closest('.modal').querySelector('#editname').value,
-        'namearabic':e.closest('.modal').querySelector('#editnamearabic').value,
-        'desc':e.closest('.modal').querySelector('#editdesc').value.replaceAll('\n', '<br>'),
-        'img':e.closest('.modal').querySelector('#editimg').getAttribute('image'),
+      const modal = e.closest('.modal');
+      const payload = {
+        name: modal.querySelector('#editname').value.trim(),
+        namearabic: modal.querySelector('#editnamearabic').value.trim(),
+        desc: modal.querySelector('#editdesc').value.replaceAll('\n', '<br>').trim(),
+        img: modal.querySelector('#editimg').getAttribute('image')
+      };
+      if (!payload.name || !payload.desc) {
+        notify({
+          icon: 'warning',
+          title: 'تنبيه',
+          text: 'يرجى إدخال الاسم والوصف قبل الحفظ.'
+        });
+        return;
       }
       AdminLoader.show()
-      await fetch(`/ControlPanel/categories/edit/${e.closest('.modal').getAttribute('idNum')}/`,{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(()=>{
+      try {
+        await apiRequest(`/ControlPanel/categories/edit/${modal.getAttribute('idNum')}/`,{
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        await notify({
+          icon: 'success',
+          title: 'تم التحديث',
+          text: 'تم تحديث الفئة بنجاح.'
+        });
         location.reload()
-      })
+      } catch (error) {
+        await handleError(error);
+      } finally {
+        AdminLoader.hide();
+      }
   })
 })
 
