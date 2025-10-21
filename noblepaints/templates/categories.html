@@ -1,510 +1,66 @@
 {% extends 'sec.html' %}
-{%block head%}
-<!-- Preload critical CSS -->
-<link rel="preload" href="/static/css/products.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/static/css/products.css"></noscript>
-<link rel="preload" href="/static/css/props.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="/static/css/props.css"></noscript>
-<link rel="stylesheet" href="/static/css/categories.css">
+{% set page_title_key = 'categories.meta.title' %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
+{% endblock %}
 
-<!-- Load external resources efficiently -->
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="preconnect" href="https://netdna.bootstrapcdn.com">
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
-    media="print" onload="this.media='all'"
-/>
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"></noscript>
-
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet"></noscript>
-
-<title class="text">Noble paints | Categories</title>
-<style>
-    header{
-        background: url("/static/images/speces01.png");
-    }
-    
-    /* Loading states */
-    .browse-products {
-        min-height: 400px;
-        position: relative;
-    }
-    .loading-spinner {
-        display: none;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #3498db;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        z-index: 1000;
-    }
-    @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-    
-    /* Image optimization and lazy loading */
-    img {
-        transition: opacity 0.5s ease;
-    }
-    .lazy-image {
-        opacity: 1;
-        filter: blur(0px);
-        transition: opacity 0.5s ease, filter 0.3s ease;
-    }
-    .lazy-image[data-src] {
-        opacity: 0.7;
-        filter: blur(2px);
-    }
-    .lazy-image.loaded {
-        opacity: 1;
-        filter: blur(0px);
-    }
-    .lazy-image.error {
-        opacity: 0.3;
-        filter: grayscale(100%);
-    }
-</style>
-{%endblock%}
-{%block content%}
-<header class="subpage">
-    <div class="breadcrubms">
-        <div class="container2">
-            <div class="row">
-                <div class="col-md-12">
-                    <nav>
-                        <a href="/" class="home">
-                            <svg aria-="true" focusable="false" data-prefix="fal" data-icon="home-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-home-alt fa-w-18"><path fill="currentColor" d="M541 229.16l-232.85-190a32.16 32.16 0 0 0-40.38 0L35 229.16a8 8 0 0 0-1.16 11.24l10.1 12.41a8 8 0 0 0 11.2 1.19L96 220.62v243a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-128l64 .3V464a16 16 0 0 0 16 16l128-.33a16 16 0 0 0 16-16V220.62L520.86 254a8 8 0 0 0 11.25-1.16l10.1-12.41a8 8 0 0 0-1.21-11.27zm-93.11 218.59h.1l-96 .3V319.88a16.05 16.05 0 0 0-15.95-16l-96-.27a16 16 0 0 0-16.05 16v128.14H128V194.51L288 63.94l160 130.57z" class=""></path></svg>
-                            <span class="text">Categories</span>
-                        </a>
-                        <span class="text">Categories</span>
-
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </div>
+{% block hero %}
+<section class="page-hero" style="--page-hero-image: url('{{ url_for('static', filename='images/speces01.png') }}');">
+    <div class="page-hero__overlay" aria-hidden="true"></div>
     <div class="container2">
-        <h1 class="text"><span class="text-bg-red text">Categories</span></h1>
-    </div>
-</header>
-
-<section class="browse-products margin-browse-products">
-    <div class="container2">
-        <!-- Loading placeholder for categories -->
-        <div id="categories-loading" class="categories-loading" style="text-align: center; padding: 40px; min-height: 400px;">
-            <div class="loading-spinner" style="display: inline-block; position: relative; transform: none; margin: 20px auto;"></div>
-            <p style="color: #666; font-size: 16px; margin-top: 20px;">Loading categories...</p>
-        </div>
-        
-        <!-- Categories content - will be populated by AJAX or fallback to server-side rendering -->
-        <div id="categories-content" style="display: none;">
-            <!-- Fallback server-side rendered content -->
-            {% if categories and categories|length > 0 %}
-            {% for x in categories %}
-            {% if loop.index0%2 == 0 %}
-            <div class="row item toLangRep hidden" lang="en">
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <picture>
-                        <img src="{{x.img}}" alt="{{x.name}} category" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                    </picture>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="descr">
-                        <h3>{{x.name}}</h3>
-                        <p>{{x.desc|safe}}</p>
-                        <a href="/productsSearch/?category={{x.id}}&page=1" class="btn toRep3 toRep3">Browse Products</a>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="row item item-inverse toLangRep hidden" lang="en">
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="descr">
-                        <h3>{{x.name}}</h3>
-                        <p>{{x.desc|safe}}</p>
-                        <a href="/productsSearch/?category={{x.id}}&page=1" class="btn toRep3 toRep3">Browse Products</a>
-                    </div>
-                    {% if x.id == 20 %}
-                        <div>
-                            <img width="100%" src="/static/images/all.jpg" alt="All products" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                        </div>
-                        {% endif %}
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <picture>
-                        <img src="{{x.img}}" alt="{{x.name}} category" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                    </picture>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% for x in categories %}
-            {% if loop.index0%2 == 0 %}
-            <div class="row item toLangRep hidden" lang="ar">
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <picture>
-                        <img src="{{x.img}}" alt="{{x.nameArabic}} category" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                    </picture>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="descr">
-                        <h3>{{x.nameArabic}}</h3>
-                        <p class="text5">{{x.desc|safe}}</p>
-                        <a href="/productsSearch/?category={{x.id}}&page=1" class="btn toRep3 toRep3">تصفح المنتجات</a>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="row item item-inverse toLangRep hidden" lang="ar">
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="descr">
-                        <h3>{{x.nameArabic}}</h3>
-                        <p class="text5">{{x.desc|safe}}</p>
-                        <a href="/productsSearch/?category={{x.id}}&page=1" class="btn toRep3 toRep3">تصفح المنتجات</a>
-                    </div>
-                    {% if x.id == 20 %}
-                        <div>
-                            <img width="100%" src="/static/images/all.jpg" alt="All products" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                        </div>
-                        {% endif %}
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <picture>
-                        <img src="{{x.img}}" alt="{{x.nameArabic}} category" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">
-                    </picture>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-        </div>
-        
-        <!-- Error state -->
-        <div id="categories-error" style="display: none; text-align: center; padding: 40px; color: #666;">
-            <p>Unable to load categories. <button onclick="loadCategories()" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">Retry</button></p>
+        <nav class="page-hero__breadcrumbs" aria-label="Breadcrumb">
+            <a href="{{ url_for_lang('home_page') }}">
+                <i class="fa-solid fa-house"></i>
+                <span>{{ t('nav.home') }}</span>
+            </a>
+            <span class="page-hero__divider" aria-hidden="true"></span>
+            <span>{{ t('categories.hero.breadcrumb') }}</span>
+        </nav>
+        <div class="page-hero__content">
+            <span class="page-hero__eyebrow">{{ t('categories.hero.eyebrow') }}</span>
+            <h1 class="page-hero__title">{{ t('categories.hero.title') }}</h1>
+            <p class="page-hero__subtitle">{{ t('categories.hero.subtitle') }}</p>
         </div>
     </div>
 </section>
+{% endblock %}
 
-<!-- Add loading spinner -->
-<div class="loading-spinner" id="loadingSpinner"></div>
-
-<!-- Optimize JavaScript loading - defer Swiper as it's not critical -->
-<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js" defer></script>
-
-<!-- Load languages first, then main JavaScript -->
-<script src="/static/js/languages/categories.js"></script>
-<script src="/static/js/categories.js" defer></script>
-
-<!-- Enhanced performance with AJAX loading -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const spinner = document.getElementById('loadingSpinner');
-    const categoriesLoading = document.getElementById('categories-loading');
-    const categoriesContent = document.getElementById('categories-content');
-    const categoriesError = document.getElementById('categories-error');
-    
-    console.log('Page loaded, checking for categories...');
-    
-    // Check if we have server-side rendered categories as fallback
-    const existingCategories = categoriesContent.querySelectorAll('.row.item');
-    const hasServerCategories = existingCategories.length > 0;
-    
-    console.log(`Server-side categories found: ${hasServerCategories ? existingCategories.length : 0}`);
-    
-    // Debug: Log the first few image sources to see what we're getting
-    if (hasServerCategories) {
-        const firstImages = categoriesContent.querySelectorAll('img');
-        console.log('First few image sources:');
-        for (let i = 0; i < Math.min(5, firstImages.length); i++) {
-            console.log(`Image ${i}: src="${firstImages[i].src}", alt="${firstImages[i].alt}"`);
-        }
-    }
-    
-    if (hasServerCategories) {
-        // We have server-side rendered categories, show them immediately
-        console.log('Using server-side rendered categories');
-        showCategories();
-        // Still try to load via AJAX for better performance next time
-        setTimeout(loadCategories, 1000);
-    } else {
-        // No server-side categories, must use AJAX
-        console.log('No server-side categories, loading via AJAX');
-        loadCategories();
-    }
-    
-    // Show categories (for server-side fallback)
-    function showCategories() {
-        if (categoriesLoading) categoriesLoading.style.display = 'none';
-        if (categoriesContent) categoriesContent.style.display = 'block';
-        if (categoriesError) categoriesError.style.display = 'none';
-        
-        // Initialize lazy loading for existing content
-        setTimeout(initializeLazyLoading, 100);
-    }
-    
-    // Load categories via AJAX for instant page load
-    function loadCategories() {
-        console.log('Loading categories via AJAX...');
-        
-        // Only show loading if we don't have server-side content
-        const existingCategories = categoriesContent.querySelectorAll('.row.item');
-        const hasExistingContent = existingCategories.length > 0;
-        
-        if (!hasExistingContent) {
-            if (categoriesLoading) categoriesLoading.style.display = 'block';
-            if (categoriesContent) categoriesContent.style.display = 'none';
-            if (categoriesError) categoriesError.style.display = 'none';
-        }
-        
-        fetch('/api/categories/')
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('API Response:', data);
-                console.log(`Loaded ${data.count} categories (cached: ${data.cached})`);
-                
-                if (data.success && data.categories && data.categories.length > 0) {
-                    // Only replace content if AJAX gives us better data
-                    if (!hasExistingContent || data.count > existingCategories.length / 2) {
-                        renderCategories(data.categories);
-                    } else {
-                        console.log('Using existing server-side content');
-                        showCategories();
-                    }
-                } else if (!hasExistingContent) {
-                    console.warn('No categories found or API error:', data);
-                    showError();
-                } else {
-                    console.log('API failed, keeping server-side content');
-                    showCategories();
-                }
-            })
-            .catch(error => {
-                console.error('Error loading categories:', error);
-                if (!hasExistingContent) {
-                    showError();
-                } else {
-                    console.log('AJAX failed, keeping server-side content');
-                    showCategories();
-                }
-            });
-    }
-    
-    // Render categories HTML
-    function renderCategories(categories) {
-        console.log('renderCategories called with:', categories.length, 'categories');
-        
-        if (!categories || categories.length === 0) {
-            console.log('No categories to render, showing error');
-            showError();
-            return;
-        }
-        
-        let html = '';
-        
-        // Generate English categories
-        categories.forEach((category, index) => {
-            console.log(`Generating category ${index}:`, category.name);
-            const isEven = index % 2 === 0;
-            if (isEven) {
-                html += generateCategoryHTML(category, 'en', false);
-            } else {
-                html += generateCategoryHTML(category, 'en', true);
-            }
-        });
-        
-        // Generate Arabic categories
-        categories.forEach((category, index) => {
-            const isEven = index % 2 === 0;
-            if (isEven) {
-                html += generateCategoryHTML(category, 'ar', false);
-            } else {
-                html += generateCategoryHTML(category, 'ar', true);
-            }
-        });
-        
-        console.log('Generated HTML length:', html.length);
-        console.log('HTML preview:', html.substring(0, 200) + '...');
-        
-        // Insert HTML and show content
-        if (categoriesContent) {
-            categoriesContent.innerHTML = html;
-            categoriesLoading.style.display = 'none';
-            categoriesContent.style.display = 'block';
-            
-            console.log('Content inserted and displayed');
-            
-            // Show categories for current language (they start hidden)
-            const allItems = categoriesContent.querySelectorAll('.toLangRep');
-            console.log('Found', allItems.length, 'toLangRep items to show');
-            
-            // Default to English, or check if there's a global language function
-            const currentLang = (typeof window !== 'undefined' && window.getCurrentLang) ? window.getCurrentLang() : 'en';
-            console.log('Showing categories for language:', currentLang);
-            
-            let visibleCount = 0;
-            allItems.forEach((item, index) => {
-                const itemLang = item.getAttribute('lang');
-                if (itemLang === currentLang) {
-                    item.classList.remove('hidden');
-                    visibleCount++;
-                    console.log(`Showing category ${index} for lang ${itemLang}`);
-                } else {
-                    item.classList.add('hidden');
-                }
-            });
-            
-            console.log(`Made ${visibleCount} categories visible for language: ${currentLang}`);
-            
-            // Initialize lazy loading and interactions
-            setTimeout(initializeLazyLoading, 100);
-        } else {
-            console.error('categoriesContent element not found!');
-        }
-    }
-    
-    // Generate HTML for a single category
-    function generateCategoryHTML(category, lang, isInverse) {
-        const name = lang === 'ar' ? (category.nameArabic || category.name) : category.name;
-        const btnText = lang === 'ar' ? 'تصفح المنتجات' : 'Browse Products';
-        const placeholder = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23f0f0f0' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='0.3em' fill='%23999' font-family='Arial'%3ELoading...%3C/text%3E%3C/svg%3E`;
-        
-        // Use actual image directly with error fallback
-        const imgSrc = category.img || '/static/images/default.png';
-        const imgTag = `<img src="${imgSrc}" alt="${name} category" class="lazy-image loaded" onerror="this.src='/static/images/default.png'">`;
-        const extraImg = category.id === 20 ? `<div><img width="100%" src="/static/images/all.jpg" alt="All products" class="lazy-image loaded" onerror="this.src='/static/images/default.png'"></div>` : '';
-        
-        if (isInverse) {
-            return `
-                <div class="row item item-inverse toLangRep hidden" lang="${lang}">
-                    <div class="col-xs-12 col-sm-12 col-md-6">
-                        <div class="descr">
-                            <h3>${name || 'Unnamed Category'}</h3>
-                            <p${lang === 'ar' ? ' class="text5"' : ''}>${category.desc || 'No description available'}</p>
-                            <a href="/productsSearch/?category=${category.id}&page=1" class="btn toRep3 toRep3">${btnText}</a>
-                        </div>
-                        ${extraImg}
+{% block content %}
+<section class="section section--light">
+    <div class="container2">
+        <div class="category-intro">
+            <p>{{ t('categories.intro.paragraph_one') }}</p>
+            <p>{{ t('categories.intro.paragraph_two') }}</p>
+        </div>
+        {% if categories %}
+        <div class="category-list">
+            {% for category in categories %}
+            {% set cat_name = category.nameArabic if current_lang == 'ar' and category.nameArabic else category.name %}
+            {% set cat_desc = category.desc %}
+            <article class="category-card {% if loop.index is even %}category-card--reverse{% endif %}">
+                <div class="category-card__inner">
+                    <div class="category-card__image" aria-hidden="true">
+                        <img src="{{ category.img }}" alt="{{ cat_name }}">
                     </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6">
-                        <picture>
-                            ${imgTag}
-                        </picture>
-                    </div>
-                </div>
-            `;
-        } else {
-            return `
-                <div class="row item toLangRep hidden" lang="${lang}">
-                    <div class="col-xs-12 col-sm-12 col-md-6">
-                        <picture>
-                            ${imgTag}
-                        </picture>
-                    </div>
-                    <div class="col-xs-12 col-sm-12 col-md-6">
-                        <div class="descr">
-                            <h3>${name || 'Unnamed Category'}</h3>
-                            <p${lang === 'ar' ? ' class="text5"' : ''}>${category.desc || 'No description available'}</p>
-                            <a href="/productsSearch/?category=${category.id}&page=1" class="btn toRep3 toRep3">${btnText}</a>
+                    <div class="category-card__content">
+                        <span class="category-card__tag">{{ t('categories.card.tag') }}</span>
+                        <h2 class="category-card__title">{{ cat_name }}</h2>
+                        <div class="category-card__text">{{ cat_desc | safe }}</div>
+                        <div class="category-card__actions">
+                            <a class="btn btn-primary" href="{{ url_for_lang('productsSearch_page_filter_category', category=category.id, page=1) }}">{{ t('categories.card.cta_primary') }}</a>
+                            <a class="btn btn-outline-primary" href="{{ url_for_lang('products_page') }}">{{ t('categories.card.cta_secondary') }}</a>
                         </div>
                     </div>
                 </div>
-            `;
-        }
-    }
-    
-    // Show error state
-    function showError() {
-        if (categoriesLoading) categoriesLoading.style.display = 'none';
-        if (categoriesContent) categoriesContent.style.display = 'none';
-        if (categoriesError) categoriesError.style.display = 'block';
-    }
-    
-    // Initialize image error handling and button interactions
-    function initializeLazyLoading() {
-        // All images now load directly with src, just handle errors
-        const allImages = document.querySelectorAll('.lazy-image');
-        allImages.forEach(img => {
-            if (!img.complete) {
-                img.addEventListener('load', function() {
-                    this.classList.add('loaded');
-                });
-                img.addEventListener('error', function() {
-                    this.src = '/static/images/default.png';
-                    this.classList.add('error');
-                    console.warn('Failed to load image, using fallback:', this.getAttribute('alt'));
-                });
-            } else {
-                img.classList.add('loaded');
-            }
-        });
-        
-        // Initialize button interactions
-        initializeButtons();
-    }
-    
-    // Initialize button functionality
-    function initializeButtons() {
-        const browseButtons = document.querySelectorAll('a.btn');
-        
-        browseButtons.forEach(button => {
-            if (button && button.href && button.href.includes('/productsSearch/')) {
-                button.addEventListener('click', function(e) {
-                    if (spinner) {
-                        spinner.style.display = 'block';
-                    }
-                    
-                    this.style.opacity = '0.7';
-                    this.style.pointerEvents = 'none';
-                    
-                    setTimeout(() => {
-                        this.style.opacity = '1';
-                        this.style.pointerEvents = 'auto';
-                    }, 3000);
-                });
-            }
-        });
-    }
-    
-    // Make loadCategories available globally for retry button
-    window.loadCategories = loadCategories;
-    
-    // Don't automatically call loadCategories here - it's handled in the logic above
-    
-    // Hide spinner when page fully loaded
-    window.addEventListener('load', function() {
-        if (spinner) {
-            spinner.style.display = 'none';
-        }
-    });
-    
-    // Basic error logging (removed problematic async handler)
-    window.addEventListener('error', function(e) {
-        if (e.message && e.message.includes('is not defined')) {
-            console.warn('Caught undefined function error:', e.message);
-        }
-    });
-    
-    // Performance monitoring
-    if (window.performance && window.performance.measure) {
-        window.addEventListener('load', function() {
-            const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
-            console.log('Categories page load time:', loadTime + 'ms');
-        });
-    }
-});
-</script>
-{%endblock%}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="category-empty">
+            <h3>{{ t('categories.empty.title') }}</h3>
+            <p>{{ t('categories.empty.subtitle') }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

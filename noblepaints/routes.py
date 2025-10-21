@@ -162,10 +162,8 @@ def show_static_pdf(upload_id):
 @app.route('/en/')
 @app.route('/ar/')
 @app.route('/')
-def home_page():  
-    # Only load featured products or limit the query instead of all products
-    featured_products = db.session.query(Product).limit(10).all()
-    return render_template('index.html', products=featured_products)
+def home_page():
+    return render_template('index.html')
 @app.route('/ral-colors/')
 def ralColors():
     return render_template('RalColors.html')
@@ -310,8 +308,8 @@ def get_cached_categories():
                 'id': cat.id,
                 'name': cat.name or 'Untitled',
                 'nameArabic': cat.nameArabic or cat.name or 'غير محدد',
-                'desc': (cat.desc or 'No description')[:200] + ('...' if len(cat.desc or '') > 200 else ''),  # Truncate long descriptions
-                'img': img_url  # Use actual image URL
+                'desc': cat.desc or 'No description available.',
+                'img': img_url
             })
         # Update cache
         categories_cache['data'] = categories_list
