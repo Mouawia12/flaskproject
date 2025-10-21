@@ -27,7 +27,20 @@ from flask import (
 )
 from flask_login import login_user, logout_user, login_required, current_user
 from noblepaints.forms import LoginForm
-from noblepaints.models import Category,Product,Catalog,TechnicalDatasheet,Post,Certificate,Approval,ProductSchema,Upload,SocialSchema,Social,User
+from noblepaints.models import (
+    Category,
+    Product,
+    Catalog,
+    TechnicalDatasheet,
+    Post,
+    Certificate,
+    Approval,
+    ProductSchema,
+    Upload,
+    SocialSchema,
+    Social,
+    User,
+)
 from noblepaints.i18n import (
     AVAILABLE_LANGUAGES,
     get_translation,
@@ -35,6 +48,76 @@ from noblepaints.i18n import (
 )
 from functools import lru_cache
 from flask_mail import Message
+
+
+FEATURED_PRODUCT_IDS = (
+    68,
+    71,
+    78,
+    80,
+    36,
+    20,
+    113,
+    64,
+    104,
+    76,
+)
+
+
+def _normalise_lang(candidate):
+    if candidate in AVAILABLE_LANGUAGES:
+        return candidate
+    return "en"
+
+
+def _get_featured_products_for_lang(lang):
+    lang = _normalise_lang(lang)
+    search_order = [lang]
+    if lang != "en":
+        search_order.append("en")
+
+    collected = {}
+    for code in search_order:
+        rows = (
+            db.session.query(Product)
+            .filter(Product.lang == code, Product.id.in_(FEATURED_PRODUCT_IDS))
+            .all()
+        )
+        for row in rows:
+            collected.setdefault(row.id, row)
+
+    ordered = [collected[pid] for pid in FEATURED_PRODUCT_IDS if pid in collected]
+    return ordered
+
+
+def _get_latest_products_for_lang(lang, limit=6):
+    lang = _normalise_lang(lang)
+    search_order = [lang]
+    if lang != "en":
+        search_order.append("en")
+
+    latest = []
+    seen_ids = set()
+
+    for code in search_order:
+        query = (
+            db.session.query(Product)
+            .filter(Product.lang == code)
+            .order_by(Product.id.desc())
+        )
+        if limit:
+            query = query.limit(limit * 2)
+        for product in query:
+            if product.id in seen_ids:
+                continue
+            latest.append(product)
+            seen_ids.add(product.id)
+            if len(latest) >= limit:
+                break
+        if len(latest) >= limit:
+            break
+
+    return latest[:limit]
 # Initialize database tables once at startup
 with app.app_context():
     db.create_all()
@@ -163,7 +246,10 @@ def show_static_pdf(upload_id):
 @app.route('/ar/')
 @app.route('/')
 def home_page():
-    return render_template('index.html')
+    lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+    featured = _get_featured_products_for_lang(lang)
+    latest = _get_latest_products_for_lang(lang)
+    return render_template('index.html', featured_products=featured, latest_products=latest)
 @app.route('/ral-colors/')
 def ralColors():
     return render_template('RalColors.html')
@@ -1414,11 +1500,17 @@ def categories_del(id):
     return json_success('Category deleted successfully.')
 @app.route('/getProducts/')
 def get_products():
-    lang=request.args.get('lang')
-    y = db.session.query(Product).filter(Product.lang==lang)
-    x = ProductSchema(many=True)
-    z = x.dump(y)
-    return jsonify(z)
+    lang = request.args.get('lang') or getattr(g, 'current_lang', None)
+    lang = _normalise_lang(lang)
+    limit = request.args.get('limit', type=int)
+
+    query = db.session.query(Product).filter(Product.lang == lang).order_by(Product.id.desc())
+    if limit:
+        query = query.limit(limit)
+
+    products = query.all()
+    schema = ProductSchema(many=True)
+    return jsonify(schema.dump(products))
 @app.route('/getsocialIcons/')
 def getsocialIcons():
     y = db.session.query(Social).all()

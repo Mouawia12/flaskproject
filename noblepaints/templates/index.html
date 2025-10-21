@@ -59,6 +59,38 @@
     </div>
 </section>
 
+{% if latest_products %}
+<section class="section section--light home-latest">
+    <div class="container2">
+        <div class="section__header">
+            <span class="section__eyebrow">{{ t('home.latest.eyebrow') }}</span>
+            <h2 class="section__title">{{ t('home.latest.title') }}</h2>
+            <p class="section__subtitle">{{ t('home.latest.subtitle') }}</p>
+        </div>
+        <div class="home-latest__grid">
+            {% for product in latest_products %}
+                {% set image = product.img or url_for('static', filename='images/prod01.png') %}
+                {% set description = (product.desc or '') | striptags | replace('\xa0', ' ') | trim %}
+                <article class="home-latest-card">
+                    <div class="home-latest-card__image">
+                        <img src="{{ image }}" alt="{{ product.name }}">
+                    </div>
+                    <div class="home-latest-card__body">
+                        <h3>{{ product.name }}</h3>
+                        {% if description %}
+                            <p>{{ description | truncate(110, True, '…') }}</p>
+                        {% endif %}
+                        <a class="home-latest-card__link" href="{{ url_for_lang('product_page', id=product.id) }}">
+                            {{ t('home.latest.cta') }}
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <section class="section section--muted home-story">
     <div class="container2">
         <div class="section__header">
