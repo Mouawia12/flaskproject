@@ -18,10 +18,10 @@
                     <h2 class="h4">المنتجات</h2>
                 </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a id="newProject" href="#" class="btn btn-sm btn-gray-800 d-inline-flex align-items-center">
-                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        <button type="button" class="btn btn-gray-800" data-bs-toggle="modal" data-bs-target="#newProjectForm">منتج جديد</button>
-                    </a>
+                    <button type="button" class="btn-admin btn-admin--primary" data-bs-toggle="modal" data-bs-target="#newProjectForm">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        <span>منتج جديد</span>
+                    </button>
                     <!--div class="btn-group ms-2 ms-lg-3">
                         <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
                         <button type="button" class="btn btn-sm btn-outline-gray-600">Export</button>
@@ -264,8 +264,8 @@
                                       </select>
                                   </div>
                                   <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary editBtn">حفظ</button>
-                                      <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">غلق</button>
+                                      <button type="button" class="btn-admin btn-admin--primary editBtn">حفظ</button>
+                                      <button type="button" class="btn-admin btn-admin--ghost ms-auto" data-bs-dismiss="modal">غلق</button>
                                   </div>
                               </div>
                           </div>
@@ -361,8 +361,8 @@
               </select>
           </div>
           <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" id="saveBtn">حفظ</button>
-              <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">غلق</button>
+              <button type="button" class="btn-admin btn-admin--primary" id="saveBtn">حفظ</button>
+              <button type="button" class="btn-admin btn-admin--ghost ms-auto" data-bs-dismiss="modal">غلق</button>
           </div>
       </div>
   </div>
