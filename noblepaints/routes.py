@@ -1256,15 +1256,20 @@ def catalogs_add():
     if request.method != 'POST':
         return json_error('Method not allowed', status=405)
 
-    if 'data' not in request.form:
+    data_payload = request.form.get('data', '')
+    if not data_payload:
         return json_error('Missing catalog data payload.')
 
-    data = json.loads(request.form['data'])
+    try:
+        data = json.loads(data_payload)
+    except (TypeError, ValueError):
+        return json_error('Invalid catalog data payload.', status=400)
+
     name = (data.get('name') or '').strip()
     img = data.get('img')
-    category = data.get('category')
-    lang = data.get('lang') or 'en'
-    country = data.get('country')
+    category = (data.get('category') or '').strip() or None
+    lang = (data.get('lang') or getattr(g, 'current_lang', 'en')).strip() or 'en'
+    country = (data.get('country') or '').strip() or None
     if not name:
         return json_error('Catalog name is required.')
 
@@ -1272,20 +1277,26 @@ def catalogs_add():
     if not file_obj or not file_obj.filename:
         return json_error('Catalog file upload is required.')
 
-    upload = Upload(filename=file_obj.filename, data=file_obj.read())
-    db.session.add(upload)
-    db.session.commit()
+    try:
+        upload = Upload(filename=file_obj.filename, data=file_obj.read())
+        db.session.add(upload)
+        db.session.flush()
 
-    catalog = Catalog(
-        name=name,
-        img=img,
-        link=upload.id,
-        category=category,
-        country=country,
-        lang=lang,
-    )
-    db.session.add(catalog)
-    db.session.commit()
+        catalog = Catalog(
+            name=name,
+            img=(img.strip() if isinstance(img, str) and img.strip() else None),
+            link=upload.id,
+            category=category,
+            country=country,
+            lang=lang,
+        )
+        db.session.add(catalog)
+        db.session.commit()
+    except Exception as exc:
+        db.session.rollback()
+        app.logger.exception('Failed to create catalog', exc_info=exc)
+        return json_error('Failed to create catalog. Please try again later.', status=500)
+
     return json_success('Catalog created successfully.', status=201, id=catalog.id)
 @app.route('/ControlPanel/catalogs/edit/<id>/',methods=['POST','GET'])
 @login_required
