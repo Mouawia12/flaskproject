@@ -1,76 +1,80 @@
 {% extends 'sec.html' %}
-{%block head%}
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
-/>
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" rel="stylesheet">
-<link href="/static/css/index.css" rel="stylesheet">
-<link href="/static/css/props.css" rel="stylesheet">
+{% block head %}
+<link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
 <title>Noble paints</title>
 <meta name="keywords" content="نوبل للدهانات, noble paints, مصنع دهانات, دهانات صناعية, دهان ضد الحريق, دهانات نوبل, مصنع الدهانات, شركة دهانات نهوبل, شركة دهانات بالسعودية">
-{%endblock%}
-{%block content%}
+{% endblock %}
+
+{% block hero %}
+<section class="hero-slider">
+    <div id="homeHero" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#homeHero" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" style="--hero-image: url('/static/images/bg1.jpg');">
+                <div class="hero-overlay"></div>
+                <div class="container2">
+                    <div class="carousel-caption text-start">
+                        <span class="eyebrow">Innovation</span>
+                        <h1>High-performance coatings engineered for the Gulf.</h1>
+                        <p>From infrastructure to interiors, Noble protects every surface with science-led solutions.</p>
+                        <div class="cta-group">
+                            <a href="{{ url_for_lang('productsSearch_page_filter_none') }}" class="btn btn-primary">Explore Products</a>
+                            <a href="{{ url_for_lang('catalogs_page_filter_none') }}" class="btn btn-outline-light">View Catalogs</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" style="--hero-image: url('/static/images/bg4.jpg');">
+                <div class="hero-overlay"></div>
+                <div class="container2">
+                    <div class="carousel-caption text-start">
+                        <span class="eyebrow">Expertise</span>
+                        <h1>Trusted industrial protection for energy, marine and heavy industry.</h1>
+                        <p>Rely on our certified systems to withstand harsh climates and demanding specifications.</p>
+                        <div class="cta-group">
+                            <a href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}" class="btn btn-primary">Technical Datasheets</a>
+                            <a href="{{ url_for_lang('approvals_page') }}" class="btn btn-outline-light">Global Approvals</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" style="--hero-image: url('/static/images/bg8.jpg');">
+                <div class="hero-overlay"></div>
+                <div class="container2">
+                    <div class="carousel-caption text-start">
+                        <span class="eyebrow">Partnership</span>
+                        <h1>Colour design, on-site support and aftercare for every project.</h1>
+                        <p>Partner with Noble for consultation, training and service that keep your finishes flawless.</p>
+                        <div class="cta-group">
+                            <a href="{{ url_for_lang('contact_page') }}" class="btn btn-primary">Talk to our team</a>
+                            <a href="{{ url_for_lang('locations_page') }}" class="btn btn-outline-light">Find a store</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeHero" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeHero" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
 <div class="steam-train">
     <div class="train">
       <div class="window"></div>
     </div>
   </div>
-<header>
-    <img src="/static/images/video.PNG" style="position:absolute">
-    <video width="100%" height="100%" loop autoplay muted playsinline preload="metadata" poster="/static/images/video.PNG" loading="lazy">
-        <source src="/static/videos/5.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-      </video>
-      <div class="text-wrapper aos-init aos-animate container" data-aos="fade-in" data-aos-delay="500">
-        <div class="text-box">
-          <h2 class="text">Hello, we’re noble</h2>
-          <p class="text">We help you protect your most valuable assets with our<br>high-quality coatings</p>
-        </div>
-      </div>
-      <!--iframe width="100%" height="100%" src="https://drive.google.com/file/d/1kidFA64-WEetlpe0ROg9RZppb7lZnKeU/preview?autoplay=1&loop=1" width="640" height="480"></iframe-->
-    <!--div class="swiper mySwiper" id="swiper1" style="direction: ltr;">
-        <div class="swiper-wrapper">
-            <div class="swiper-slide">
-                <div class="swiper-text-box swiper-text-box1 containerAbs">
-                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
-                    <span class="text">Innovative Painting<span class="after-swiper-text-box"></span></span>
-                </div>
-                <div class="swiper-img-box">
-                    <img src="/static/images/prod01.png">
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="swiper-text-box swiper-text-box2 containerAbs">
-                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
-                    <span class="text">Coating<span class="after-swiper-text-box"></span></span>
-                </div>
-                <div class="swiper-img-box">
-                    <img src="/static/images/prod02.png">
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="swiper-text-box swiper-text-box3 containerAbs">
-                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
-                    <span class="text">Construction<span class="after-swiper-text-box"></span></span>
-                </div>
-                <div class="swiper-img-box">
-                    <img src="/static/images/prod03.png">
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="swiper-text-box swiper-text-box4 containerAbs">
-                    <h1 class="text">A Global<br> Leader In<span class="after-swiper-text-box"></span></h1>
-                    <span class="text">Solutions<span class="after-swiper-text-box"></span></span>
-                </div>
-                <div class="swiper-img-box">
-                    <img src="/static/images/prod01.png">
-                </div>
-            </div>
-        </div>
-                <div class="swiper-pagination"></div>
-    </div-->
-</header>
 <section class="paintspart custom" id="productsCategories" style="display:flex;">
     <div class="lists" style="margin-top: 0;">
         <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" onclick="location.href=`/TechnicalDatasheets/?lang=${localStorage.getItem('nobleLang')}`">
