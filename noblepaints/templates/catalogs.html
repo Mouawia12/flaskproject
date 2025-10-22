@@ -178,7 +178,7 @@
                     <select class="form-select" id="catalogCategory" name="category" data-auto-submit>
                         <option value="All" {% if category in (None, '', 'All', 'null') %}selected{% endif %}>{{ t('catalogs.option.all_categories') }}</option>
                         {% for option in catalog_categories %}
-                            <option value="{{ option }}" {% if option == category %}selected{% endif %}>{{ option }}</option>
+                            <option value="{{ option.value }}" {% if option.value == category %}selected{% endif %}>{{ option.label }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -228,8 +228,8 @@
                 <div class="catalog-card__body">
                     <h2 class="catalog-card__title">{{ item.name }}</h2>
                     <div class="catalog-card__meta">
-                        {% if item.category %}
-                            <span><strong>{{ t('catalogs.filters.category') }}:</strong> {{ item.category }}</span>
+                        {% if item.category_label %}
+                            <span><strong>{{ t('catalogs.filters.category') }}:</strong> {{ item.category_label }}</span>
                         {% endif %}
                         {% if item.country %}
                             <span><strong>{{ t('catalogs.filters.country') }}:</strong> {{ item.country }}</span>
