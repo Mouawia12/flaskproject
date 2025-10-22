@@ -660,9 +660,9 @@ def productsSearch_page_filter_none():
 @app.route('/catalogs/')
 def catalogs_page_filter_none():
     try:
-        cat = request.args.get('category', 'All')
+        cat = (request.args.get('category') or 'All').strip()
         search = request.args.get('search', '').strip()
-        country = request.args.get('country', 'All')
+        country = (request.args.get('country') or 'All').strip()
         lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
         try:
             page = int(request.args.get('page', 1))
@@ -671,14 +671,49 @@ def catalogs_page_filter_none():
         except (ValueError, TypeError):
             page = 1
         items_per_page = 12
+
+        categories_data = (
+            db.session.query(Category.id, Category.name, Category.nameArabic)
+            .order_by(Category.name.asc())
+            .all()
+        )
+        category_by_id = {}
+        category_by_name = {}
+        for category_id, category_name, category_name_ar in categories_data:
+            cleaned_name = (category_name or '').strip()
+            cleaned_name_ar = (category_name_ar or '').strip()
+            display_label = cleaned_name or cleaned_name_ar or f"Category {category_id}"
+            key = str(category_id)
+            category_by_id[key] = display_label
+            if cleaned_name:
+                category_by_name[cleaned_name] = key
+                category_by_name.setdefault(cleaned_name.lower(), key)
+            if cleaned_name_ar:
+                category_by_name[cleaned_name_ar] = key
+                category_by_name.setdefault(cleaned_name_ar.lower(), key)
+
         base_query = db.session.query(Catalog)
         language_filters = [Catalog.lang == lang]
         if lang == 'en':
             language_filters.extend([Catalog.lang.is_(None), Catalog.lang == ''])
         base_query = base_query.filter(or_(*language_filters))
         query = base_query
+        selected_category = 'All'
         if cat and cat not in ('All', 'null'):
-            query = query.filter(Catalog.category == cat)
+            category_filter_values = {cat}
+            if cat in category_by_id:
+                category_filter_values.add(category_by_id[cat])
+                selected_category = cat
+            else:
+                mapped_id = category_by_name.get(cat) or category_by_name.get(cat.lower())
+                if mapped_id:
+                    category_filter_values.add(mapped_id)
+                    selected_category = mapped_id
+                else:
+                    selected_category = cat
+            query = query.filter(Catalog.category.in_(category_filter_values))
+        else:
+            selected_category = 'All'
         if country and country not in ('All', 'null'):
             query = query.filter(Catalog.country == country)
         if search:
@@ -699,12 +734,48 @@ def catalogs_page_filter_none():
             page = total_pages
         offset = (page - 1) * items_per_page
         items = query.offset(offset).limit(items_per_page).all()
+        for item in items:
+            raw_category = (item.category or '').strip()
+            if raw_category in category_by_id:
+                item.category_label = category_by_id[raw_category]
+                item.category_value = raw_category
+            elif raw_category in category_by_name or raw_category.lower() in category_by_name:
+                mapped_id = category_by_name.get(raw_category) or category_by_name.get(raw_category.lower())
+                item.category_label = category_by_id.get(mapped_id, raw_category)
+                item.category_value = mapped_id
+            else:
+                item.category_label = raw_category
+                item.category_value = raw_category
         categories_query = (
             base_query.with_entities(Catalog.category)
             .filter(Catalog.category.isnot(None), Catalog.category != '')
             .distinct()
         )
-        catalog_categories = sorted([row[0] for row in categories_query if row[0]])
+        category_options = {}
+        for value, label in category_by_id.items():
+            if value and value not in category_options:
+                category_options[value] = label
+        for row in categories_query:
+            raw_value = (row[0] or '').strip()
+            if not raw_value:
+                continue
+            if raw_value in category_by_id:
+                value = raw_value
+                label = category_by_id[raw_value]
+            else:
+                mapped_id = category_by_name.get(raw_value) or category_by_name.get(raw_value.lower())
+                if mapped_id:
+                    value = mapped_id
+                    label = category_by_id.get(mapped_id, raw_value)
+                else:
+                    value = raw_value
+                    label = raw_value
+            if value not in category_options:
+                category_options[value] = label
+        catalog_categories = [
+            {'value': key, 'label': value}
+            for key, value in sorted(category_options.items(), key=lambda item: str(item[1]).lower())
+        ]
         countries_query = (
             base_query.with_entities(Catalog.country)
             .filter(Catalog.country.isnot(None), Catalog.country != '')
@@ -721,7 +792,7 @@ def catalogs_page_filter_none():
             page=page,
             total_pages=total_pages,
             page_numbers=page_numbers,
-            category=cat,
+            category=selected_category,
             search=search,
             country=country,
             template='catalogs',
@@ -734,6 +805,8 @@ def catalogs_page_filter_none():
         print(f"Error in catalogs route: {e}")
         try:
             items = db.session.query(Catalog).filter(Catalog.lang == 'en').order_by(desc(Catalog.id)).limit(12).all()
+            for item in items:
+                item.category_label = (item.category or '').strip()
             return render_template(
                 'catalogs.html',
                 items=items,
