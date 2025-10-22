@@ -1321,12 +1321,35 @@ def products_del(id):
 def cpanel_catalogs():
     page, show = _get_admin_pagination()
     lang = _get_admin_lang()
-    catalogs = (
-        db.session.query(Catalog)
-        .filter(Catalog.lang == lang)
-        .order_by(Catalog.id.desc())
-        .all()
+    base_query = db.session.query(Catalog)
+
+    # Always expose catalogs created in any supported language so that
+    # administrators do not need to duplicate entries when switching the
+    # dashboard locale.  Results are ordered so that entries matching the
+    # currently selected language appear first, followed by other supported
+    # translations and language-neutral rows.
+    visible_langs = set(AVAILABLE_LANGUAGES.keys())
+    visible_langs.add(lang)
+    base_query = base_query.filter(
+        or_(
+            Catalog.lang.in_(tuple(visible_langs)),
+            Catalog.lang.is_(None),
+            Catalog.lang == '',
+        )
     )
+
+    ordering_rules = [(Catalog.lang == lang, 0)]
+    priority = 1
+    for code in AVAILABLE_LANGUAGES.keys():
+        if code == lang:
+            continue
+        ordering_rules.append((Catalog.lang == code, priority))
+        priority += 1
+    ordering_rules.append((Catalog.lang.is_(None), priority))
+    ordering_rules.append((Catalog.lang == '', priority))
+    sort_priority = case(ordering_rules, else_=priority + 1)
+
+    catalogs = base_query.order_by(sort_priority, Catalog.id.desc()).all()
     categories = (
         db.session.query(Category)
         .order_by(Category.id.asc())
