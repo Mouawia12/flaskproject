@@ -10,6 +10,7 @@ instance/
 venv/
 env/
 ENV/
+noblepaints/noblepaints.db
 
 # ===== OS & Editor Files =====
 .DS_Store
