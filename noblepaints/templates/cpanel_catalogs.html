@@ -81,7 +81,13 @@
                                 <img src="{{x.img}}" width="80px">
                               </span>
                             </td>
-                            <td><span class="fw-normal"><a href="/download/{{x.link}}">الرابط</a></span></td>                        
+                            <td>
+                                {% if x.link %}
+                                    <span class="fw-normal"><a href="/download/{{ x.link }}" target="_blank">الرابط</a></span>
+                                {% else %}
+                                    <span class="text-muted">لا يوجد</span>
+                                {% endif %}
+                            </td>
                             <td><span class="fw-normal">{{x.category}}</span></td> 
                             <td><span class="fw-normal">{{x.country}}</span></td>   
                             <td>
