@@ -5,7 +5,7 @@ import time
 from io import BytesIO
 import os
 from urllib.parse import urlparse
-from sqlalchemy import insert, desc, func, case
+from sqlalchemy import insert, desc, func, case, or_
 from sqlalchemy.orm import noload
 import pathlib
 import requests
@@ -671,7 +671,12 @@ def catalogs_page_filter_none():
         except (ValueError, TypeError):
             page = 1
         items_per_page = 12
-        query = db.session.query(Catalog)
+        base_query = db.session.query(Catalog)
+        language_filters = [Catalog.lang == lang]
+        if lang == 'en':
+            language_filters.extend([Catalog.lang.is_(None), Catalog.lang == ''])
+        base_query = base_query.filter(or_(*language_filters))
+        query = base_query
         if cat and cat not in ('All', 'null'):
             query = query.filter(Catalog.category == cat)
         if country and country not in ('All', 'null'):
@@ -695,13 +700,13 @@ def catalogs_page_filter_none():
         offset = (page - 1) * items_per_page
         items = query.offset(offset).limit(items_per_page).all()
         categories_query = (
-            db.session.query(Catalog.category)
+            base_query.with_entities(Catalog.category)
             .filter(Catalog.category.isnot(None), Catalog.category != '')
             .distinct()
         )
         catalog_categories = sorted([row[0] for row in categories_query if row[0]])
         countries_query = (
-            db.session.query(Catalog.country)
+            base_query.with_entities(Catalog.country)
             .filter(Catalog.country.isnot(None), Catalog.country != '')
             .distinct()
         )
