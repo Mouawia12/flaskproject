@@ -89,7 +89,13 @@
                               </span>
                             </td>
                             <td><span class="fw-normal">{{x.desc|safe}}</span></td>    
-                            <td><span class="fw-normal"><a href="/download/{{x.datasheet}}" target="_blank">الرابط</a></span></td>                        
+                            <td>
+                                {% if x.datasheet %}
+                                    <span class="fw-normal"><a href="/download/{{ x.datasheet }}" target="_blank">الرابط</a></span>
+                                {% else %}
+                                    <span class="text-muted">لا يوجد</span>
+                                {% endif %}
+                            </td>
                             <td><span class="fw-normal">{{x.category}}</span></td> 
                             <td><span class="fw-normal">{{x.country}}</span></td>   
                             <td>

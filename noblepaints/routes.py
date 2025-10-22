@@ -246,6 +246,46 @@ def json_error(message, status=400, **extra):
     if extra:
         payload.update(extra)
     return jsonify(payload), status
+
+
+def _get_admin_pagination(default_show=10):
+    """Return validated ``page`` and ``show`` parameters for admin listings.
+
+    The dashboard templates slice the result sets manually using the string
+    values of ``page`` and ``show``.  Historically the routes passed ``None``
+    when these query parameters were missing which caused ``page|int`` and
+    ``show|int`` in the templates to evaluate to ``0``.  The end result was an
+    empty table, broken pagination controls and failing CRUD actions because
+    the forms rely on the currently visible entries.
+
+    This helper normalises the query parameters so that every control-panel
+    view always receives sensible defaults.  The template logic continues to
+    work as-is while ensuring that out-of-range or non-numeric input silently
+    falls back to ``1`` (for ``page``) and ``default_show`` (for ``show``).
+    """
+
+    raw_page = request.args.get('page', '1')
+    raw_show = request.args.get('show', str(default_show))
+
+    try:
+        page_num = max(int(raw_page), 1)
+    except (TypeError, ValueError):
+        page_num = 1
+
+    try:
+        show_num = max(int(raw_show), 1)
+    except (TypeError, ValueError):
+        show_num = default_show
+
+    # The templates expect strings (``i|string in page``) so normalise back.
+    return str(page_num), str(show_num)
+
+
+def _get_admin_lang(default='en'):
+    """Resolve the active language for admin listings."""
+
+    lang = request.args.get('lang') or getattr(g, 'current_lang', default)
+    return _normalise_lang(lang)
 # create download function for download files
 @app.route('/download/<upload_id>')
 def download(upload_id):
@@ -757,12 +797,18 @@ def TechnicalDatasheets_page_filter_none():
 @app.route('/ControlPanel/socialIcons/')
 @login_required
 def cpanel_socialIcons():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    if show:
-        return render_template('cpanel_socialIcons.html',socialIcons = db.session.query(Social).all(),page=page,show=show)
-    else:
-        return render_template('cpanel_socialIcons.html',socialIcons = db.session.query(Social).all(),page=page,show='10')
+    page, show = _get_admin_pagination()
+    social_icons = (
+        db.session.query(Social)
+        .order_by(Social.id.desc())
+        .all()
+    )
+    return render_template(
+        'cpanel_socialIcons.html',
+        socialIcons=social_icons,
+        page=page,
+        show=show,
+    )
 @app.route('/ControlPanel/socialIcons/add/',methods=['POST','GET'])
 @login_required
 def socialIcons_add():
@@ -812,13 +858,21 @@ def socialIcons_del(id):
 @app.route('/ControlPanel/news/')
 @login_required
 def cpanel_news():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    lang = request.args.get('lang') or getattr(g, 'current_lang', 'en')
-    if show:
-        return render_template('cpanel_news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page=page,show=show)
-    else:
-        return render_template('cpanel_news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page=page,show='10')
+    page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
+    news_items = (
+        db.session.query(Post)
+        .filter(Post.lang == lang)
+        .order_by(Post.id.desc())
+        .all()
+    )
+    return render_template(
+        'cpanel_news.html',
+        news=news_items,
+        page=page,
+        show=show,
+        lang=lang,
+    )
 @app.route('/ControlPanel/news/add/',methods=['POST','GET'])
 @login_required
 def news_add():
@@ -885,12 +939,18 @@ def news_del(id):
 @app.route('/ControlPanel/certificates/')
 @login_required
 def cpanel_certificates():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    if show:
-        return render_template('cpanel_certificates.html',certificates = db.session.query(Certificate).all(),page=page,show=show)
-    else:
-        return render_template('cpanel_certificates.html',certificates = db.session.query(Certificate).all(),page=page,show='10')
+    page, show = _get_admin_pagination()
+    certificates = (
+        db.session.query(Certificate)
+        .order_by(Certificate.id.desc())
+        .all()
+    )
+    return render_template(
+        'cpanel_certificates.html',
+        certificates=certificates,
+        page=page,
+        show=show,
+    )
 @app.route('/ControlPanel/certificates/add/',methods=['POST','GET'])
 @login_required
 def certificates_add():
@@ -952,12 +1012,18 @@ def certificates_del(id):
 @app.route('/ControlPanel/approvals/')
 @login_required
 def cpanel_approvals():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    if show:
-        return render_template('cpanel_approvals.html',approvals = db.session.query(Approval).all(),page=page,show=show)
-    else:
-        return render_template('cpanel_approvals.html',approvals = db.session.query(Approval).all(),page=page,show='10')
+    page, show = _get_admin_pagination()
+    approvals = (
+        db.session.query(Approval)
+        .order_by(Approval.id.desc())
+        .all()
+    )
+    return render_template(
+        'cpanel_approvals.html',
+        approvals=approvals,
+        page=page,
+        show=show,
+    )
 @app.route('/ControlPanel/approvals/add/',methods=['POST','GET'])
 @login_required
 def approvals_add():
@@ -1019,14 +1085,27 @@ def approvals_del(id):
 @app.route('/ControlPanel/products/')
 @login_required
 def cpanel_products():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    #lang = request.args.get('lang')
-    lang = 'en'
-    if show:
-        return render_template('cpanel_products.html',products = db.session.query(Product).filter(Product.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
-    else:
-        return render_template('cpanel_products.html',products = db.session.query(Product).filter(Product.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
+    page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
+    products = (
+        db.session.query(Product)
+        .filter(Product.lang == lang)
+        .order_by(Product.id.desc())
+        .all()
+    )
+    categories = (
+        db.session.query(Category)
+        .order_by(Category.id.asc())
+        .all()
+    )
+    return render_template(
+        'cpanel_products.html',
+        products=products,
+        page=page,
+        show=show,
+        categories=categories,
+        lang=lang,
+    )
 @app.route('/ControlPanel/products/add/',methods=['POST','GET'])
 @login_required
 def products_add():
@@ -1131,14 +1210,27 @@ def products_del(id):
 @app.route('/ControlPanel/catalogs/')
 @login_required
 def cpanel_catalogs():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    #lang = request.args.get('lang')
-    lang = 'en'
-    if show:
-        return render_template('cpanel_catalogs.html',catalogs = db.session.query(Catalog).filter(Catalog.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
-    else:
-        return render_template('cpanel_catalogs.html',catalogs = db.session.query(Catalog).filter(Catalog.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
+    page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
+    catalogs = (
+        db.session.query(Catalog)
+        .filter(Catalog.lang == lang)
+        .order_by(Catalog.id.desc())
+        .all()
+    )
+    categories = (
+        db.session.query(Category)
+        .order_by(Category.id.asc())
+        .all()
+    )
+    return render_template(
+        'cpanel_catalogs.html',
+        catalogs=catalogs,
+        page=page,
+        show=show,
+        categories=categories,
+        lang=lang,
+    )
 @app.route('/ControlPanel/catalogs/add/',methods=['POST','GET'])
 @login_required
 def catalogs_add():
@@ -1247,14 +1339,27 @@ def catalogs_del(id):
 @app.route('/ControlPanel/TechnicalDatasheets/')
 @login_required
 def cpanel_TechnicalDatasheets():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    #lang = request.args.get('lang')
-    lang = 'en'
-    if show:
-        return render_template('cpanel_TechnicalDatasheets.html',TechnicalDatasheets = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.lang==lang).all(),page=page,show=show,categories = db.session.query(Category).all(),)
-    else:
-        return render_template('cpanel_TechnicalDatasheets.html',TechnicalDatasheets = db.session.query(TechnicalDatasheet).filter(TechnicalDatasheet.lang==lang).all(),page=page,show='10',categories = db.session.query(Category).all(),)
+    page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
+    datasheets = (
+        db.session.query(TechnicalDatasheet)
+        .filter(TechnicalDatasheet.lang == lang)
+        .order_by(TechnicalDatasheet.id.desc())
+        .all()
+    )
+    categories = (
+        db.session.query(Category)
+        .order_by(Category.id.asc())
+        .all()
+    )
+    return render_template(
+        'cpanel_TechnicalDatasheets.html',
+        TechnicalDatasheets=datasheets,
+        page=page,
+        show=show,
+        categories=categories,
+        lang=lang,
+    )
 @app.route('/ControlPanel/TechnicalDatasheets/add/',methods=['POST','GET'])
 @login_required
 def TechnicalDatasheets_add():
@@ -1325,18 +1430,18 @@ def TechnicalDatasheets_del(id):
 @app.route('/ControlPanel/categories/')
 @login_required
 def cpanel_categories():
-    page = request.args.get('page')
-    show = request.args.get('show')
-    if page:
-        if show:
-            return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page=page,show=show)
-        else:
-            return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page=page,show='10')
-    else:
-        if show:
-            return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page='1',show=show)
-        else:
-            return render_template('cpanel_categories.html',categories = db.session.query(Category).all(),page='1',show='10')
+    page, show = _get_admin_pagination()
+    categories = (
+        db.session.query(Category)
+        .order_by(Category.id.asc())
+        .all()
+    )
+    return render_template(
+        'cpanel_categories.html',
+        categories=categories,
+        page=page,
+        show=show,
+    )
 @app.route('/ControlPanel/categories/add/',methods=['POST','GET'])
 @login_required
 def categories_add():
