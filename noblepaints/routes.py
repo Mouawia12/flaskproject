@@ -5,7 +5,7 @@ import time
 from io import BytesIO
 import os
 from urllib.parse import urlparse
-from sqlalchemy import insert, desc, func
+from sqlalchemy import insert, desc, func, case
 from sqlalchemy.orm import noload
 import pathlib
 import requests
@@ -658,12 +658,12 @@ def productsSearch_page_filter_none():
         lang=lang,
     )
 @app.route('/catalogs/')
-def catalogs_page_filter_none():  
+def catalogs_page_filter_none():
     try:
         cat = request.args.get('category', 'All')
         search = request.args.get('search', '').strip()
         country = request.args.get('country', 'All')
-        lang = getattr(g, 'current_lang', 'en')
+        lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
         try:
             page = int(request.args.get('page', 1))
             if page < 1:
@@ -671,7 +671,7 @@ def catalogs_page_filter_none():
         except (ValueError, TypeError):
             page = 1
         items_per_page = 12
-        query = db.session.query(Catalog).filter(Catalog.lang == lang)
+        query = db.session.query(Catalog)
         if cat and cat not in ('All', 'null'):
             query = query.filter(Catalog.category == cat)
         if country and country not in ('All', 'null'):
@@ -679,16 +679,32 @@ def catalogs_page_filter_none():
         if search:
             search_value = f"%{search.lower()}%"
             query = query.filter(func.lower(Catalog.name).like(search_value))
-        query = query.order_by(desc(Catalog.id))
         total_items = query.count()
+        ordering_rules = [
+            (Catalog.lang == lang, 0),
+            (Catalog.lang.is_(None), 1),
+            (Catalog.lang == '', 1),
+        ]
+        if lang != 'en':
+            ordering_rules.append((Catalog.lang == 'en', 2))
+        sort_priority = case(ordering_rules, else_=3)
+        query = query.order_by(sort_priority, desc(Catalog.id))
         total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
         if page > total_pages:
             page = total_pages
         offset = (page - 1) * items_per_page
         items = query.offset(offset).limit(items_per_page).all()
-        categories_query = db.session.query(Catalog.category).filter(Catalog.lang == lang).distinct()
+        categories_query = (
+            db.session.query(Catalog.category)
+            .filter(Catalog.category.isnot(None), Catalog.category != '')
+            .distinct()
+        )
         catalog_categories = sorted([row[0] for row in categories_query if row[0]])
-        countries_query = db.session.query(Catalog.country).filter(Catalog.lang == lang).distinct()
+        countries_query = (
+            db.session.query(Catalog.country)
+            .filter(Catalog.country.isnot(None), Catalog.country != '')
+            .distinct()
+        )
         catalog_countries = sorted([row[0] for row in countries_query if row[0]])
         window_start = max(1, page - 2)
         window_end = min(total_pages, page + 2)
@@ -1270,7 +1286,7 @@ def catalogs_add():
             link=upload.id,
             category=category,
             country=country,
-            lang=lang,
+            lang=_normalise_lang(lang),
         )
         db.session.add(catalog)
         db.session.commit()
@@ -1320,7 +1336,7 @@ def catalogs_edit(id):
     if country and country != 'undefined':
         catalog.country = country
     if lang and lang != 'undefined':
-        catalog.lang = lang
+        catalog.lang = _normalise_lang(lang)
     if img and img != 'undefined':
         catalog.img = img
 
