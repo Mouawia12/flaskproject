@@ -17,115 +17,39 @@
     </div>
 </header>
 <section class="paintspart" id="productsCategories">
-    <div class="lists">
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Decorative Interior Paints">
-            <div class="imgbox">
-                <img src="/static/images/products_categories01.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/palitr-icon.png" alt=""></div>
-                <h4>Decorative<br>Interior Paints</h4>
+    <div class="container2">
+        {% if categories %}
+        <div class="lists">
+            {% for category in categories %}
+                {% set display_name = category.name if current_lang == 'en' else category.nameArabic or category.name %}
+                {% set target_url = url_for_lang('productsSearch_page_filter_none', category=category.id, page=1) %}
+                {% set image_src = category.img or '/static/images/default.png' %}
+                <div class="col-lg-4 col-sm-6 col-xs-6 paintbox"
+                     data-category-id="{{ category.id }}"
+                     data-target-url="{{ target_url }}"
+                     data-category-name-en="{{ category.name }}"
+                     data-category-name-ar="{{ category.nameArabic or category.name }}">
+                    <div class="imgbox">
+                        <img src="{{ image_src }}" alt="{{ display_name }}" onerror="this.src='/static/images/default.png'">
+                    </div>
+                    <div class="details">
+                        <div class="icon" aria-hidden="true">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <h4>{{ display_name }}</h4>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="lists">
+            <div class="col-12 paintbox">
+                <div class="details">
+                    <h4>{{ 'No categories available yet.' if current_lang == 'en' else 'لا توجد فئات متاحة حالياً.' }}</h4>
+                </div>
             </div>
         </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Decorative Interior Trust Hygienic">
-            <div class="imgbox">
-                <img src="/static/images/products_categories02.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/calculator-icon.png" alt=""></div>
-                <h4>Decorative Interior<br>Trust Hygienic</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Decorative Exterior">
-            <div class="imgbox">
-                <img src="/static/images/products_categories03.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Decorative<br>Exterior</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Automotive Paint">
-            <div class="imgbox">
-                <img src="/static/images/products_categories04.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Automotive<br>Paint</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Industrial Coatings">
-            <div class="imgbox">
-                <img src="/static/images/products_categories05.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Industrial<br>Coatings</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Protective Paints">
-            <div class="imgbox">
-                <img src="/static/images/products_categories06.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Protective<br>Paints</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Wood Stain">
-            <div class="imgbox">
-                <img src="/static/images/products_categories07.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Wood<br>Stain</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Fire Intumescent Paints">
-            <div class="imgbox">
-                <img src="/static/images/products_categories08.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Fire Intumescent<br>Paints</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Floor Coating&Road Marking">
-            <div class="imgbox">
-                <img src="/static/images/products_categories09.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Floor Coating <br>&Road Marking</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Powder Coatings">
-            <div class="imgbox">
-                <img src="/static/images/products_categories10.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Powder<br>Coatings</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Adhesives">
-            <div class="imgbox">
-                <img src="/static/images/products_categories11.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Adhesives</h4>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-xs-6 paintbox" idNum="Thinners">
-            <div class="imgbox">
-                <img src="/static/images/products_categories12.png" alt="">
-            </div>
-            <div class="details">
-                <div class="icon"><img src="/Content/ClientTheme/en/images/location-icon.png" alt=""></div>
-                <h4>Thinners</h4>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </section>
 <script src="/static/js/languages/products.js"></script>
