@@ -1346,8 +1346,10 @@ def cpanel_catalogs():
         ordering_rules.append((Catalog.lang == code, priority))
         priority += 1
     ordering_rules.append((Catalog.lang.is_(None), priority))
+    priority += 1
     ordering_rules.append((Catalog.lang == '', priority))
-    sort_priority = case(ordering_rules, else_=priority + 1)
+    priority += 1
+    sort_priority = case(*ordering_rules, else_=priority)
 
     catalogs = base_query.order_by(sort_priority, Catalog.id.desc()).all()
     categories = (
