@@ -392,8 +392,9 @@ def calculator_page():
 def socialMedia_page():  
         return render_template('social.html')
 @app.route('/products/')
-def products_page():  
-        return render_template('products.html')
+def products_page():
+    categories = get_cached_categories()
+    return render_template('products.html', categories=categories)
 @app.route('/product/')
 def product_page():
         id = request.args.get('id')  
