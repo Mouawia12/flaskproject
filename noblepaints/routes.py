@@ -628,33 +628,111 @@ def news_page():
         type=news_type,
     )
 @app.route('/certificates/')
-def certificates_page():  
-    page = request.args.get('page')
-    type = request.args.get('type') 
-    if(page !='' and page !='undefined' and page != None):
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('certificates.html',certificates = db.session.query(Certificate).filter(Certificate.type==type),page=page,type=type)
-        else:
-            return render_template('certificates.html',certificates = db.session.query(Certificate).all(),page=page,type=type)
+def certificates_page():
+    lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+    try:
+        page = max(int(request.args.get('page', 1)), 1)
+    except (TypeError, ValueError):
+        page = 1
+
+    items_per_page = 12
+    base_query = db.session.query(Certificate)
+    base_query = base_query.filter(_visible_lang_filter(Certificate.lang, lang))
+    base_query = base_query.order_by(
+        _language_sort_case(Certificate.lang, lang),
+        Certificate.id.desc(),
+    )
+
+    total_items = base_query.count()
+    if total_items:
+        total_pages = math.ceil(total_items / items_per_page)
+        if page > total_pages:
+            page = total_pages
+        certificates = (
+            base_query
+            .offset((page - 1) * items_per_page)
+            .limit(items_per_page)
+            .all()
+        )
+        start_index = ((page - 1) * items_per_page) + 1
+        end_index = start_index + len(certificates) - 1
+        page_numbers = list(range(1, total_pages + 1))
     else:
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('certificates.html',certificates = db.session.query(Certificate).filter(Certificate.type==type),page='1',type=type)
-        else:
-            return render_template('certificates.html',certificates = db.session.query(Certificate).all(),page='1',type=type)
+        certificates = []
+        total_pages = 1
+        page = 1
+        start_index = 0
+        end_index = 0
+        page_numbers = [1]
+
+    return render_template(
+        'certificates.html',
+        certificates=certificates,
+        page=page,
+        total_pages=total_pages,
+        page_numbers=page_numbers,
+        total_items=total_items,
+        items_per_page=items_per_page,
+        has_prev=page > 1,
+        has_next=page < total_pages,
+        prev_page=(page - 1) if page > 1 else None,
+        next_page=(page + 1) if page < total_pages else None,
+        start_index=start_index,
+        end_index=end_index,
+    )
 @app.route('/approvals/')
-def approvals_page():  
-    page = request.args.get('page')
-    type = request.args.get('type') 
-    if(page !='' and page !='undefined' and page != None):
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('approvals.html',approvals = db.session.query(Certificate).filter(Certificate.type==type),page=page,type=type)
-        else:
-            return render_template('approvals.html',approvals = db.session.query(Certificate).all(),page=page,type=type)
+def approvals_page():
+    lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+    try:
+        page = max(int(request.args.get('page', 1)), 1)
+    except (TypeError, ValueError):
+        page = 1
+
+    items_per_page = 12
+    base_query = db.session.query(Approval)
+    base_query = base_query.filter(_visible_lang_filter(Approval.lang, lang))
+    base_query = base_query.order_by(
+        _language_sort_case(Approval.lang, lang),
+        Approval.id.desc(),
+    )
+
+    total_items = base_query.count()
+    if total_items:
+        total_pages = math.ceil(total_items / items_per_page)
+        if page > total_pages:
+            page = total_pages
+        approvals = (
+            base_query
+            .offset((page - 1) * items_per_page)
+            .limit(items_per_page)
+            .all()
+        )
+        start_index = ((page - 1) * items_per_page) + 1
+        end_index = start_index + len(approvals) - 1
+        page_numbers = list(range(1, total_pages + 1))
     else:
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('approvals.html',approvals = db.session.query(Certificate).filter(Certificate.type==type),page='1',type=type)
-        else:
-            return render_template('approvals.html',approvals = db.session.query(Certificate).all(),page='1',type=type)
+        approvals = []
+        total_pages = 1
+        page = 1
+        start_index = 0
+        end_index = 0
+        page_numbers = [1]
+
+    return render_template(
+        'approvals.html',
+        approvals=approvals,
+        page=page,
+        total_pages=total_pages,
+        page_numbers=page_numbers,
+        total_items=total_items,
+        items_per_page=items_per_page,
+        has_prev=page > 1,
+        has_next=page < total_pages,
+        prev_page=(page - 1) if page > 1 else None,
+        next_page=(page + 1) if page < total_pages else None,
+        start_index=start_index,
+        end_index=end_index,
+    )
 @app.route('/news/<id>/')
 def news_page_details(id):  
     lang = getattr(g, 'current_lang', 'en')
@@ -1210,9 +1288,11 @@ def news_del(id):
 @login_required
 def cpanel_certificates():
     page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
     certificates = (
         db.session.query(Certificate)
-        .order_by(Certificate.id.desc())
+        .filter(_visible_lang_filter(Certificate.lang, lang))
+        .order_by(_language_sort_case(Certificate.lang, lang), Certificate.id.desc())
         .all()
     )
     return render_template(
@@ -1220,6 +1300,7 @@ def cpanel_certificates():
         certificates=certificates,
         page=page,
         show=show,
+        lang=lang,
     )
 @app.route('/ControlPanel/certificates/add/',methods=['POST','GET'])
 @login_required
@@ -1238,6 +1319,7 @@ def certificates_add():
         img=data.get('img'),
         description=description,
         link=data.get('link'),
+        lang=_normalise_lang((data.get('lang') or '').strip() or getattr(g, 'current_lang', 'en')),
     )
     db.session.add(certificate)
     db.session.commit()
@@ -1257,6 +1339,7 @@ def certificates_edit(id):
     description = data.get('description')
     link = data.get('link')
     img = data.get('img')
+    lang_value = data.get('lang')
     if title and title != 'undefined':
         certificate.title = title.strip()
     if description and description != 'undefined':
@@ -1265,6 +1348,8 @@ def certificates_edit(id):
         certificate.link = link
     if img and img != 'undefined':
         certificate.img = img
+    if lang_value and lang_value != 'undefined':
+        certificate.lang = _normalise_lang(lang_value)
 
     db.session.commit()
     return json_success('Certificate updated successfully.')
@@ -1283,9 +1368,11 @@ def certificates_del(id):
 @login_required
 def cpanel_approvals():
     page, show = _get_admin_pagination()
+    lang = _get_admin_lang()
     approvals = (
         db.session.query(Approval)
-        .order_by(Approval.id.desc())
+        .filter(_visible_lang_filter(Approval.lang, lang))
+        .order_by(_language_sort_case(Approval.lang, lang), Approval.id.desc())
         .all()
     )
     return render_template(
@@ -1293,6 +1380,7 @@ def cpanel_approvals():
         approvals=approvals,
         page=page,
         show=show,
+        lang=lang,
     )
 @app.route('/ControlPanel/approvals/add/',methods=['POST','GET'])
 @login_required
@@ -1311,6 +1399,7 @@ def approvals_add():
         img=data.get('img'),
         description=description,
         link=data.get('link'),
+        lang=_normalise_lang((data.get('lang') or '').strip() or getattr(g, 'current_lang', 'en')),
     )
     db.session.add(approval)
     db.session.commit()
@@ -1330,6 +1419,7 @@ def approvals_edit(id):
     description = data.get('description')
     link = data.get('link')
     img = data.get('img')
+    lang_value = data.get('lang')
     if title and title != 'undefined':
         approval.title = title.strip()
     if description and description != 'undefined':
@@ -1338,6 +1428,8 @@ def approvals_edit(id):
         approval.link = link
     if img and img != 'undefined':
         approval.img = img
+    if lang_value and lang_value != 'undefined':
+        approval.lang = _normalise_lang(lang_value)
 
     db.session.commit()
     return json_success('Approval updated successfully.')

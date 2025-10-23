@@ -1,139 +1,181 @@
-#topics-toggle{
-    display: flex;
-    padding: 30px 0;
-    justify-content: center;
-    gap:30px;
-    white-space: nowrap;
-    overflow: scroll;
+.documents-wrapper {
+    padding: 3rem 0 4rem;
+}
+
+.documents-meta {
+    margin-bottom: 1.5rem;
+    color: #4a5568;
+    font-weight: 500;
+    text-align: left;
+}
+
+html[dir="rtl"] .documents-meta {
+    text-align: right;
+}
+
+.documents-grid {
+    display: grid;
+    gap: 1.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.documents-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(15, 35, 95, 0.08);
     overflow: hidden;
-}
-
-#topics-toggle > div{
-    padding:12px 20px;
-}
-
-
-#topics-toggle > div.activeTopic{
-    border-radius: 500px;
-    color:white;
-    background-color: var(--red);
-}
-
-/**********************************************************/
-
-#certificates{
-    display: flex;
-    gap:30px;
-    flex-wrap: wrap;
-    padding: 1.1em 0 3.3rem 0;
-}
-
-#certificates > div{
-    border: 1px solid #e7e8e9;
-    border-radius: 6px;
     display: flex;
     flex-direction: column;
-    flex-basis: calc(33% - 20px);
-    transition: 0.6s;
-    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#certificates > div:hover{
-    box-shadow: 0 8px 16px 0 rgb(16 25 40 / 10%);
+.documents-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 55px rgba(5, 18, 64, 0.14);
 }
 
-#certificates > div > div:first-child{
-    max-height: 220px;
-    overflow: hidden;
-}
-
-#certificates > div > div >div.post-info-small.gray{
-    color:var(--gray2)
-}
-
-#certificates > div > div > div > span{
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-}
-
-#certificates > div > div > img{
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+.documents-card__image {
     width: 100%;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
-    aspect-ratio: 16/9;
+    background: #f8fafc;
 }
 
-#certificates > div > div:not(#certificates > div > div:first-child){
-    padding: 20px;
+.documents-card__body {
+    padding: 1.5rem;
+    display: flex;
     flex-direction: column;
-    gap:5px;
+    gap: 0.75rem;
+    flex: 1 1 auto;
 }
 
-#certificates > div > div > div > h2{
-    padding-bottom: 20px;
+.documents-card__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
 }
 
-/*************************************************************/
+.documents-card__description {
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
 
-.pagination{
+.documents-card__actions {
+    margin-top: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 3.3rem;
-    direction: ltr;
+    gap: 0.75rem;
 }
 
-.pagination__link {
+.documents-card__actions .btn-view {
     display: inline-flex;
-    padding: 0.25rem 0.4rem;
-    margin: 0 0.1rem;
-    color: #101928;
-    text-decoration: none;
-    border: 2px solid rgba(0,0,0,0);
-    line-height: 1;
-    border-radius: 7px;
-}
-
-.pagination__button {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
     align-items: center;
-    padding: 8px;
-    position: static;
-    width: 40px;
-    height: 40px;
-    left: 0px;
-    top: 0px;
-    background: #fff;
-    border: 1px solid #d5d7da;
-    box-sizing: border-box;
-    box-shadow: 0px 4px 6px rgb(16 25 40 / 6%);
-    border-radius: 4px;
-    margin: 0px 8px;
+    justify-content: center;
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: #ffffff;
+    background: #be1e2d;
+    transition: background 0.2s ease;
 }
 
-#logo > img{
-    height: 60px;
+.documents-card__actions .btn-view:hover,
+.documents-card__actions .btn-view:focus {
+    background: #9b1825;
+    color: #ffffff;
 }
 
-@media(max-width:1000px){
-    #certificates > div{
-        flex-basis: calc(50% - 20px);
-    }  
+.documents-empty {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(15, 35, 95, 0.08);
+    padding: 3rem 2rem;
+    text-align: center;
 }
 
-@media(max-width:767px){
-    #certificates > div{
-        flex-basis: calc(100% - 0px);
-    }  
-    #topics-toggle{
-        justify-content: flex-start;
+.documents-empty h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #1f2937;
+}
+
+.documents-empty p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.documents-pagination {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.documents-pagination .pagination {
+    list-style: none;
+    display: inline-flex;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+}
+
+.documents-pagination .page-item {
+    display: flex;
+}
+
+.documents-pagination .page-link {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: none;
+    background: #f1f5f9;
+    color: #1f2937;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.documents-pagination .page-link:hover,
+.documents-pagination .page-link:focus {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+.documents-pagination .page-link.active {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    cursor: default;
+    transform: none;
+}
+
+.documents-pagination .page-item.disabled .page-link {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+@media (max-width: 767px) {
+    .documents-wrapper {
+        padding: 2rem 0 3rem;
+    }
+
+    .documents-card__actions {
+        flex-direction: column;
+    }
+
+    .documents-card__actions .btn-view {
+        width: 100%;
     }
 }
-
-
