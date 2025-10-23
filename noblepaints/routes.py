@@ -735,7 +735,7 @@ def catalogs_page_filter_none():
                 continue
             ordering_rules.append((lang_column == code, priority))
             priority += 1
-        sort_priority = case(ordering_rules, else_=priority)
+        sort_priority = case(*ordering_rules, else_=priority)
         query = query.order_by(sort_priority, desc(Catalog.id))
         total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
         if page > total_pages:
