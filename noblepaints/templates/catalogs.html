@@ -121,56 +121,22 @@
         display: flex;
         justify-content: center;
     }
-    .pagination-tabs {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.6rem;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 12px 30px rgba(15, 35, 95, 0.08);
-        flex-wrap: wrap;
+    .catalog-pagination .pagination {
+        gap: 0.4rem;
     }
-    .pagination-tab,
-    .pagination-number {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 70px;
-        padding: 0.55rem 1.25rem;
+    .catalog-pagination .page-link {
         border-radius: 10px;
-        font-weight: 600;
+        min-width: 40px;
+        text-align: center;
         border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        color: #1f2937;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 6px rgba(15, 35, 95, 0.08);
+        color: #1a202c;
+        font-weight: 600;
     }
-    .pagination-number {
-        min-width: 48px;
-        padding: 0.55rem 0.9rem;
-    }
-    .pagination-tab:hover,
-    .pagination-number:hover {
-        background: #e2e8f0;
-        color: #0f2146;
-    }
-    .pagination-number.is-active {
-        background: #2563eb;
-        border-color: #2563eb;
-        color: #ffffff;
-        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
-    }
-    .pagination-tab.is-disabled {
-        pointer-events: none;
-        opacity: 0.6;
-        color: #94a3b8;
-        box-shadow: none;
-    }
-    .pagination-numbers {
-        display: flex;
-        gap: 0.5rem;
+    .catalog-pagination .page-link.active,
+    .catalog-pagination .page-link:hover {
+        background: #be1e2d;
+        color: #fff;
+        border-color: #be1e2d;
     }
     .catalog-meta {
         margin-bottom: 1rem;
@@ -286,19 +252,19 @@
 
         {% if total_pages > 1 %}
         <div class="catalog-pagination">
-            <nav class="pagination-tabs" aria-label="{{ t('hero.heading.catalogs') }}">
-                <a class="pagination-tab {% if page >= total_pages %}is-disabled{% endif %}" href="{% if page < total_pages %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page + 1) }}{% else %}#{% endif %}">
-                    <span data-i18n-key="catalogs.pagination.next">Next</span>
-                </a>
-                <div class="pagination-numbers">
-                    {% for number in page_numbers %}
-                    <a class="pagination-number {% if number == page %}is-active{% endif %}" href="{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=number) }}">{{ number }}</a>
-                    {% endfor %}
-                </div>
-                <a class="pagination-tab {% if page <= 1 %}is-disabled{% endif %}" href="{% if page > 1 %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page - 1) }}{% else %}#{% endif %}">
-                    <span data-i18n-key="catalogs.pagination.previous">Previous</span>
-                </a>
-            </nav>
+            <ul class="pagination">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page > 1 %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page - 1) }}{% else %}#{% endif %}" aria-label="Previous">&laquo;</a>
+                </li>
+                {% for number in page_numbers %}
+                <li class="page-item">
+                    <a class="page-link {% if number == page %}active{% endif %}" href="{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=number) }}">{{ number }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{% if page < total_pages %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page + 1) }}{% else %}#{% endif %}" aria-label="Next">&raquo;</a>
+                </li>
+            </ul>
         </div>
         {% endif %}
     </div>
