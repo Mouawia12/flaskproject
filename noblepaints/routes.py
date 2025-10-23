@@ -294,6 +294,52 @@ def _get_admin_lang(default='en'):
 
     lang = request.args.get('lang') or getattr(g, 'current_lang', default)
     return _normalise_lang(lang)
+
+
+def _language_sort_case(lang_column, active_lang):
+    """Return a SQLAlchemy ``case`` expression that prioritises *active_lang*.
+
+    Entries without an explicit language (``NULL``/empty string) are sorted
+    ahead of language-specific rows so that legacy content remains visible.
+    Remaining languages follow in the order they are defined in
+    ``AVAILABLE_LANGUAGES``.
+    """
+
+    normalised = _normalise_lang(active_lang)
+    lang_expr = func.lower(func.trim(func.coalesce(lang_column, '')))
+
+    ordering_rules = [
+        (lang_expr == '', 0),
+        (lang_expr == normalised, 1),
+    ]
+
+    priority = 2
+    for code in AVAILABLE_LANGUAGES.keys():
+        code_normalised = _normalise_lang(code)
+        if code_normalised == normalised:
+            continue
+        ordering_rules.append((lang_expr == code_normalised, priority))
+        priority += 1
+
+    return case(*ordering_rules, else_=priority)
+
+
+def _visible_lang_filter(lang_column, active_lang):
+    """Build a filter that keeps language-neutral rows visible.
+
+    The dashboard allows administrators to switch between locales.  We keep
+    rows that are either stored without a language code or belong to any
+    supported locale so that entries never disappear when editors toggle the
+    filter.
+    """
+
+    normalised = _normalise_lang(active_lang)
+    lang_expr = func.lower(func.trim(func.coalesce(lang_column, '')))
+    visible_codes = {''}
+    visible_codes.update(_normalise_lang(code) for code in AVAILABLE_LANGUAGES.keys())
+    visible_codes.add(normalised)
+
+    return or_(lang_expr == '', lang_expr.in_(tuple(visible_codes)))
 # create download function for download files
 @app.route('/download/<upload_id>')
 def download(upload_id):
@@ -553,20 +599,34 @@ def api_categories():
             'timestamp': int(time.time())
         }), 500
 @app.route('/news/')
-def news_page():  
-    page = request.args.get('page')
-    type = request.args.get('type') 
-    lang = getattr(g, 'current_lang', 'en')
-    if(page !='' and page !='undefined' and page != None):
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('news.html',news = db.session.query(Post).filter(Post.type==type,Post.lang==lang),page=page,type=type)
+def news_page():
+    lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+    raw_page = request.args.get('page')
+    news_type = request.args.get('type')
+
+    try:
+        page = max(int(raw_page), 1)
+    except (TypeError, ValueError):
+        page = 1
+
+    base_query = db.session.query(Post)
+    if news_type not in (None, '', 'undefined'):
+        post_type_attr = getattr(Post, 'type', None)
+        if post_type_attr is not None:
+            base_query = base_query.filter(Post.type == news_type)
         else:
-            return render_template('news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page=page,type=type)
-    else:
-        if(type !='' and type !='undefined' and type != None):
-            return render_template('news.html',news = db.session.query(Post).filter(Post.type==type,Post.lang==lang),page='1',type=type)
-        else:
-            return render_template('news.html',news = db.session.query(Post).filter(Post.lang==lang).all(),page='1',type=type)
+            base_query = base_query.filter(Post.category == news_type)
+
+    query = base_query.filter(_visible_lang_filter(Post.lang, lang))
+    sort_priority = _language_sort_case(Post.lang, lang)
+    items = query.order_by(sort_priority, Post.id.desc()).all()
+
+    return render_template(
+        'news.html',
+        news=items,
+        page=str(page),
+        type=news_type,
+    )
 @app.route('/certificates/')
 def certificates_page():  
     page = request.args.get('page')
@@ -641,7 +701,11 @@ def productsSearch_page_filter_none():
     except (TypeError, ValueError):
         page_number = 1
 
-    query = db.session.query(Product).filter(Product.lang == lang)
+    query = db.session.query(Product)
+
+    query = query.filter(_visible_lang_filter(Product.lang, lang))
+
+    sort_priority = _language_sort_case(Product.lang, lang)
 
     if category_filter not in (None, '', 'All', 'null'):
         query = query.filter(Product.category == category_filter)
@@ -652,7 +716,7 @@ def productsSearch_page_filter_none():
     if search_term:
         query = query.filter(Product.name.ilike(f'%{search_term}%'))
 
-    items = query.order_by(Product.id.desc()).all()
+    items = query.order_by(sort_priority, Product.id.desc()).all()
 
     return render_template(
         'productsSearch.html',
@@ -841,63 +905,159 @@ def catalogs_page_filter_none():
             print(f"Fallback error: {fallback_error}")
             return "Internal server error in catalogs page", 500
 @app.route('/TechnicalDatasheets/')
-def TechnicalDatasheets_page_filter_none():  
+def TechnicalDatasheets_page_filter_none():
     try:
-        # Get filter parameters with proper defaults and validation
-        cat = request.args.get('category', 'All')
-        search = request.args.get('search', '').strip()
-        country = request.args.get('country', 'All')
-        lang = 'en'
-        # Handle page parameter safely
+        cat = (request.args.get('category') or 'All').strip()
+        search = (request.args.get('search') or '').strip()
+        country = (request.args.get('country') or 'All').strip()
+        lang = _normalise_lang(getattr(g, 'current_lang', 'en'))
+
         try:
             page = int(request.args.get('page', 1))
             if page < 1:
                 page = 1
         except (ValueError, TypeError):
             page = 1
-        # Build base query for Products (TechnicalDatasheets uses Product model)
-        query = db.session.query(Product).filter(Product.lang == lang)
-        # Apply filters conditionally
-        if cat and cat != 'All' and cat != 'null':
-            query = query.filter(Product.category == cat)
-        if country and country != 'All' and country != 'null':
-            query = query.filter(Product.country == country)
-        if search:
-            query = query.filter(Product.name.contains(search))
-        # Get total count for pagination
-        total_items = query.count()
-        # Apply pagination - only get items for current page
         items_per_page = 12
+
+        categories_data = (
+            db.session.query(Category.id, Category.name, Category.nameArabic)
+            .order_by(Category.name.asc())
+            .all()
+        )
+        category_by_id = {}
+        category_by_name = {}
+        for category_id, category_name, category_name_ar in categories_data:
+            cleaned_name = (category_name or '').strip()
+            cleaned_name_ar = (category_name_ar or '').strip()
+            display_label = cleaned_name or cleaned_name_ar or f"Category {category_id}"
+            key = str(category_id)
+            category_by_id[key] = display_label
+            if cleaned_name:
+                category_by_name[cleaned_name] = key
+                category_by_name.setdefault(cleaned_name.lower(), key)
+            if cleaned_name_ar:
+                category_by_name[cleaned_name_ar] = key
+                category_by_name.setdefault(cleaned_name_ar.lower(), key)
+
+        base_query = db.session.query(TechnicalDatasheet)
+        query = base_query.filter(_visible_lang_filter(TechnicalDatasheet.lang, lang))
+        selected_category = 'All'
+
+        if cat and cat not in ('All', 'null'):
+            category_filter_values = {cat}
+            if cat in category_by_id:
+                category_filter_values.add(cat)
+                selected_category = cat
+            else:
+                mapped_id = category_by_name.get(cat) or category_by_name.get(cat.lower())
+                if mapped_id:
+                    category_filter_values.add(mapped_id)
+                    selected_category = mapped_id
+                else:
+                    selected_category = cat
+            query = query.filter(TechnicalDatasheet.category.in_(category_filter_values))
+
+        if country and country not in ('All', 'null'):
+            query = query.filter(TechnicalDatasheet.country == country)
+
+        if search:
+            search_value = f"%{search.lower()}%"
+            query = query.filter(func.lower(TechnicalDatasheet.name).like(search_value))
+
+        sort_priority = _language_sort_case(TechnicalDatasheet.lang, lang)
+
+        total_items = query.count()
+        total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
+        if page > total_pages:
+            page = total_pages
         offset = (page - 1) * items_per_page
-        items = query.offset(offset).limit(items_per_page).all()
-        # Get categories once
-        categories = db.session.query(Category).all()
-        return render_template('TechnicalDatasheets.html',
+        items = (
+            query.order_by(sort_priority, desc(TechnicalDatasheet.id))
+            .offset(offset)
+            .limit(items_per_page)
+            .all()
+        )
+
+        for item in items:
+            raw_category = (item.category or '').strip()
+            if raw_category in category_by_id:
+                item.category_label = category_by_id[raw_category]
+                item.category_value = raw_category
+            else:
+                mapped_id = category_by_name.get(raw_category) or category_by_name.get(raw_category.lower())
+                if mapped_id:
+                    item.category_label = category_by_id.get(mapped_id, raw_category)
+                    item.category_value = mapped_id
+                else:
+                    item.category_label = raw_category
+                    item.category_value = raw_category
+
+        countries_query = (
+            base_query.with_entities(TechnicalDatasheet.country)
+            .filter(TechnicalDatasheet.country.isnot(None), TechnicalDatasheet.country != '')
+            .distinct()
+        )
+        datasheet_countries = sorted([row[0] for row in countries_query if row[0]])
+
+        page_numbers = list(range(1, total_pages + 1))
+
+        categories = (
+            db.session.query(Category)
+            .order_by(Category.id.asc())
+            .all()
+        )
+
+        return render_template(
+            'TechnicalDatasheets.html',
             items=items,
             total_items=total_items,
             page=str(page),
-            category=cat,
+            category=selected_category,
             search=search,
             country=country,
             categories=categories,
-            items_per_page=items_per_page
+            items_per_page=items_per_page,
+            total_pages=total_pages,
+            page_numbers=page_numbers,
+            datasheet_countries=datasheet_countries,
+            lang=lang,
+            has_prev=page > 1,
+            has_next=page < total_pages,
+            prev_page=(page - 1) if page > 1 else None,
+            next_page=(page + 1) if page < total_pages else None,
         )
     except Exception as e:
         # Fallback to basic functionality if something goes wrong
         print(f"Error in TechnicalDatasheets route: {e}")
         try:
-            # Simple fallback query
-            items = db.session.query(Product).filter(Product.lang == 'en').limit(12).all()
+            items = (
+                db.session.query(TechnicalDatasheet)
+                .order_by(desc(TechnicalDatasheet.id))
+                .limit(12)
+                .all()
+            )
             categories = db.session.query(Category).all()
-            return render_template('TechnicalDatasheets.html',
+            for item in items:
+                item.category_label = (item.category or '').strip()
+            return render_template(
+                'TechnicalDatasheets.html',
                 items=items,
                 total_items=len(items),
                 page="1",
-                category="All", 
+                category="All",
                 search="",
                 country="All",
                 categories=categories,
-                items_per_page=12
+                items_per_page=12,
+                total_pages=1,
+                page_numbers=[1],
+                datasheet_countries=[],
+                lang='en',
+                has_prev=False,
+                has_next=False,
+                prev_page=None,
+                next_page=None,
             )
         except Exception as fallback_error:
             print(f"TechnicalDatasheets fallback error: {fallback_error}")
@@ -969,10 +1129,11 @@ def socialIcons_del(id):
 def cpanel_news():
     page, show = _get_admin_pagination()
     lang = _get_admin_lang()
+    base_query = db.session.query(Post)
     news_items = (
-        db.session.query(Post)
-        .filter(Post.lang == lang)
-        .order_by(Post.id.desc())
+        base_query
+        .filter(_visible_lang_filter(Post.lang, lang))
+        .order_by(_language_sort_case(Post.lang, lang), Post.id.desc())
         .all()
     )
     return render_template(
@@ -1196,10 +1357,11 @@ def approvals_del(id):
 def cpanel_products():
     page, show = _get_admin_pagination()
     lang = _get_admin_lang()
+    base_query = db.session.query(Product)
     products = (
-        db.session.query(Product)
-        .filter(Product.lang == lang)
-        .order_by(Product.id.desc())
+        base_query
+        .filter(_visible_lang_filter(Product.lang, lang))
+        .order_by(_language_sort_case(Product.lang, lang), Product.id.desc())
         .all()
     )
     categories = (
@@ -1474,10 +1636,11 @@ def catalogs_del(id):
 def cpanel_TechnicalDatasheets():
     page, show = _get_admin_pagination()
     lang = _get_admin_lang()
+    base_query = db.session.query(TechnicalDatasheet)
     datasheets = (
-        db.session.query(TechnicalDatasheet)
-        .filter(TechnicalDatasheet.lang == lang)
-        .order_by(TechnicalDatasheet.id.desc())
+        base_query
+        .filter(_visible_lang_filter(TechnicalDatasheet.lang, lang))
+        .order_by(_language_sort_case(TechnicalDatasheet.lang, lang), TechnicalDatasheet.id.desc())
         .all()
     )
     categories = (
