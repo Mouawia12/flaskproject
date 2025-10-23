@@ -7,6 +7,57 @@
     .catalogs-wrapper {
         padding: 3rem 0;
     }
+    .catalogs-tabs {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(15, 35, 95, 0.08);
+        padding: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    .catalogs-tabs__list {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .catalogs-tabs__item {
+        flex: 1 1 180px;
+    }
+    .catalogs-tabs__link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        color: #1a202c;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .catalogs-tabs__link:hover,
+    .catalogs-tabs__link:focus {
+        background: #f1f5f9;
+        color: #0f2146;
+        outline: none;
+    }
+    .catalogs-tabs__link.is-active {
+        background: #be1e2d;
+        color: #ffffff;
+        box-shadow: 0 12px 35px rgba(190, 30, 45, 0.25);
+    }
+    [dir="rtl"] .catalogs-tabs__list {
+        justify-content: center;
+    }
+    [dir="rtl"] .catalogs-tabs__link {
+        font-weight: 600;
+    }
     .catalog-filters {
         background: #ffffff;
         border-radius: 12px;
@@ -170,6 +221,19 @@
 {% block content %}
 <section class="catalogs-wrapper">
     <div class="container2">
+        <nav class="catalogs-tabs" aria-label="{{ t('hero.heading.catalogs') }}">
+            <ul class="catalogs-tabs__list">
+                <li class="catalogs-tabs__item">
+                    <a class="catalogs-tabs__link" href="{{ url_for_lang('productsSearch_page_filter_none') }}" data-i18n-key="home.hero.cta_primary"></a>
+                </li>
+                <li class="catalogs-tabs__item">
+                    <a class="catalogs-tabs__link is-active" href="{{ url_for_lang('catalogs_page_filter_none') }}" aria-current="page" data-i18n-key="home.hero.cta_secondary"></a>
+                </li>
+                <li class="catalogs-tabs__item">
+                    <a class="catalogs-tabs__link" href="{{ url_for_lang('TechnicalDatasheets_page_filter_none') }}" data-i18n-key="nav.business_solutions.datasheets"></a>
+                </li>
+            </ul>
+        </nav>
         <form id="catalogFilterForm" class="catalog-filters" method="get">
             <input type="hidden" name="lang" value="{{ current_lang }}">
             <div class="row g-3">
