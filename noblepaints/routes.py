@@ -83,8 +83,16 @@ def _translate_text(text, target_lang="ar", source_lang="auto"):
 
 
 def _normalise_lang(candidate):
-    if candidate in AVAILABLE_LANGUAGES:
-        return candidate
+    if not candidate:
+        return "en"
+
+    normalised = str(candidate).strip().lower()
+    if not normalised:
+        return "en"
+
+    if normalised in AVAILABLE_LANGUAGES:
+        return normalised
+
     return "en"
 
 
@@ -693,21 +701,9 @@ def catalogs_page_filter_none():
                 category_by_name.setdefault(cleaned_name_ar.lower(), key)
 
         base_query = db.session.query(Catalog)
-
-        # Always expose catalogs created in any supported language so that
-        # administrators do not need to duplicate entries when switching the
-        # dashboard locale.  Results are still ordered so that the currently
-        # active language appears first, followed by other supported
-        # translations and finally language-neutral entries.
-        visible_langs = set(AVAILABLE_LANGUAGES.keys())
-        visible_langs.add(lang)
-        base_query = base_query.filter(
-            or_(
-                Catalog.lang.in_(tuple(visible_langs)),
-                Catalog.lang.is_(None),
-                Catalog.lang == '',
-            )
-        )
+        # Always expose catalogs regardless of how their language code was stored,
+        # then prefer matches for the active locale via the ordering rules below.
+        lang_column = func.lower(func.coalesce(Catalog.lang, ''))
         query = base_query
         selected_category = 'All'
         if cat and cat not in ('All', 'null'):
@@ -731,17 +727,17 @@ def catalogs_page_filter_none():
             search_value = f"%{search.lower()}%"
             query = query.filter(func.lower(Catalog.name).like(search_value))
         total_items = query.count()
-        ordering_rules = [(Catalog.lang == lang, 0)]
+        ordering_rules = [(lang_column == lang, 0)]
         # Ensure the remaining languages appear afterwards in a stable order.
         priority = 1
         for code in AVAILABLE_LANGUAGES.keys():
             if code == lang:
                 continue
-            ordering_rules.append((Catalog.lang == code, priority))
+            ordering_rules.append((lang_column == code, priority))
             priority += 1
-        ordering_rules.append((Catalog.lang.is_(None), priority))
-        ordering_rules.append((Catalog.lang == '', priority))
-        sort_priority = case(ordering_rules, else_=3)
+        ordering_rules.append((lang_column == '', priority))
+        priority += 1
+        sort_priority = case(ordering_rules, else_=priority)
         query = query.order_by(sort_priority, desc(Catalog.id))
         total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
         if page > total_pages:
