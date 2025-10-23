@@ -5,7 +5,7 @@ import time
 from io import BytesIO
 import os
 from urllib.parse import urlparse
-from sqlalchemy import insert, desc, func, case, or_
+from sqlalchemy import insert, desc, func, case, or_, text
 from sqlalchemy.orm import noload
 import pathlib
 import requests
@@ -150,11 +150,16 @@ with app.app_context():
     # Add database indexes for better performance
     try:
         # Create indexes if they don't exist (SQLite compatible)
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_categories_id ON categories(category_id)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_products_lang ON products(lang)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalogs_lang ON catalogs(lang)')
-        db.engine.execute('CREATE INDEX IF NOT EXISTS idx_catalogs_category ON catalogs(category)')
+        statements = (
+            'CREATE INDEX IF NOT EXISTS idx_categories_id ON categories(category_id)',
+            'CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)',
+            'CREATE INDEX IF NOT EXISTS idx_products_lang ON products(lang)',
+            'CREATE INDEX IF NOT EXISTS idx_catalogs_lang ON catalogs(lang)',
+            'CREATE INDEX IF NOT EXISTS idx_catalogs_category ON catalogs(category)',
+        )
+        with db.engine.begin() as connection:
+            for statement in statements:
+                connection.execute(text(statement))
         print("Database indexes created/verified for better performance")
     except Exception as e:
         print(f"Note: Could not create indexes (may already exist): {e}")
