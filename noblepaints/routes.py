@@ -5,7 +5,7 @@ import time
 from io import BytesIO
 import os
 from urllib.parse import urlparse
-from sqlalchemy import insert, desc, func, case, or_, text
+from sqlalchemy import insert, desc, func, case, or_, text, inspect
 from sqlalchemy.orm import noload
 import pathlib
 import requests
@@ -163,6 +163,24 @@ with app.app_context():
         print("Database indexes created/verified for better performance")
     except Exception as e:
         print(f"Note: Could not create indexes (may already exist): {e}")
+
+    # Ensure legacy tables contain multilingual support columns
+    try:
+        def ensure_column(table_name, column_name, ddl):
+            inspector = inspect(db.engine)
+            try:
+                columns = {column['name'] for column in inspector.get_columns(table_name)}
+            except Exception:
+                return
+            if column_name not in columns:
+                with db.engine.begin() as connection:
+                    connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {ddl}"))
+                print(f"Added missing column '{column_name}' to '{table_name}'.")
+
+        ensure_column('certificate', 'lang', "VARCHAR")
+        ensure_column('approval', 'lang', "VARCHAR")
+    except Exception as e:
+        print(f"Could not ensure multilingual columns exist: {e}")
     try:
         default_username = os.environ.get('ADMIN_INITIAL_USERNAME', 'admin')
         configured_password = os.environ.get('ADMIN_INITIAL_PASSWORD') or app.config.get('DEFAULT_ADMIN_PASSWORD')

@@ -48,20 +48,22 @@ CREATE TABLE post (
 	PRIMARY KEY (id)
 );
 CREATE TABLE certificate (
-	id INTEGER NOT NULL, 
-	title VARCHAR, 
-	description VARCHAR, 
-	link VARCHAR, 
-	img VARCHAR, 
-	PRIMARY KEY (id)
+        id INTEGER NOT NULL,
+        title VARCHAR,
+        description VARCHAR,
+        link VARCHAR,
+        img VARCHAR,
+        lang VARCHAR,
+        PRIMARY KEY (id)
 );
 CREATE TABLE approval (
-	id INTEGER NOT NULL, 
-	title VARCHAR, 
-	description VARCHAR, 
-	link VARCHAR, 
-	img VARCHAR, 
-	PRIMARY KEY (id)
+        id INTEGER NOT NULL,
+        title VARCHAR,
+        description VARCHAR,
+        link VARCHAR,
+        img VARCHAR,
+        lang VARCHAR,
+        PRIMARY KEY (id)
 );
 CREATE TABLE product_categorie (
 	category_id INTEGER, 
