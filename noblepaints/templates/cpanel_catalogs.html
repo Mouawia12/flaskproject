@@ -132,11 +132,6 @@
                                               {% endif %}
                                           {% endfor %}
                                       </select>
-                                      <label class="my-1 me-2" for="editlang">اللغة</label>
-                                      <select id="editlang" class="form-control">
-                                              <option value="en" {% if x.lang == 'en' %}selected{% endif %}>English</option>
-                                              <option value="ar" {% if x.lang == 'ar' %}selected{% endif %}>العربية</option>
-                                      </select>
                                       <label class="my-1 me-2" for="type">البلد</label>
                                       <select value="{{x.country}}" id="editcountry" class="form-control">
                                               <option></option>
@@ -329,11 +324,6 @@
                   <option lang="en" class="" value="{{x.id}}">{{x.name}}</option>
                     {% endfor %}
               </select>
-              <label class="my-1 me-2" for="newAddlang">اللغة</label>
-              <select id="newAddlang" class="form-control">
-                      <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
-                      <option value="ar" {% if lang == 'ar' %}selected{% endif %}>العربية</option>
-              </select>
               <label class="my-1 me-2" for="type">البلد</label>
               <select id="newAddcountry" class="form-control">
                       <option></option>
@@ -423,13 +413,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const fileInput = createModal.querySelector('#newAddlink');
         const uploadedFile = fileInput.files && fileInput.files[0];
         const imageValue = createModal.querySelector('#newAddimg').getAttribute('image');
-        const langSelect = createModal.querySelector('#newAddlang');
         const payload = {
           name: createModal.querySelector('#newAddname').value.trim(),
           img: imageValue || undefined,
           category: createModal.querySelector('#newAddcategory').value,
           country: createModal.querySelector('#newAddcountry').value,
-          lang: (langSelect && langSelect.value) || resolveAdminLang(),
         };
         if (!payload.name || !uploadedFile) {
           await notifyWarning({
@@ -486,13 +474,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!modal) {
         return;
       }
-      const langSelect = modal.querySelector('#editlang');
       const payload = {
         name: modal.querySelector('#editname').value.trim(),
         img: modal.querySelector('#editimg').getAttribute('image') || undefined,
         category: modal.querySelector('#editcategory').value,
         country: modal.querySelector('#editcountry').value,
-        lang: (langSelect && langSelect.value) || resolveAdminLang(),
       };
       if (!payload.name) {
         await notifyWarning({

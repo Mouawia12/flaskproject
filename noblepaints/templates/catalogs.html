@@ -285,16 +285,16 @@
         {% if total_pages > 1 %}
         <div class="catalog-pagination">
             <ul class="pagination">
-                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page > 1 %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page - 1) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.previous') }}" data-i18n-key="catalogs.pagination.previous">{{ t('catalogs.pagination.previous') }}</a>
+                <li class="page-item {% if not has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{% if has_prev %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=prev_page) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.previous') }}" data-i18n-key="catalogs.pagination.previous">{{ t('catalogs.pagination.previous') }}</a>
                 </li>
                 {% for number in page_numbers %}
                 <li class="page-item">
-                    <a class="page-link {% if number == page %}active{% endif %}" href="{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=number) }}">{{ number }}</a>
+                    <a class="page-link {% if number == page %}active{% endif %}" href="{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=number) }}" {% if number == page %}aria-current="page"{% endif %}>{{ number }}</a>
                 </li>
                 {% endfor %}
-                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page < total_pages %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page + 1) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.next') }}" data-i18n-key="catalogs.pagination.next">{{ t('catalogs.pagination.next') }}</a>
+                <li class="page-item {% if not has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{% if has_next %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=next_page) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.next') }}" data-i18n-key="catalogs.pagination.next">{{ t('catalogs.pagination.next') }}</a>
                 </li>
             </ul>
         </div>
