@@ -987,7 +987,7 @@ def news_add():
     data = request.get_json(silent=True) or {}
     title = (data.get('title') or '').strip()
     description = (data.get('description') or '').strip()
-    lang = (data.get('lang') or '').strip() or getattr(g, 'current_lang', 'en')
+    lang = _normalise_lang((data.get('lang') or '').strip() or getattr(g, 'current_lang', 'en'))
     if not title or not description:
         return json_error('Title and description are required.')
 
@@ -1026,7 +1026,7 @@ def news_edit(id):
     if img and img != 'undefined':
         post.img = img
     if lang and lang != 'undefined':
-        post.lang = lang.strip()
+        post.lang = _normalise_lang(lang)
 
     db.session.commit()
     return json_success('News item updated successfully.')
@@ -1229,7 +1229,7 @@ def products_add():
     img = data.get('img')
     category = data.get('category')
     country = data.get('country')
-    lang = data.get('lang') or 'en'
+    lang = _normalise_lang(data.get('lang'))
 
     datasheet_id = ""
     if request.files:
@@ -1295,7 +1295,7 @@ def products_edit(id):
     if country and country != 'undefined':
         product.country = country
     if lang and lang != 'undefined':
-        product.lang = lang
+        product.lang = _normalise_lang(lang)
     if img and img != 'undefined':
         product.img = img
 
@@ -1501,7 +1501,7 @@ def TechnicalDatasheets_add():
     link = data.get('link')
     category = data.get('category')
     country = data.get('country')
-    lang = data.get('lang') or 'en'
+    lang = _normalise_lang(data.get('lang'))
     if not name or not link:
         return json_error('Name and link are required.')
 
@@ -1541,7 +1541,7 @@ def TechnicalDatasheets_edit(id):
     if country and country != 'undefined':
         datasheet.country = country
     if lang and lang != 'undefined':
-        datasheet.lang = lang
+        datasheet.lang = _normalise_lang(lang)
 
     db.session.commit()
     return json_success('Technical datasheet updated successfully.')
