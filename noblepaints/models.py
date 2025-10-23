@@ -67,6 +67,7 @@ class Certificate(db.Model):
     description = db.Column(db.String())
     link = db.Column(db.String())
     img = db.Column(db.String())
+    lang = db.Column(db.String())
 
 class Approval(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -74,6 +75,7 @@ class Approval(db.Model):
     description = db.Column(db.String())
     link = db.Column(db.String())
     img = db.Column(db.String())
+    lang = db.Column(db.String())
 
 class ProductSchema(SQLAlchemyAutoSchema):
     class Meta:

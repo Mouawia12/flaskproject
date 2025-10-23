@@ -114,6 +114,11 @@
                                       <textarea class="form-control" id="editdescription" cols="30" rows="10">{{x.description|safe}}</textarea>
                                       <label class="my-1 me-2" for="name">الرابط</label>
                                       <input id="editlink" class="form-control" value="{{x.link}}" type="text">
+                                      <label class="my-1 me-2" for="editlang">اللغة</label>
+                                      <select id="editlang" class="form-control">
+                                              <option value="en" {% if x.lang == 'en' %}selected{% endif %}>English</option>
+                                              <option value="ar" {% if x.lang == 'ar' %}selected{% endif %}>العربية</option>
+                                      </select>
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn btn-secondary editBtn">حفظ</button>
@@ -177,6 +182,11 @@
               <textarea class="form-control" id="newAdddescription" cols="30" rows="10"></textarea>
               <label class="my-1 me-2" for="type">الرابط</label>
               <input id="newAddlink" class="form-control" type="text">
+              <label class="my-1 me-2" for="newAddlang">اللغة</label>
+              <select id="newAddlang" class="form-control">
+                      <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                      <option value="ar" {% if lang == 'ar' %}selected{% endif %}>العربية</option>
+              </select>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" id="saveBtn">حفظ</button>
@@ -236,10 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveButton) {
       saveButton.addEventListener('click', async (event) => {
         event.preventDefault();
+        const langSelect = createModal.querySelector('#newAddlang');
         const payload = {
           title: createModal.querySelector('#newAddtitle').value.trim(),
           description: createModal.querySelector('#newAdddescription').value.trim(),
           link: createModal.querySelector('#newAddlink').value.trim(),
+          lang: (langSelect && langSelect.value) || resolveAdminLang(),
         };
         const imageValue = createModal.querySelector('#newAddimg').getAttribute('image');
         if (imageValue) {
@@ -300,163 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!modal) {
         return;
       }
+      const langSelect = modal.querySelector('#editlang');
       const payload = {
         title: modal.querySelector('#edittitle').value.trim(),
         description: modal.querySelector('#editdescription').value.trim(),
         link: modal.querySelector('#editlink').value.trim(),
-      };
-      const imageValue = modal.querySelector('#editimg').getAttribute('image');
-      if (imageValue) {
-        payload.img = imageValue;
-      }
-      if (!payload.title || !payload.description) {
-        await notifyWarning({
-          text: 'يرجى إدخال العنوان والوصف قبل الحفظ.',
-        });
-        return;
-      }
-      const id = modal.getAttribute('idNum');
-      if (!id) {
-        await notifyError('تعذر تحديد الشهادة المطلوب تحديثها.');
-        return;
-      }
-      try {
-        await request(`/ControlPanel/certificates/edit/${id}/`, {
-          method: 'POST',
-          body: payload,
-        });
-        await notifySuccess({
-          title: 'تم التحديث',
-          text: 'تم تحديث الشهادة بنجاح.',
-        });
-        window.location.reload();
-      } catch (error) {
-        await notifyError(error.message);
-      }
-    });
-  });
-
-  const changeLangCont = document.getElementById('changeLangCont');
-  if (changeLangCont) {
-    changeLangCont.classList.add('hidden');
-  }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const api = window.AdminApi;
-  if (!api) {
-    console.error('AdminApi is not available.');
-    return;
-  }
-
-  const { request, notifySuccess, notifyWarning, notifyError, confirmDelete, resolveAdminLang } = api;
-
-  const entriesMenu = document.querySelector('#entriesNumber');
-  if (entriesMenu) {
-    entriesMenu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        event.preventDefault();
-        const params = new URLSearchParams(window.location.search);
-        const page = params.get('page') || '1';
-        const show = link.textContent.trim();
-        const lang = resolveAdminLang();
-        window.location.replace(`/ControlPanel/certificates/?page=${page}&show=${show}&lang=${lang}`);
-      });
-    });
-  }
-
-  const bindImageInput = (input) => {
-    input.addEventListener('input', () => {
-      const file = input.files && input.files[0];
-      if (!file || !file.type.match(/image.*/)) {
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        input.setAttribute('image', event.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  document.querySelectorAll('.imgInput').forEach(bindImageInput);
-
-  const createModal = document.getElementById('newProjectForm');
-  if (createModal) {
-    const saveButton = createModal.querySelector('#saveBtn');
-    if (saveButton) {
-      saveButton.addEventListener('click', async (event) => {
-        event.preventDefault();
-        const payload = {
-          title: createModal.querySelector('#newAddtitle').value.trim(),
-          description: createModal.querySelector('#newAdddescription').value.trim(),
-          link: createModal.querySelector('#newAddlink').value.trim(),
-        };
-        const imageValue = createModal.querySelector('#newAddimg').getAttribute('image');
-        if (imageValue) {
-          payload.img = imageValue;
-        }
-        if (!payload.title || !payload.description) {
-          await notifyWarning({
-            text: 'يرجى إدخال العنوان والوصف قبل الحفظ.',
-          });
-          return;
-        }
-        try {
-          await request('/ControlPanel/certificates/add/', {
-            method: 'POST',
-            body: payload,
-          });
-          await notifySuccess({
-            title: 'تم الحفظ',
-            text: 'تم إنشاء الشهادة بنجاح.',
-          });
-          window.location.reload();
-        } catch (error) {
-          await notifyError(error.message);
-        }
-      });
-    }
-  }
-
-  document.querySelectorAll('.delete').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const confirmed = await confirmDelete();
-      if (!confirmed) {
-        return;
-      }
-      const row = button.closest('tr');
-      const id = row ? row.getAttribute('id-num') : null;
-      if (!id) {
-        await notifyError('تعذر تحديد الشهادة المطلوب حذفها.');
-        return;
-      }
-      try {
-        await request(`/ControlPanel/certificates/del/${id}/`, { method: 'DELETE' });
-        await notifySuccess({
-          title: 'تم الحذف',
-          text: 'تم حذف الشهادة بنجاح.',
-        });
-        window.location.reload();
-      } catch (error) {
-        await notifyError(error.message);
-      }
-    });
-  });
-
-  document.querySelectorAll('.editBtn').forEach((button) => {
-    button.addEventListener('click', async (event) => {
-      event.preventDefault();
-      const modal = button.closest('.modal');
-      if (!modal) {
-        return;
-      }
-      const payload = {
-        title: modal.querySelector('#edittitle').value.trim(),
-        description: modal.querySelector('#editdescription').value.trim(),
-        link: modal.querySelector('#editlink').value.trim(),
+        lang: (langSelect && langSelect.value) || resolveAdminLang(),
       };
       const imageValue = modal.querySelector('#editimg').getAttribute('image');
       if (imageValue) {
