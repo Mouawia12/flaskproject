@@ -727,16 +727,14 @@ def catalogs_page_filter_none():
             search_value = f"%{search.lower()}%"
             query = query.filter(func.lower(Catalog.name).like(search_value))
         total_items = query.count()
-        ordering_rules = [(lang_column == lang, 0)]
+        ordering_rules = [(lang_column == '', 0), (lang_column == lang, 1)]
         # Ensure the remaining languages appear afterwards in a stable order.
-        priority = 1
+        priority = 2
         for code in AVAILABLE_LANGUAGES.keys():
             if code == lang:
                 continue
             ordering_rules.append((lang_column == code, priority))
             priority += 1
-        ordering_rules.append((lang_column == '', priority))
-        priority += 1
         sort_priority = case(ordering_rules, else_=priority)
         query = query.order_by(sort_priority, desc(Catalog.id))
         total_pages = max(1, math.ceil(total_items / items_per_page)) if total_items else 1
@@ -792,9 +790,11 @@ def catalogs_page_filter_none():
             .distinct()
         )
         catalog_countries = sorted([row[0] for row in countries_query if row[0]])
-        window_start = max(1, page - 2)
-        window_end = min(total_pages, page + 2)
-        page_numbers = list(range(window_start, window_end + 1))
+        # Expose the full list of pages so the template can always render
+        # visible pagination controls. The dataset is typically small enough
+        # that rendering the complete sequence avoids edge cases where
+        # condensed windows would hide the component altogether.
+        page_numbers = list(range(1, total_pages + 1))
         return render_template(
             'catalogs.html',
             items=items,
@@ -809,7 +809,11 @@ def catalogs_page_filter_none():
             items_per_page=items_per_page,
             catalog_categories=catalog_categories,
             catalog_countries=catalog_countries,
-            lang=lang
+            lang=lang,
+            has_prev=page > 1,
+            has_next=page < total_pages,
+            prev_page=(page - 1) if page > 1 else None,
+            next_page=(page + 1) if page < total_pages else None,
         )
     except Exception as e:
         print(f"Error in catalogs route: {e}")
@@ -1334,17 +1338,17 @@ def cpanel_catalogs():
         )
     )
 
-    ordering_rules = [(Catalog.lang == lang, 0)]
-    priority = 1
+    ordering_rules = [
+        (Catalog.lang.is_(None), 0),
+        (Catalog.lang == '', 1),
+        (Catalog.lang == lang, 2),
+    ]
+    priority = 3
     for code in AVAILABLE_LANGUAGES.keys():
         if code == lang:
             continue
         ordering_rules.append((Catalog.lang == code, priority))
         priority += 1
-    ordering_rules.append((Catalog.lang.is_(None), priority))
-    priority += 1
-    ordering_rules.append((Catalog.lang == '', priority))
-    priority += 1
     sort_priority = case(*ordering_rules, else_=priority)
 
     catalogs = base_query.order_by(sort_priority, Catalog.id.desc()).all()
@@ -1379,7 +1383,6 @@ def catalogs_add():
     name = (data.get('name') or '').strip()
     img = data.get('img')
     category = (data.get('category') or '').strip() or None
-    lang = (data.get('lang') or getattr(g, 'current_lang', 'en')).strip() or 'en'
     country = (data.get('country') or '').strip() or None
     if not name:
         return json_error('Catalog name is required.')
@@ -1389,7 +1392,8 @@ def catalogs_add():
         return json_error('Catalog file upload is required.')
 
     try:
-        upload = Upload(filename=file_obj.filename, data=file_obj.read())
+        original_filename = pathlib.Path(file_obj.filename).name
+        upload = Upload(filename=original_filename, data=file_obj.read())
         db.session.add(upload)
         db.session.flush()
 
@@ -1399,7 +1403,7 @@ def catalogs_add():
             link=upload.id,
             category=category,
             country=country,
-            lang=_normalise_lang(lang),
+            lang=None,
         )
         db.session.add(catalog)
         db.session.commit()
@@ -1426,18 +1430,18 @@ def catalogs_edit(id):
     name = data.get('name')
     img = data.get('img')
     category = data.get('category')
-    lang = data.get('lang')
     country = data.get('country')
 
     if request.files:
         link = request.files.get('file')
         if link and link.filename and link != 'undefined':
             upload = db.session.query(Upload).filter(Upload.id == catalog.link).first()
+            new_filename = pathlib.Path(link.filename).name
             if upload:
-                upload.filename = link.filename
+                upload.filename = new_filename
                 upload.data = link.read()
             else:
-                upload = Upload(filename=link.filename, data=link.read())
+                upload = Upload(filename=new_filename, data=link.read())
                 db.session.add(upload)
                 db.session.commit()
                 catalog.link = upload.id
@@ -1448,8 +1452,7 @@ def catalogs_edit(id):
         catalog.category = category
     if country and country != 'undefined':
         catalog.country = country
-    if lang and lang != 'undefined':
-        catalog.lang = _normalise_lang(lang)
+    catalog.lang = None
     if img and img != 'undefined':
         catalog.img = img
 
