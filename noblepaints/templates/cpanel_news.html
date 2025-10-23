@@ -115,6 +115,11 @@
                                       <input id="editdate" class="form-control" type="date" value="{{x.date}}">
                                       <label class="my-1 me-2" for="type">الوصف</label>
                                       <textarea class="form-control" id="editdescription" cols="30" rows="10">{{x.description|safe}}</textarea>
+                                      <label class="my-1 me-2" for="editlang">اللغة</label>
+                                      <select id="editlang" class="form-control">
+                                              <option value="en" {% if x.lang == 'en' %}selected{% endif %}>English</option>
+                                              <option value="ar" {% if x.lang == 'ar' %}selected{% endif %}>العربية</option>
+                                      </select>
                                   </div>
                                   <div class="modal-footer">
                                       <button type="button" class="btn btn-secondary editBtn">حفظ</button>
@@ -178,6 +183,11 @@
               <input id="newAdddate" class="form-control" type="date">
               <label class="my-1 me-2" for="type">الوصف</label>
               <textarea class="form-control" id="newAdddescription" cols="30" rows="10"></textarea>
+              <label class="my-1 me-2" for="newAddlang">اللغة</label>
+              <select id="newAddlang" class="form-control">
+                      <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                      <option value="ar" {% if lang == 'ar' %}selected{% endif %}>العربية</option>
+              </select>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-secondary" id="saveBtn">حفظ</button>
@@ -236,11 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveButton) {
       saveButton.addEventListener('click', async (event) => {
         event.preventDefault();
+        const langSelect = createModal.querySelector('#newAddlang');
         const payload = {
           title: createModal.querySelector('#newAddtitle').value.trim(),
           description: createModal.querySelector('#newAdddescription').value.replaceAll('\n', '<br>').trim(),
           date: createModal.querySelector('#newAdddate').value,
-          lang: resolveAdminLang(),
+          lang: (langSelect && langSelect.value) || resolveAdminLang(),
         };
         const imageValue = createModal.querySelector('#newAddimg').getAttribute('image');
         if (imageValue) {
@@ -301,11 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!modal) {
         return;
       }
+      const langSelect = modal.querySelector('#editlang');
       const payload = {
         title: modal.querySelector('#edittitle').value.trim(),
         description: modal.querySelector('#editdescription').value.replaceAll('\n', '<br>').trim(),
         date: modal.querySelector('#editdate').value,
-        lang: resolveAdminLang(),
+        lang: (langSelect && langSelect.value) || resolveAdminLang(),
       };
       const imageValue = modal.querySelector('#editimg').getAttribute('image');
       if (imageValue) {

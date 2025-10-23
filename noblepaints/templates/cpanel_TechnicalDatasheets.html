@@ -107,6 +107,11 @@
                                               {% endif %}
                                           {% endfor %}
                                         </select>
+                                        <label class="my-1 me-2" for="editlang">اللغة</label>
+                                        <select id="editlang" class="form-control">
+                                                <option value="en" {% if x.lang == 'en' %}selected{% endif %}>English</option>
+                                                <option value="ar" {% if x.lang == 'ar' %}selected{% endif %}>العربية</option>
+                                        </select>
                                         <label class="my-1 me-2" for="type">البلد</label>
                                         <select value="{{x.country}}" id="editcountry" class="form-control">
                                                 <option></option>
@@ -297,6 +302,11 @@
                   <option lang="en" class="" value="{{x.id}}">{{x.name}}</option>
                     {% endfor %}
               </select>
+              <label class="my-1 me-2" for="newAddlang">اللغة</label>
+              <select id="newAddlang" class="form-control">
+                      <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                      <option value="ar" {% if lang == 'ar' %}selected{% endif %}>العربية</option>
+              </select>
               <label class="my-1 me-2" for="type">البلد</label>
               <select id="newAddcountry" class="form-control">
                       <option></option>
@@ -366,12 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveButton) {
       saveButton.addEventListener('click', async (event) => {
         event.preventDefault();
+        const langSelect = createModal.querySelector('#newAddlang');
         const payload = {
           name: createModal.querySelector('#newAddname').value.trim(),
           link: createModal.querySelector('#newAddlink').value.trim(),
           category: createModal.querySelector('#newAddcategory').value,
           country: createModal.querySelector('#newAddcountry').value,
-          lang: resolveAdminLang(),
+          lang: (langSelect && langSelect.value) || resolveAdminLang(),
         };
         if (!payload.name || !payload.link) {
           await notifyWarning({
@@ -428,12 +439,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!modal) {
         return;
       }
+      const langSelect = modal.querySelector('#editlang');
       const payload = {
         name: modal.querySelector('#editname').value.trim(),
         link: modal.querySelector('#editlink').value.trim(),
         category: modal.querySelector('#editcategory').value,
         country: modal.querySelector('#editcountry').value,
-        lang: resolveAdminLang(),
+        lang: (langSelect && langSelect.value) || resolveAdminLang(),
       };
       if (!payload.name || !payload.link) {
         await notifyWarning({
