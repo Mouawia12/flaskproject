@@ -306,7 +306,7 @@ def _language_sort_case(lang_column, active_lang):
     """
 
     normalised = _normalise_lang(active_lang)
-    lang_expr = func.lower(func.trim(func.coalesce(lang_column, '')))
+    lang_expr = func.lower(func.coalesce(lang_column, ''))
 
     ordering_rules = [
         (lang_expr == '', 0),
@@ -334,7 +334,7 @@ def _visible_lang_filter(lang_column, active_lang):
     """
 
     normalised = _normalise_lang(active_lang)
-    lang_expr = func.lower(func.trim(func.coalesce(lang_column, '')))
+    lang_expr = func.lower(func.coalesce(lang_column, ''))
     visible_codes = {''}
     visible_codes.update(_normalise_lang(code) for code in AVAILABLE_LANGUAGES.keys())
     visible_codes.add(normalised)
