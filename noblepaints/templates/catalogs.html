@@ -122,21 +122,53 @@
         justify-content: center;
     }
     .catalog-pagination .pagination {
-        gap: 0.4rem;
+        list-style: none;
+        display: inline-flex;
+        gap: 0.5rem;
+        padding: 0;
+        margin: 0;
+    }
+    .catalog-pagination .page-item {
+        display: flex;
     }
     .catalog-pagination .page-link {
-        border-radius: 10px;
-        min-width: 40px;
-        text-align: center;
-        border: 1px solid #e2e8f0;
-        color: #1a202c;
+        border-radius: 999px;
+        min-width: 44px;
+        height: 44px;
+        padding: 0 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: #f1f5f9;
+        color: #1f2937;
         font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
-    .catalog-pagination .page-link.active,
-    .catalog-pagination .page-link:hover {
-        background: #be1e2d;
-        color: #fff;
-        border-color: #be1e2d;
+    .catalog-pagination .page-link:hover,
+    .catalog-pagination .page-link:focus {
+        background: #e2e8f0;
+        color: #0f172a;
+        transform: translateY(-1px);
+    }
+    .catalog-pagination .page-link.active {
+        background: #2563eb;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        cursor: default;
+        transform: none;
+    }
+    .catalog-pagination .page-item.disabled .page-link {
+        background: #e2e8f0;
+        color: #94a3b8;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+    html[dir="rtl"] .catalog-pagination .pagination {
+        flex-direction: row-reverse;
     }
     .catalog-meta {
         margin-bottom: 1rem;
@@ -254,7 +286,7 @@
         <div class="catalog-pagination">
             <ul class="pagination">
                 <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page > 1 %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page - 1) }}{% else %}#{% endif %}" aria-label="Previous">&laquo;</a>
+                    <a class="page-link" href="{% if page > 1 %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page - 1) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.previous') }}" data-i18n-key="catalogs.pagination.previous">{{ t('catalogs.pagination.previous') }}</a>
                 </li>
                 {% for number in page_numbers %}
                 <li class="page-item">
@@ -262,7 +294,7 @@
                 </li>
                 {% endfor %}
                 <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{% if page < total_pages %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page + 1) }}{% else %}#{% endif %}" aria-label="Next">&raquo;</a>
+                    <a class="page-link" href="{% if page < total_pages %}{{ url_for_lang('catalogs_page_filter_none', category=category, country=country, search=search, page=page + 1) }}{% else %}#{% endif %}" aria-label="{{ t('catalogs.pagination.next') }}" data-i18n-key="catalogs.pagination.next">{{ t('catalogs.pagination.next') }}</a>
                 </li>
             </ul>
         </div>
